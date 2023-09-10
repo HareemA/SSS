@@ -204,8 +204,6 @@ header {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url(/images/bg2.jpeg) no-repeat;
-    background-size: cover;
     background-position: center;
     display: flex;
     justify-content: center;
@@ -213,7 +211,7 @@ header {
 }
 
 
-iframe {
+video {
     border: 5px solid cyan; 
     width: 50%;
     height: 50%;
@@ -248,7 +246,7 @@ iframe {
 }
 
 .Camera1{
-    background: url(/images/bg.avif);
+    background: url(/images/wallpaper5.jpg);
     background-size: cover;
 }
 

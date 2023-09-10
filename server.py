@@ -93,7 +93,7 @@ def get_latest_processed_frame():
 
         results=model.predict(frame,classes=[0])
     #   print(results)
-        a=results[0].boxes.boxes
+        a=results[0].boxes.data
         px=pd.DataFrame(a).astype("float")
     #    print(px)
         list=[]

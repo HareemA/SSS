@@ -2,7 +2,7 @@ import cv2
 import requests
 import numpy as np
 
-server_url = 'http://192.168.100.10:8080/get_latest_processed_frame'  # Replace with the correct server URL
+server_url = 'http://192.168.18.132:8080/get_latest_processed_frame'  # Replace with the correct server URL
 
 while True:
     try:
