@@ -4,8 +4,7 @@ import numpy as np
 from ultralytics import YOLO
 from tracker import *
 from flask import Flask, jsonify, render_template, request, Response
-from flask_socketio import SocketIO
-import threading  # Import the threading module
+import threading 
 
 app = Flask(__name__)
 
@@ -148,6 +147,6 @@ def get_latest_processed_frame():
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.100.10',port=8080)
+    app.run(host='192.168.18.132',port=8080)
 
     
