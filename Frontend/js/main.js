@@ -9,38 +9,64 @@ function scrollToSection(sectionId) {
     }
 }
 
-function loadCamera1Video() {
-    // Get the iframe element by its ID
-    var iframe = document.getElementById("frame");
-
-    // Set the source URL of the iframe to the server endpoint that provides the video
-    // Replace 'server_video_endpoint' with the actual URL of your video endpoint
-    iframe.src = 'http://192.168.18.132:8080/get_latest_processed_frame';
-}
-
-
-// Function to update the video and count
-// function updateVideoAndCount() {
-//     // Make an AJAX request to get the latest frame and count from the server
-//     fetch('http://192.168.18.132:8080/get_latest_processed_frame')
-//         .then(response => response.json())
-//         .then(data => {
-//             // Update the iframe source with the received frame
-//             const iframe = document.getElementById('frame');
-//             iframe.src = `data:image/jpeg;base64, ${data.frame}`;
-
-//             // Update the count on the web page
-//             const countSpan = document.getElementById('countValue');
-//             countSpan.textContent = data.count;
+function getvideo() {
+    const iframe = document.getElementById("frame");
+    const countSpan = document.getElementById('countValue');
             
-//             // Call the function again after a delay (e.g., 1000ms for 1 second)
-//             setTimeout(updateVideoAndCount, 1000);
-//         })
-//         .catch(error => {
-//             console.error('Error fetching data:', error);
-//         });
-// }
-
+    async function fetchAndUpdate() {
+        try {
+            
+            const response = await fetch('http://192.168.100.10:8080/get_latest_processed_frame'); // Update the URL if needed
+    
+            if (response.status === 200) {
+                const data = await response.json();
+                
+                // Decode and set the frame source
+                const imageData = data.frame; // Assuming data.frame contains the Latin1 encoded image data
+    
+                // Create an ArrayBuffer from the Latin1 encoded string
+                const buffer = new ArrayBuffer(imageData.length);
+                const view = new Uint8Array(buffer);
+                for (let i = 0; i < imageData.length; i++) {
+                    view[i] = imageData.charCodeAt(i) & 0xff;
+                }
+                
+    
+                // Create a Blob from the ArrayBuffer and set it as the source of the image
+                const blob = new Blob([buffer], { type: 'image/jpeg' }); // Adjust the type as needed
+                const imageUrl = URL.createObjectURL(blob);
+                
+                // Create an <img> element
+                const img = new Image();
+    
+                // Set dimensions for the image (adjust these values as needed)
+                img.width = 560; // Set the desired width
+                img.height = 315; // Set the desired height
+    
+                // Set the image source to the Object URL
+                img.src = imageUrl;
+    
+                // Replace the iframe's content with the image
+                iframe.contentDocument.body.innerHTML = ''; // Clear previous content
+                iframe.contentDocument.body.appendChild(img);
+    
+                // Update the count on the web page
+                countSpan.textContent = data.count;
+                console.log(data.count);
+            } else {
+                console.error('Error fetching data. Status:', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle errors if necessary
+            return;
+        }
+        
+        // Call the function again after a delay to continuously send requests
+        setTimeout(fetchAndUpdate, 0); // Adjust the delay as needed (e.g., 1000 ms = 1 second)
+    }
+    fetchAndUpdate()
+}
 
 
 // Initialize the Typed.js instance
@@ -57,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const camera1Link = document.getElementById("camera1Link");
     const camera2Link = document.getElementById("camera2Link");
     const camera3Link = document.getElementById("camera3Link");
-    const camera1button = document.getElementById("Cam1")
+    const camera1button = document.getElementById("Cam1");
 
     if (homeLink) {
         homeLink.addEventListener("click", function (e) {
@@ -71,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
             console.log("Clicked on camera1Link");
             scrollToSection("Camera1");
-            updateVideoAndCount();
+            getvideo(); // Start fetching and updating
             console.log("update");
         });
     }
@@ -81,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
             console.log("Clicked on camera1Button");
             scrollToSection("Camera1");
-            loadCamera1Video();    
+            getvideo(); // Start fetching and updating
         });
     }
 
