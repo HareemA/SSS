@@ -6,6 +6,9 @@ from tracker import *
 from flask import Flask, jsonify, render_template, request, Response
 import threading 
 from flask_cors import CORS  # Import the CORS extension
+import base64
+from datetime import datetime
+from group_test_server import *
 
 app = Flask(__name__)
 CORS(app) 
@@ -24,6 +27,7 @@ tracker=Tracker()
 
 latest_frame = None  # Initialize a variable to store the latest frame
 detected_persons_count = 0
+groupCount = 0
 
 @app.route('/update_frame', methods=['POST'])
 def update_frame():
@@ -41,36 +45,6 @@ def update_frame():
         # Decode the frame
         frame = cv2.imdecode(frame_array, cv2.IMREAD_COLOR)
 
-    #     conf_thresh = 0.5
-
-    #     results=model.predict(frame,classes=[0])
-    # #   print(results)
-    #     a=results[0].boxes.boxes
-    #     px=pd.DataFrame(a).astype("float")
-    # #    print(px)
-    #     list=[]
-    #     for index,row in px.iterrows():
-    # #        print(row)
-    
-    #         x1=int(row[0])
-    #         y1=int(row[1])
-    #         x2=int(row[2])
-    #         y2=int(row[3])
-    #         d=int(row[5])
-    #         #c=class_list[d]
-        
-    #         list.append([x1,y1,x2,y2])
-                
-    #     bbox_idx=tracker.update(list)
-    #     detected_persons_count = len(bbox_idx)
-        
-    #     for bbox in bbox_idx:
-    #         x3,y3,x4,y4,id=bbox
-    #         cx=int(x3+x4)//2
-    #         cy=int(y3+y4)//2
-    #         cv2.rectangle(frame,(x3,y3),(x4,y4),(0,255,0),2)
-    #         cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
-
         if frame is None:
             return Response('Error: Unable to decode frame', status=400)
 
@@ -82,45 +56,18 @@ def update_frame():
         return Response(f'Error: {str(e)}', status=500)
 
 
+
 @app.route('/get_latest_processed_frame', methods=['GET'])
 def get_latest_processed_frame():
     global latest_frame
     global detected_persons_count
+    global groupCount
     try:
-        if latest_frame is None:
+        if latest_frame is None :
             return Response('No processed frame available', status=404)
         
-        frame = latest_frame
 
-        conf_thresh = 0.5
-
-        results=model.predict(frame,classes=[0])
-    #   print(results)
-        a=results[0].boxes.data
-        px=pd.DataFrame(a).astype("float")
-    #    print(px)
-        list=[]
-        for index,row in px.iterrows():
-    #        print(row)
-    
-            x1=int(row[0])
-            y1=int(row[1])
-            x2=int(row[2])
-            y2=int(row[3])
-            d=int(row[5])
-            #c=class_list[d]
-        
-            list.append([x1,y1,x2,y2])
-                
-        bbox_idx=tracker.update(list)
-        detected_persons_count = len(bbox_idx)
-        
-        for bbox in bbox_idx:
-            x3,y3,x4,y4,id=bbox
-            cx=int(x3+x4)//2
-            cy=int(y3+y4)//2
-            cv2.rectangle(frame,(x3,y3),(x4,y4),(0,255,0),2)
-            cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
+        frame , detected_persons_count , groupCount  = main(latest_frame)
 
         # Convert the processed frame to JPEG format
         #_, encoded_frame = cv2.imencode('.jpg', latest_frame)
@@ -130,16 +77,17 @@ def get_latest_processed_frame():
             print("Error here")
             return Response('Error: Unable to encode frame', status=500)
 
-        frame_bytes = encoded_frame.tobytes()
+        frame_bytes = base64.b64encode(encoded_frame)
+        timestamp = datetime.now().strftime('%H:%M:%S')
         
         #be sure to decode frame on clients side
         response_data = {
             'count': detected_persons_count,
-            'frame': frame_bytes.decode('latin1')  # Convert bytes to a string
+            'frame': frame_bytes.decode('utf-8'),  # Convert bytes to a string
+            'Group count': groupCount,
+            'time' : timestamp
         }
         return jsonify(response_data)
-
-        #return Response(response=frame_bytes, status=200, mimetype='image/jpeg')
 
        
     except Exception as e:
@@ -148,8 +96,7 @@ def get_latest_processed_frame():
 
 
 
-
 if __name__ == '__main__':
-    app.run(host='192.168.203.125',port=8080)
+    app.run(host='192.168.100.10',port=8080)
 
     
