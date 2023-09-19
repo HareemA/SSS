@@ -5,7 +5,7 @@ from ultralytics import YOLO
 from tracker import *
 from flask import Flask, jsonify, render_template, request, Response
 import threading 
-from flask_cors import CORS  # Import the CORS extension
+from flask_cors import CORS 
 import base64
 from datetime import datetime
 from group_test_server import *
@@ -97,6 +97,6 @@ def get_latest_processed_frame():
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.100.10',port=8080)
+    app.run(host='192.168.18.132',port=8080)
 
     
