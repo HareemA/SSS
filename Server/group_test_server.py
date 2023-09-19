@@ -75,7 +75,9 @@ def main(frame):
     conf_thresh = 0.1
 
     results = model.predict(frame, classes=[0])
+    #contains info about all the detected people
     a = results[0].boxes.data
+    #converts them in a pandas dataset
     px = pd.DataFrame(a).astype("float")
 
     original_coordinates = []  
@@ -97,8 +99,8 @@ def main(frame):
     
     for bbox in bbox_idx:
         x3,y3,x4,y4,id=bbox
-        cx=int(x3+x4)//2
-        cy=int(y3+y4)//2
+        #cx=int(x3+x4)//2
+        #cy=int(y3+y4)//2
         original_coordinates.append([x3, y3, x4, y4])
         cv2.rectangle(frame,(x3,y3),(x4,y4),(0,255,0),2)
         cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
