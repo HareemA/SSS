@@ -5,7 +5,7 @@ import numpy as np
 video_path = './vidp.mp4'
 cap = cv2.VideoCapture(video_path)
 
-server_url = 'http://192.168.100.10:8080/update_frame'  # Use the correct URL for the update_frame route
+server_url = 'http://192.168.18.132:8080/update_frame'  # Use the correct URL for the update_frame route
 
 while True:
     ret, frame = cap.read()
