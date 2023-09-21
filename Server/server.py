@@ -2,7 +2,6 @@ import cv2
 import pandas as pd
 import numpy as np
 from ultralytics import YOLO
-print("Working")
 from tracker import *
 from flask import Flask, jsonify, render_template, request, Response
 import threading 
@@ -47,6 +46,7 @@ def update_frame():
         return Response(f'Error: {str(e)}', status=500)
 
 
+processing_lock = asyncio.Lock()
 
 @app.route('/get_latest_processed_frame/<int:group_threshold>', methods=['GET'])
 def get_latest_processed_frame(group_threshold):
@@ -56,6 +56,7 @@ def get_latest_processed_frame(group_threshold):
     try:
         if latest_frame is None :
             return Response('No processed frame available', status=404)
+        
         
         frame , detected_persons_count , groupCount  = main(latest_frame,group_threshold)
 
