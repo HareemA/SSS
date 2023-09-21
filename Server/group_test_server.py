@@ -68,9 +68,9 @@ def group_coordinates(coordinates, group_threshold):
     return coordinate_groups
 
  
-def main(frame):
+def main(frame,threshold):
 
-    group_threshold = 35 
+    group_threshold = threshold
 
     frame = cv2.resize(frame, (1020, 500))
     

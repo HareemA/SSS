@@ -48,8 +48,8 @@ def update_frame():
 
 
 
-@app.route('/get_latest_processed_frame', methods=['GET'])
-def get_latest_processed_frame():
+@app.route('/get_latest_processed_frame/<int:group_threshold>', methods=['GET'])
+def get_latest_processed_frame(group_threshold):
     global latest_frame
     global detected_persons_count
     global groupCount
@@ -57,8 +57,7 @@ def get_latest_processed_frame():
         if latest_frame is None :
             return Response('No processed frame available', status=404)
         
-
-        frame , detected_persons_count , groupCount  = main(latest_frame)
+        frame , detected_persons_count , groupCount  = main(latest_frame,group_threshold)
 
         # Convert the processed frame to JPEG format
         #_, encoded_frame = cv2.imencode('.jpg', latest_frame)
