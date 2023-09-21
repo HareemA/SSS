@@ -1,8 +1,8 @@
-import cv2
-from deepface import DeepFace
+# import cv2
+# from deepface import DeepFace
 
-img = cv2.imread("faces/3.jpg")
+# img = cv2.imread("faces/3.jpg")
 
-result = DeepFace.analyze(img,actions=("gender","age","emotion","race"))
+# result = DeepFace.analyze(img,actions=("gender","age","emotion","race"))
 
-print("Result: ",result)
+# print("Result: ",result)

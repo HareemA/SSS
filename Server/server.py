@@ -9,20 +9,10 @@ from flask_cors import CORS
 import base64
 from datetime import datetime
 from group_test_server import *
+import torch
 
 app = Flask(__name__)
 CORS(app) 
-
-
-model=YOLO('yolov8s.pt')
-
-
-my_file = open("coco.txt", "r")
-data = my_file.read()
-class_list = data.split("\n")
-#print(class_list)
-count=0
-tracker=Tracker()   
 
 
 latest_frame = None  # Initialize a variable to store the latest frame
@@ -97,6 +87,6 @@ def get_latest_processed_frame():
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.18.132',port=8080)
+    app.run(host='192.168.100.10',port=8080)
 
     

@@ -5,7 +5,9 @@ from ultralytics import YOLO
 from tracker import *
 import math
 
+
 model = YOLO('yolov8s.pt')
+
 
 # def RGB(event, x, y, flags, param):
 #     if event == cv2.EVENT_MOUSEMOVE:
@@ -37,7 +39,7 @@ def calculate_distance(coord1, coord2):
     return math.sqrt((cx1 - cx2) ** 2 + (cy1 - cy2) ** 2)
 
 def group_coordinates(coordinates, group_threshold):
-    # Create an empty dictionary to store the groups
+    #dictionary to store the groups
     coordinate_groups = {}
 
     # Iterate through each set of coordinates
