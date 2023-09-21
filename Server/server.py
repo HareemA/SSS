@@ -46,7 +46,6 @@ def update_frame():
         return Response(f'Error: {str(e)}', status=500)
 
 
-processing_lock = asyncio.Lock()
 
 @app.route('/get_latest_processed_frame/<int:group_threshold>', methods=['GET'])
 def get_latest_processed_frame(group_threshold):
