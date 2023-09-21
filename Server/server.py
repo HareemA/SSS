@@ -74,7 +74,7 @@ def get_latest_processed_frame():
         response_data = {
             'count': detected_persons_count,
             'frame': frame_bytes.decode('utf-8'),  # Convert bytes to a string
-            'Group count': groupCount,
+            'groupCount': groupCount,
             'time' : timestamp
         }
         return jsonify(response_data)
@@ -87,6 +87,11 @@ def get_latest_processed_frame():
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     app.run(host='192.168.100.10',port=8080)
+=======
+
+    app.run(host='192.168.43.71',port=8080)
+>>>>>>> 0bde53688fb45bcc9b24d715d97f2c559c65b01c
 
     
