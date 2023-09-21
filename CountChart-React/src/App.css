@@ -36,3 +36,19 @@
     transform: rotate(360deg);
   }
 }
+
+.container {
+  display: flex;
+  justify-content: space-between; /* To separate components */
+  align-items: flex-start; /* To align components to the top */
+}
+
+.frame-display{
+  width:50%;
+  padding: 10px;
+}
+
+.frame-display img{
+  max-width: 100%;
+  height: auto;
+}
