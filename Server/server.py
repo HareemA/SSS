@@ -2,6 +2,7 @@ import cv2
 import pandas as pd
 import numpy as np
 from ultralytics import YOLO
+print("Working")
 from tracker import *
 from flask import Flask, jsonify, render_template, request, Response
 import threading 
@@ -74,7 +75,7 @@ def get_latest_processed_frame():
         response_data = {
             'count': detected_persons_count,
             'frame': frame_bytes.decode('utf-8'),  # Convert bytes to a string
-            'Group count': groupCount,
+            'groupCount': groupCount,
             'time' : timestamp
         }
         return jsonify(response_data)
