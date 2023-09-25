@@ -120,7 +120,7 @@ def main(frame,threshold):
             min_y = min([y1 for (x1, y1, x2, y2) in group_coord])
             max_x = max([x2 for (x1, y1, x2, y2) in group_coord])
             max_y = max([y2 for (x1, y1, x2, y2) in group_coord])
-            cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 0), 2)
+            cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
 
     print("Group Count: ", grpCount)
 

@@ -9,6 +9,7 @@ from flask_cors import CORS
 import base64
 from datetime import datetime
 from group_test_server import *
+from deepface import DeepFace
 
 
 app = Flask(__name__)
@@ -18,6 +19,10 @@ CORS(app)
 latest_frame = None  # Initialize a variable to store the latest frame
 detected_persons_count = 0
 groupCount = 0
+latest_gender_frame = None
+female_count = 0
+male_count=0
+
 
 @app.route('/update_frame', methods=['POST'])
 def update_frame():
@@ -83,6 +88,21 @@ def get_latest_processed_frame(group_threshold):
     except Exception as e:
         print(e)
         return Response(f'Error: {str(e)}', status=500)
+
+@app.route('/get_gender_count', methods=['GET'])
+def get_gender_count():
+    global male_count
+    global female_count
+
+    response_data = {
+        'male_count': male_count,
+        'female_count': female_count
+    }
+    
+    return jsonify(response_data)
+
+
+    
 
 
 
