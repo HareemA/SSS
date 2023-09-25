@@ -9,25 +9,20 @@ from flask_cors import CORS
 import base64
 from datetime import datetime
 from group_test_server import *
+from deepface import DeepFace
+
 
 app = Flask(__name__)
 CORS(app) 
 
 
-model=YOLO('yolov8s.pt')
-
-
-my_file = open("coco.txt", "r")
-data = my_file.read()
-class_list = data.split("\n")
-#print(class_list)
-count=0
-tracker=Tracker()   
-
-
 latest_frame = None  # Initialize a variable to store the latest frame
 detected_persons_count = 0
 groupCount = 0
+latest_gender_frame = None
+female_count = 0
+male_count=0
+
 
 @app.route('/update_frame', methods=['POST'])
 def update_frame():
@@ -57,8 +52,8 @@ def update_frame():
 
 
 
-@app.route('/get_latest_processed_frame', methods=['GET'])
-def get_latest_processed_frame():
+@app.route('/get_latest_processed_frame/<int:group_threshold>', methods=['GET'])
+def get_latest_processed_frame(group_threshold):
     global latest_frame
     global detected_persons_count
     global groupCount
@@ -66,8 +61,8 @@ def get_latest_processed_frame():
         if latest_frame is None :
             return Response('No processed frame available', status=404)
         
-
-        frame , detected_persons_count , groupCount  = main(latest_frame)
+        
+        frame , detected_persons_count , groupCount  = main(latest_frame,group_threshold)
 
         # Convert the processed frame to JPEG format
         #_, encoded_frame = cv2.imencode('.jpg', latest_frame)
@@ -94,10 +89,24 @@ def get_latest_processed_frame():
         print(e)
         return Response(f'Error: {str(e)}', status=500)
 
+@app.route('/get_gender_count', methods=['GET'])
+def get_gender_count():
+    global male_count
+    global female_count
+
+    response_data = {
+        'male_count': male_count,
+        'female_count': female_count
+    }
+    
+    return jsonify(response_data)
+
+
+    
+
 
 
 if __name__ == '__main__':
-
-    app.run(host='192.168.43.71',port=8080)
+    app.run(host='192.168.100.10',port=8080)
 
     

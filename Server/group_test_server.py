@@ -5,7 +5,9 @@ from ultralytics import YOLO
 from tracker import *
 import math
 
+
 model = YOLO('yolov8s.pt')
+
 
 # def RGB(event, x, y, flags, param):
 #     if event == cv2.EVENT_MOUSEMOVE:
@@ -37,7 +39,7 @@ def calculate_distance(coord1, coord2):
     return math.sqrt((cx1 - cx2) ** 2 + (cy1 - cy2) ** 2)
 
 def group_coordinates(coordinates, group_threshold):
-    # Create an empty dictionary to store the groups
+    #dictionary to store the groups
     coordinate_groups = {}
 
     # Iterate through each set of coordinates
@@ -66,9 +68,9 @@ def group_coordinates(coordinates, group_threshold):
     return coordinate_groups
 
  
-def main(frame):
+def main(frame,threshold):
 
-    group_threshold = 35 
+    group_threshold = threshold
 
     frame = cv2.resize(frame, (1020, 500))
     
@@ -118,7 +120,7 @@ def main(frame):
             min_y = min([y1 for (x1, y1, x2, y2) in group_coord])
             max_x = max([x2 for (x1, y1, x2, y2) in group_coord])
             max_y = max([y2 for (x1, y1, x2, y2) in group_coord])
-            cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 0), 2)
+            cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
 
     print("Group Count: ", grpCount)
 

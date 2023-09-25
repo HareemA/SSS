@@ -1,0 +1,10 @@
+opencv-python
+pandas
+numpy
+ultralytics
+Flask
+Flask-Cors
+selenium
+pytube
+pafy
+deepface
