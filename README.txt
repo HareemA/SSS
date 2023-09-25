@@ -7,7 +7,8 @@ PUBLISHER:
 To run publisher thats in server folder, first change IP and then run the python script
 
 FRONTEND:
-To view front end, open the frontend-React folder, install Node.js and then in terminal run 
+To view front end, open the Admin React folder in VS code.
+install Node.js and then in terminal run 
 npm install 
 this will download all the dependencies, then to start the react app run
 npm start
