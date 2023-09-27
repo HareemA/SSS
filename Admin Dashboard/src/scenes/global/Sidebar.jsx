@@ -17,6 +17,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
+    <Box>
     <MenuItem
       active={selected === title}
       style={{
@@ -28,6 +29,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       <Typography>{title}</Typography>
       <Link to={to} />
     </MenuItem>
+    </Box>
   );
 };
 
@@ -36,6 +38,7 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  
 
   return (
     <Box
@@ -55,9 +58,13 @@ const Sidebar = () => {
         "& .pro-menu-item.active": {
           color: "#6870fa !important",
         },
+
       }}
     >
-      <ProSidebar collapsed={isCollapsed}>
+      
+      <ProSidebar collapsed={isCollapsed} 
+        style={{ height: "250vh" }}
+      >
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
           <MenuItem

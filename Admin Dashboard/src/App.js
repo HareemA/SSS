@@ -9,6 +9,8 @@ import Bar from "./scenes/bar";
 import Line from "./scenes/CountLine";
 import GLine from "./scenes/GCountLine";
 import Pie from "./scenes/pie";
+import CCTV from "./scenes/Video";
+
 
 
 function App() {
@@ -32,6 +34,7 @@ function App() {
                 <Route path="/line_count" element={<Line />} />
                 <Route path="/line_gCount" element={<GLine />} />
                 {/* <Route path="/video" element={<Line />} /> */}
+                <Route path="/video" element={<CCTV />} />
                 
             </Routes>
             </main>
