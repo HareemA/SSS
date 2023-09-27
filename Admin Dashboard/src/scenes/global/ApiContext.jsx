@@ -17,7 +17,7 @@ export function ApiProvider({ children }) {
   // Function to fetch data from the API
   const fetchDataFromApi = async () => {
     try {
-      const response = await fetch("http://192.168.18.132:8080/get_latest_processed_frame/2"); 
+      const response = await fetch("http://192.168.18.132:8080/get_latest_processed_frame/35"); 
 
       if (!response.ok) {
         throw new Error('Network response was not ok');

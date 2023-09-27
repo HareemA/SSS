@@ -11,6 +11,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import VideocamIcon from '@mui/icons-material/Videocam';
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 // Menu Item Component
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -63,7 +64,7 @@ const Sidebar = () => {
     >
       
       <ProSidebar collapsed={isCollapsed} 
-        style={{ height: "250vh" }}
+        style={{ height: "270vh" }}
       >
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
@@ -148,6 +149,13 @@ const Sidebar = () => {
               title="Gender Distribution"
               to="/pie"
               icon={<PieChartOutlineOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Live Count"
+              to="/liveCount"
+              icon={<TrendingUpIcon />}
               selected={selected}
               setSelected={setSelected}
             />

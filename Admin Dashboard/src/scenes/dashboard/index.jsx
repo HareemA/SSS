@@ -8,6 +8,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import Header from "../../components/Header";
 import CountLineChart from "../../components/CountLineChart";
 import GCountLineChart from "../../components/GCountLineChart";
+import CurrentCountsLine from "../../components/CurrentCountsLine";
 import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
 import StatBox from "../../components/StatBox";
@@ -20,7 +21,7 @@ import { useApi } from "../../scenes/global/ApiContext";
 const Dashboard = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const { count, groupCount, time } = useApi();; // Use the useApi hook to access the API data
+    const { count, groupCount, time } = useApi(); // Use the useApi hook to access the API data
 
   
     return (
@@ -211,6 +212,44 @@ const Dashboard = () => {
               <CountLineChart isDashboard={true} />
             </Box>
           </Box> 
+
+          {/* Row 3 */}
+
+          <Box
+            gridColumn="span 12"
+            gridRow="span 2"
+            backgroundColor={colors.primary[400]}
+          >
+            <Box
+              mt="25px"
+              p="0 30px"
+              display="flex "
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Box>
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                >
+                  LIVE COUNTS
+                </Typography>
+                <Typography
+                  variant="h3"
+                  fontWeight="bold"
+                  color={colors.greenAccent[500]}
+                >
+                  Individual | Group
+                </Typography>
+              </Box>
+              
+            </Box>
+            <Box height="250px" m="-20px 0 0 0">
+              <CurrentCountsLine isDashboard={true} />
+            </Box>
+          </Box> 
+
           
           {/* ROW 3 */}
           <Box
@@ -273,6 +312,8 @@ const Dashboard = () => {
           </Box>
 
               {/* ROW 4 */}
+
+                  
    
 
           <Box
@@ -342,8 +383,10 @@ const Dashboard = () => {
             <Typography>MONTHLY GROWTH IN FOOTFALL</Typography>
           </Box>
         </Box>
-        </Box>  
+        </Box>        
         </Box>
+
+        
 
     );
 };
