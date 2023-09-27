@@ -13,11 +13,15 @@ import PieChart from "../../components/PieChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
 import CCTVVideo from "../../components/CCTVVideo";
+import React from "react";
+import { useApi } from "../../scenes/global/ApiContext";
 
 
 const Dashboard = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const { count, groupCount, time } = useApi();; // Use the useApi hook to access the API data
+
   
     return (
       <Box m="20px">
@@ -58,10 +62,10 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title="57"
+              title= {count}
               subtitle="PEOPLE COUNT"
               progress="0.75"
-              increase="+14%"
+              increase={time}
               icon={
                 <PeopleIcon
                   sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -116,10 +120,10 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title="7"
+              title={groupCount}
               subtitle="GROUP COUNT"
               progress="0.80"
-              increase="+43%"
+              increase={time}
               icon={
                 <GroupsIcon
                   sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
