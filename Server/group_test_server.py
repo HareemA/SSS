@@ -109,12 +109,12 @@ def main(frame,threshold):
         
 
     coordinate_groups = group_coordinates(original_coordinates, group_threshold)
-    print(coordinate_groups)
+    #print(coordinate_groups)
 
     # Iterate through the grouped coordinates and draw bounding boxes around groups
     for group_key, group_coord in coordinate_groups.items():
         if len(group_coord) >= 2:
-            print("Group detected, key:", group_key)
+            #print("Group detected, key:", group_key)
             grpCount = grpCount + 1
             min_x = min([x1 for (x1, y1, x2, y2) in group_coord])
             min_y = min([y1 for (x1, y1, x2, y2) in group_coord])

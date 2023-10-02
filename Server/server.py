@@ -9,11 +9,14 @@ from flask_cors import CORS
 import base64
 from datetime import datetime
 from group_test_server import *
-from deepface import DeepFace
+from pytube import YouTube
+import threading
 
 
 app = Flask(__name__)
 CORS(app) 
+
+lock = threading.Lock()
 
 
 latest_frame = None  # Initialize a variable to store the latest frame
@@ -23,33 +26,22 @@ latest_gender_frame = None
 female_count = 0
 male_count=0
 
+video_path = './vidp.mp4'
+cap = cv2.VideoCapture(video_path)
 
-@app.route('/update_frame', methods=['POST'])
-def update_frame():
-    global latest_frame,detected_persons_count
+def capture_frames():
+    global latest_frame
 
-    try:
-        frame_bytes = request.data
-
-        if not frame_bytes:
-            return Response('Error: Empty frame data', status=400)
-
-        # Convert frame_bytes to a NumPy array
-        frame_array = np.frombuffer(frame_bytes, np.uint8)
-
-        # Decode the frame
-        frame = cv2.imdecode(frame_array, cv2.IMREAD_COLOR)
-
-        if frame is None:
-            return Response('Error: Unable to decode frame', status=400)
-
-        # Store the latest frame
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
         latest_frame = frame
-
-        return Response('Frame received', status=200)
-    except Exception as e:
-        return Response(f'Error: {str(e)}', status=500)
-
+        cv2.waitKey(int(1000/25)) #40 frames per second
+            
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 @app.route('/get_latest_processed_frame/<int:group_threshold>', methods=['GET'])
@@ -89,24 +81,25 @@ def get_latest_processed_frame(group_threshold):
         print(e)
         return Response(f'Error: {str(e)}', status=500)
 
-@app.route('/get_gender_count', methods=['GET'])
-def get_gender_count():
-    global male_count
-    global female_count
 
-    response_data = {
-        'male_count': male_count,
-        'female_count': female_count
-    }
+
+# @app.route('/get_gender_count', methods=['GET'])
+# def get_gender_count():
+#     global male_count
+#     global female_count
+
+#     response_data = {
+#         'male_count': male_count,
+#         'female_count': female_count
+#     }
     
-    return jsonify(response_data)
-
-
-    
+#     return jsonify(response_data)
 
 
 
 if __name__ == '__main__':
+    thread = threading.Thread(target=capture_frames)
+    thread.start()
     app.run(host='192.168.100.10',port=8080)
 
     
