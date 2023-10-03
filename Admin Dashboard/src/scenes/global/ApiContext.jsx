@@ -14,10 +14,16 @@ export function ApiProvider({ children }) {
     time: null,
   });
 
+  const [sliderValue, setSliderValue] = useState(35);
+
+  const updateSliderValue = (value) => {
+    setSliderValue(value);
+  };
+
   // Function to fetch data from the API
   const fetchDataFromApi = async () => {
     try {
-      const response = await fetch("http://192.168.18.132:8080/get_latest_processed_frame/35"); 
+      const response = await fetch(`http://172.23.17.3:8080/get_latest_processed_frame/${sliderValue}`);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -40,14 +46,19 @@ export function ApiProvider({ children }) {
     fetchDataFromApi(); // Fetch data initially
 
     // Set up a timer to fetch data every 5 seconds (5000 milliseconds)
-    const interval = setInterval(fetchDataFromApi, 100);
+    const interval = setInterval(fetchDataFromApi, 500);
 
     // Clean up the timer when the component unmounts
     return () => clearInterval(interval);
-  }, []);
+  }, [sliderValue]);
+
+  const apiContextValue = {
+    apiData,
+    updateSliderValue,
+  };
 
   return (
-    <ApiContext.Provider value={apiData}>
+    <ApiContext.Provider value={apiContextValue}>
       {children}
     </ApiContext.Provider>
   );
