@@ -13,6 +13,7 @@ import GLine from "./scenes/GCountLine";
 import Pie from "./scenes/pie";
 import CCTV from "./scenes/Video";
 import CurrentCountsLine from "./scenes/liveCount";
+import CountLiveMinute from "./scenes/lineMinutes";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -34,6 +35,7 @@ function App() {
               <Route path="/line_gCount" element={<GLine />} />
               <Route path="/liveCount" element={<CurrentCountsLine />} />
               <Route path="/video" element={<CCTV />} />
+              <Route path="/liveCountMinute" element={<CountLiveMinute />} />
             </Routes>
           </main>
         </div>

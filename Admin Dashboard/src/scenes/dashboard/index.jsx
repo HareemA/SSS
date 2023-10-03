@@ -16,6 +16,7 @@ import ProgressCircle from "../../components/ProgressCircle";
 import CCTVVideo from "../../components/CCTVVideo";
 import React from "react";
 import { useApi } from "../../scenes/global/ApiContext";
+import CountLiveMinute from "../../components/CountLiveMinute";
 
 
 const Dashboard = () => {
@@ -74,45 +75,7 @@ const Dashboard = () => {
               }
             />
           </Box>
-          
-          <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              title="17"
-              subtitle="MEN"
-              progress="0.50"
-              increase="+21%"
-              icon={
-                <ManIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                />
-              }
-            />
-          </Box>
-          <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              title="20"
-              subtitle="WOMEN"
-              progress="0.30"
-              increase="+5%"
-              icon={
-                <Woman2Icon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                />
-              }
-            />
-          </Box>
+
           <Box
             gridColumn="span 3"
             backgroundColor={colors.primary[400]}
@@ -132,6 +95,46 @@ const Dashboard = () => {
               }
             />
           </Box>
+          
+          <Box
+            gridColumn="span 3"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <StatBox
+              title="X"
+              subtitle="MEN"
+              progress="0.50"
+              increase="+21%"
+              icon={
+                <ManIcon
+                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                />
+              }
+            />
+          </Box>
+          <Box
+            gridColumn="span 3"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <StatBox
+              title="Y"
+              subtitle="WOMEN"
+              progress="0.30"
+              increase="+5%"
+              icon={
+                <Woman2Icon
+                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                />
+              }
+            />
+          </Box>
+          
   
           {/* ROW 2 */}
           <Box
@@ -190,14 +193,14 @@ const Dashboard = () => {
                   fontWeight="600"
                   color={colors.grey[100]}
                 >
-                  HOURLY FOOTFALL
+                  MIN/MAX COUNT PER MINUTE
                 </Typography>
                 <Typography
                   variant="h3"
                   fontWeight="bold"
                   color={colors.greenAccent[500]}
                 >
-                  668 individuals today
+                  Min and Max people in a minute
                 </Typography>
               </Box>
               <Box>
@@ -209,7 +212,7 @@ const Dashboard = () => {
               </Box>
             </Box>
             <Box height="250px" m="-20px 0 0 0">
-              <CountLineChart isDashboard={true} />
+              <CountLiveMinute isDashboard={true} />
             </Box>
           </Box> 
 
@@ -383,6 +386,47 @@ const Dashboard = () => {
             <Typography>MONTHLY GROWTH IN FOOTFALL</Typography>
           </Box>
         </Box>
+
+        <Box
+            gridColumn="span 7"
+            gridRow="span 2"
+            backgroundColor={colors.primary[400]}
+          >
+            <Box
+              mt="25px"
+              p="0 30px"
+              display="flex "
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Box>
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                >
+                  HOURLY FOOTFALL
+                </Typography>
+                <Typography
+                  variant="h3"
+                  fontWeight="bold"
+                  color={colors.greenAccent[500]}
+                >
+                  XXX individuals today
+                </Typography>
+              </Box>
+              <Box>
+                <IconButton>
+                  <DownloadOutlinedIcon
+                    sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
+                  />
+                </IconButton>
+              </Box>
+            </Box>
+            <Box height="250px" m="-20px 0 0 0">
+              <CountLineChart isDashboard={true} />
+            </Box>
+          </Box>
         </Box>        
         </Box>
 

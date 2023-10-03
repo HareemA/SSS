@@ -64,7 +64,7 @@ const Sidebar = () => {
     >
       
       <ProSidebar collapsed={isCollapsed} 
-        style={{ height: "270vh" }}
+        style={{ height: "330vh" }}
       >
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
@@ -155,6 +155,13 @@ const Sidebar = () => {
             <Item
               title="Live Count"
               to="/liveCount"
+              icon={<TrendingUpIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Count Per Minute"
+              to="/liveCountMinute"
               icon={<TrendingUpIcon />}
               selected={selected}
               setSelected={setSelected}
