@@ -18,6 +18,8 @@ CORS(app)
 
 lock = threading.Lock()
 
+lock = threading.Lock()
+
 
 latest_frame = None  # Initialize a variable to store the latest frame
 detected_persons_count = 0
@@ -38,6 +40,32 @@ def capture_frames():
     while True:
         if not cap:
             cap = cv2.VideoCapture(video_path)
+
+        ret, frame = cap.read()
+        if not ret:
+            print("Error reading frame. Reopening the stream...")
+            cap.release()
+            cap = None
+            continue
+
+        try:
+            latest_frame = frame
+        except cv2.error as e:
+            print("Hadia shafqat")
+            print(f"Error while decoding frame: {e}")
+            continue  # Skip the problematic frame
+video_path = './vidp.mp4'
+cap = cv2.VideoCapture('rtsp://admin:Ncsael-123@172.23.16.150:554')
+#"rtsp://admin:PNcsael@123@172.23.16.150:554"
+
+
+def capture_frames():
+    global latest_frame
+    global cap
+
+    while True:
+        if not cap:
+            cap = cv2.VideoCapture('rtsp://admin:Ncsael-123@172.23.16.150:554')
 
         ret, frame = cap.read()
         if not ret:
@@ -117,6 +145,6 @@ def get_latest_processed_frame(group_threshold):
 if __name__ == '__main__':
     thread = threading.Thread(target=capture_frames)
     thread.start()
-    app.run(host='192.168.18.132',port=8080)
+    app.run(host='172.23.17.3',port=8080)
 
     

@@ -3,9 +3,10 @@ import requests
 import numpy as np
 
 video_path = './vidp.mp4'
+
 cap = cv2.VideoCapture('rtsp://admin:Ncsael@123@172.23.16.150:554')
 
-server_url = 'http://192.168.18.132:8080/update_frame'  # Use the correct URL for the update_frame route
+server_url = 'http://172.23.17.3:8080/update_frame'  # Use the correct URL for the update_frame route
 
 while True:
     ret, frame = cap.read()

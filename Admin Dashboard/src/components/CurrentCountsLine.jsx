@@ -7,7 +7,9 @@ import { useApi } from "../scenes/global/ApiContext";
 const CurrentCountsLine = ({ isCustomLineColors = false, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { count, groupCount, time } = useApi();
+  const { apiData } = useApi();
+  const { count, groupCount, time } = apiData;
+
 
   // State to store the line chart data
   const [chartData, setChartData] = useState([

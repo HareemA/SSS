@@ -22,7 +22,8 @@ import CountLiveMinute from "../../components/CountLiveMinute";
 const Dashboard = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const { count, groupCount, time } = useApi(); // Use the useApi hook to access the API data
+    const { apiData } = useApi();
+    const { count, groupCount, time } = apiData;
 
   
     return (
