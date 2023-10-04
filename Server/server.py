@@ -9,11 +9,14 @@ from flask_cors import CORS
 import base64
 from datetime import datetime
 from group_test_server import *
-from deepface import DeepFace
+from pytube import YouTube
+import threading
 
 
 app = Flask(__name__)
 CORS(app) 
+
+lock = threading.Lock()
 
 
 latest_frame = None  # Initialize a variable to store the latest frame
@@ -23,33 +26,39 @@ latest_gender_frame = None
 female_count = 0
 male_count=0
 
+video_path = './vidp.mp4'
+cap = cv2.VideoCapture(video_path)
+#"rtsp://admin:PNcsael@123@172.23.16.150:554"
 
-@app.route('/update_frame', methods=['POST'])
-def update_frame():
-    global latest_frame,detected_persons_count
 
-    try:
-        frame_bytes = request.data
+def capture_frames():
+    global latest_frame
+    global cap
 
-        if not frame_bytes:
-            return Response('Error: Empty frame data', status=400)
+    while True:
+        if not cap:
+            cap = cv2.VideoCapture(video_path)
 
-        # Convert frame_bytes to a NumPy array
-        frame_array = np.frombuffer(frame_bytes, np.uint8)
+        ret, frame = cap.read()
+        if not ret:
+            print("Error reading frame. Reopening the stream...")
+            cap.release()
+            cap = None
+            continue
 
-        # Decode the frame
-        frame = cv2.imdecode(frame_array, cv2.IMREAD_COLOR)
+        try:
+            latest_frame = frame
+        except cv2.error as e:
+            print("Hadia shafqat")
+            print(f"Error while decoding frame: {e}")
+            continue  # Skip the problematic frame
 
-        if frame is None:
-            return Response('Error: Unable to decode frame', status=400)
+        if cv2.waitKey(1) & 0xFF == 27: 
+            break
 
-        # Store the latest frame
-        latest_frame = frame
-
-        return Response('Frame received', status=200)
-    except Exception as e:
-        return Response(f'Error: {str(e)}', status=500)
-
+    #if cap:
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 @app.route('/get_latest_processed_frame/<int:group_threshold>', methods=['GET'])
@@ -89,24 +98,25 @@ def get_latest_processed_frame(group_threshold):
         print(e)
         return Response(f'Error: {str(e)}', status=500)
 
-@app.route('/get_gender_count', methods=['GET'])
-def get_gender_count():
-    global male_count
-    global female_count
 
-    response_data = {
-        'male_count': male_count,
-        'female_count': female_count
-    }
+
+# @app.route('/get_gender_count', methods=['GET'])
+# def get_gender_count():
+#     global male_count
+#     global female_count
+
+#     response_data = {
+#         'male_count': male_count,
+#         'female_count': female_count
+#     }
     
-    return jsonify(response_data)
-
-
-    
+#     return jsonify(response_data)
 
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.100.10',port=8080)
+    thread = threading.Thread(target=capture_frames)
+    thread.start()
+    app.run(host='192.168.18.132',port=8080)
 
     

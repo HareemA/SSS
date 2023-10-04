@@ -17,7 +17,7 @@ stream = yt.streams.get_highest_resolution()
 # OpenCV VideoCapture from the stream URL
 cap = cv2.VideoCapture(stream.url)
 
-server_url = 'http://192.168.100.10:8080/update_frame'  # Use the correct URL for the update_frame route
+server_url = 'http://192.168.202.71:8080/update_frame'  # Use the correct URL for the update_frame route
 
 while True:
     ret, frame = cap.read()

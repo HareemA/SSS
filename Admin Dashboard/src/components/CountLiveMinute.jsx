@@ -60,7 +60,7 @@ const CountLiveMinute = ({ isCustomLineColors = false, isDashboard = false }) =>
       
       // Increment dataPointCount
       setDataPointCount(dataPointCount + 1);
-    }, 60000); // Reset every 60 seconds (1 minute)
+    }, 1000); // Reset every 60 seconds (1 minute)
 
     return () => clearInterval(timer); // Cleanup timer on unmount
   }, [chartData, count, time, dataPointCount]);

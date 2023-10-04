@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://192.168.100.10:8080/get_latest_processed_frame/${groupThreshold}`);
+        const response = await fetch(`http://192.168.18.132:8080/get_latest_processed_frame/${groupThreshold}`);
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
