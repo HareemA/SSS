@@ -6,6 +6,7 @@ export function useApi() {
   return useContext(ApiContext);
 }
 
+
 export function ApiProvider({ children }) {
   const [apiData, setApiData] = useState({
     frame: null,
@@ -15,6 +16,10 @@ export function ApiProvider({ children }) {
   });
 
   const [sliderValue, setSliderValue] = useState(35);
+
+  // State variables to track maximum and minimum values within a minute
+  const [maxCountWithinMinute, setMaxCountWithinMinute] = useState(0);
+  const [minCountWithinMinute, setMinCountWithinMinute] = useState(0);
 
   const updateSliderValue = (value) => {
     setSliderValue(value);
@@ -30,6 +35,12 @@ export function ApiProvider({ children }) {
       }
 
       const jsonData = await response.json();
+
+      // Update maximum and minimum values within a minute
+      if (jsonData.count !== null) {
+        setMaxCountWithinMinute((prevMax) => Math.max(prevMax, jsonData.count));
+        setMinCountWithinMinute((prevMin) => (prevMin === 0 ? jsonData.count : Math.min(prevMin, jsonData.count)));
+      }
 
       setApiData({
         frame: jsonData.frame,
@@ -54,6 +65,8 @@ export function ApiProvider({ children }) {
 
   const apiContextValue = {
     apiData,
+    maxCountWithinMinute,
+    minCountWithinMinute,
     updateSliderValue,
   };
 

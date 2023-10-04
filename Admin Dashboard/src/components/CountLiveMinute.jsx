@@ -7,75 +7,53 @@ import { useApi } from "../scenes/global/ApiContext";
 const CountLiveMinute = ({ isCustomLineColors = false, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { count, time } = useApi();
+  const { apiData, maxCountWithinMinute, minCountWithinMinute } = useApi();
+  const { count, time } = apiData;
 
   // State to store the line chart data
   const [chartData, setChartData] = useState([
     {
       id: "maxCount",
-      data: [{ x: 0, y: 0 }], // Initialize with a single data point
+      data: [],
     },
     {
       id: "minCount",
-      data: [{ x: 0, y: 0 }], // Initialize with a single data point
+      data: [],
     },
   ]);
 
-  // State variables to track maximum and minimum values within a minute
-  let maxCountWithinMinute = count;
-  let minCountWithinMinute = count;
-  
-  // State to track the number of data points added
-  const [dataPointCount, setDataPointCount] = useState(0);
 
-  // Timer to reset maximum and minimum values and update chart data at the end of each minute
   useEffect(() => {
-    const timer = setInterval(() => {
-      // Update maximum and minimum values at the end of each minute
+    const timeoutId = setTimeout(() => {
+      // Create a new data point with the current time and values
       const newMaxCountDataPoint = {
-        x: time,
+        x: new Date().toLocaleTimeString(),
         y: maxCountWithinMinute,
       };
       const newMinCountDataPoint = {
-        x: time,
+        x: new Date().toLocaleTimeString(),
         y: minCountWithinMinute,
       };
 
-      // Add the maximum and minimum values to the chart data
+      // Create a copy of the chart data and update it with the new data point
       const newChartData = [...chartData];
       newChartData[0].data.push(newMaxCountDataPoint);
       newChartData[1].data.push(newMinCountDataPoint);
 
       // Limit the number of data points to keep on the chart (e.g., 10 data points)
-      if (newChartData[0].data.length > 10) {
+      if (newChartData[0].data.length > 5) {
         newChartData[0].data.shift();
         newChartData[1].data.shift();
       }
 
+      // Set the new chart data
       setChartData(newChartData);
+    }, 60000); // 60000 milliseconds = 1 minute
 
-      // Reset maximum and minimum values for the next minute
-      maxCountWithinMinute = count;
-      minCountWithinMinute = count;
-      
-      // Increment dataPointCount
-      setDataPointCount(dataPointCount + 1);
-    }, 1000); // Reset every 60 seconds (1 minute)
-
-    return () => clearInterval(timer); // Cleanup timer on unmount
-  }, [chartData, count, time, dataPointCount]);
-
-  // Use useEffect to continuously update the maximum and minimum values when new API data arrives
-  useEffect(() => {
-    // Update maximum and minimum values for the current minute
-    if (count > maxCountWithinMinute) {
-      maxCountWithinMinute = count;
-    }
-    if (count < minCountWithinMinute) {
-      minCountWithinMinute = count;
-    }
-  }, [count]);
-
+    // Cleanup the timeout on component unmount or when dependencies change
+    return () => clearTimeout(timeoutId);
+  }, [maxCountWithinMinute, minCountWithinMinute]);
+  
 
   return (
     <ResponsiveLine
@@ -119,7 +97,7 @@ const CountLiveMinute = ({ isCustomLineColors = false, isDashboard = false }) =>
             type: 'linear',
             min: 'auto',
             max: 'auto',
-            stacked: true,
+            stacked: false,
             reverse: false
         }}
         yFormat=" >-.2f"
