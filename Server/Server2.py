@@ -15,13 +15,13 @@ CORS(app)
 
 model = YOLO('yolov8s.pt')
 
-def RGB(event, x, y, flags, param):
-    if event == cv2.EVENT_MOUSEMOVE:
-        colorsBGR = [x, y]
-        print(colorsBGR)
+# def RGB(event, x, y, flags, param):
+#     if event == cv2.EVENT_MOUSEMOVE:
+#         colorsBGR = [x, y]
+#         print(colorsBGR)
 
-cv2.namedWindow('RGB')
-cv2.setMouseCallback('RGB', RGB)
+# cv2.namedWindow('RGB')
+# cv2.setMouseCallback('RGB', RGB)
 
 cap = cv2.VideoCapture('H:\\Downloads\\rtsp___172.23.16.150_554 - VLC media player 2023-10-16 12-56-14.mp4')
 
@@ -221,9 +221,9 @@ def compute_data():
             cv2.putText(frame, f"Female: {str(female)}", (30, 160), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
             cv2.putText(frame, f"Unknown: {str(unknown)}", (30, 180), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
 
-        cv2.imshow("RGB", frame)
-        if cv2.waitKey(1) & 0xFF == 27:
-            break
+        # cv2.imshow("RGB", frame)
+        # if cv2.waitKey(1) & 0xFF == 27:
+        #     break
 
     cap.release()
     cv2.destroyAllWindows()
@@ -263,4 +263,4 @@ def get_data(group_threshold):
 if __name__ == '__main__':
     thread = threading.Thread(target=compute_data)
     thread.start()
-    app.run(host='192.168.126.125', port=8080)
+    app.run(host='192.168.100.10', port=8080)
