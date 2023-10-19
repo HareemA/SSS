@@ -49,6 +49,8 @@ exit = 0
 people_exit = {}
 counter2 = []
 
+people_in_frame = 0
+
 #Gate 1
 area1=[(241,164),(332,173),(326,187),(234,171)]
 area2=[(248,150),(344,157),(339,171),(242,159)]
@@ -59,6 +61,7 @@ area4=[(606,183),(691,196),(693,212),(602,198)]
 
 
 def compute_data():
+    global cap
     global latest_frame
     global male
     global female
@@ -71,11 +74,20 @@ def compute_data():
     global people_exit
     global counter1
     global counter2
+    global people_in_frame
     
     while True:
+
+        if not cap:
+            cap = cv2.VideoCapture('rtsp://admin:Ncsael-123@172.23.16.150:554')
+
         ret, frame = cap.read()
         if not ret:
-            break
+            print("Error reading frame. Reopening the stream...")
+            cap.release()
+            cap = None
+            continue
+
         count += 1
         if count % 3 != 0:
             continue
@@ -97,7 +109,6 @@ def compute_data():
         #    print(px)
         list = []
         for index, row in px.iterrows():
-            #        print(row)
 
             x1 = int(row[0])
             y1 = int(row[1])
@@ -108,6 +119,7 @@ def compute_data():
             list.append([x1, y1, x2, y2])
 
         bbox_id = tracker.update(list)
+        people_in_frame = len(bbox_id)
         for bbox in bbox_id:
             x3, y3, x4, y4, id = bbox
             x_centre = (x3 + x4) // 2
@@ -142,7 +154,7 @@ def compute_data():
                         counter1.append(id)
                         detected = detected + 1
                         enter = enter + 1
-                        cv2.imshow("Detected faces", face)
+                        #cv2.imshow("Detected faces", face)
                         # Gender detection
                         try:
                             gender_result = DeepFace.analyze(face, actions=['gender'])
@@ -213,13 +225,13 @@ def compute_data():
             cv2.circle(frame, (x_centre, y4), 4, (255, 0, 0), -1)
             cv2.putText(frame, str(int(id)), (x3, y3), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0), 1)
             # Entry
-            cv2.putText(frame, f"Entry: {str(enter)}", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1)
+            cv2.putText(frame, f"Entry: {str(enter)}", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
             # Exit
-            cv2.putText(frame, f"Exit: {str(exit)}", (30, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+            cv2.putText(frame, f"Exit: {str(exit)}", (30, 125), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
             # Gender
-            cv2.putText(frame, f"Male: {str(male)}", (30, 140), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
-            cv2.putText(frame, f"Female: {str(female)}", (30, 160), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
-            cv2.putText(frame, f"Unknown: {str(unknown)}", (30, 180), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
+            cv2.putText(frame, f"Male: {str(male)}", (30, 150), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
+            cv2.putText(frame, f"Female: {str(female)}", (30, 175), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
+            cv2.putText(frame, f"Unknown: {str(unknown)}", (30, 200), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
 
         # cv2.imshow("RGB", frame)
         # if cv2.waitKey(1) & 0xFF == 27:
@@ -249,7 +261,7 @@ def get_data(group_threshold):
         frame_bytes = base64.b64encode(encoded_frame)
         timestamp = datetime.now().strftime('%H:%M:%S')
         response_data = {
-            'count': detected,
+            'count': people_in_frame,
             'frame': frame_bytes.decode('utf-8'),  # Convert bytes to a string
             'groupCount': groupCount,
             'time': timestamp,
