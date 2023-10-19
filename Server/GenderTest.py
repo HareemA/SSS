@@ -122,10 +122,12 @@ while True:
                     counter1.append(id)
                     detected = detected + 1
                     enter=enter+1
+                    cv2.imshow("Detected faces",face)
                     #Gender detection
                     try:
                         gender_result = DeepFace.analyze(face,actions=['gender'])
                         gender= gender_result['gender']
+                        print("Here")
                         if gender=='Male':
                             male=male+1
                         elif gender=='Female':
@@ -133,6 +135,7 @@ while True:
                     except Exception as e:
                         gender='Unknown'
                         unknown=unknown+1
+                        print(e)
 
                     print("GENDER: ",gender)
                     print("Enter count: ",len(counter1))
