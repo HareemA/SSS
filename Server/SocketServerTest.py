@@ -1,11 +1,9 @@
 import cv2
 import pandas as pd
-import numpy as np
 from ultralytics import YOLO
 from tracker import *
 import socket
-import time
-import threading
+import pickle
 
 model = YOLO('yolov8s.pt')
 
@@ -22,13 +20,12 @@ cap = cv2.VideoCapture('E:\\Freelance Projects\\Shop Surveillance System\\video\
 my_file = open("coco.txt", "r")
 data = my_file.read()
 class_list = data.split("\n")
-
 count = 999
 tracker = Tracker()
 
 # Create a socket server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = '192.168.143.71'  # Use '0.0.0.0' to bind to all available network interfaces
+host = '192.168.126.71'  
 port = 8080  # Choose a port to listen on
 server_socket.bind((host, port))
 server_socket.listen(5)
@@ -38,63 +35,57 @@ print(f"Waiting for clients to connect on {host}:{port}...")
 client_socket, client_address = server_socket.accept()
 print(f"Client {client_address} connected!")
 
-# Create a thread for sending video frames and count information
-def send_video_and_count():
-    try:
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            count += 1
-            if count % 3 != 0:
-                continue
+try:
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        count += 1
+        if count % 3 != 0:
+            continue
 
-            if not frame.any():
-                continue
+        conf_thresh = 0.5
 
-            frame = cv2.resize(frame, (1020, 500))
+        results = model.predict(frame, classes=[0])
+        a = results[0].boxes.boxes
+        px = pd.DataFrame(a).astype("float")
+        obj_list = []
+        for index, row in px.iterrows():
+            x1 = int(row[0])
+            y1 = int(row[1])
+            x2 = int(row[2])
+            y2 = int(row[3])
+            d = int(row[5])
+            obj_list.append([x1, y1, x2, y2])
 
-            # Process the frame and send it
-            conf_thresh = 0.5
-            results = model.predict(frame, classes=[0])
-            a = results[0].boxes.boxes
-            px = pd.DataFrame(a).astype("float")
-            list = []
-            for index, row in px.iterrows():
-                x1 = int(row[0])
-                y1 = int(row[1])
-                x2 = int(row[2])
-                y2 = int(row[3])
-                d = int(row[5])
-                list.append([x1, y1, x2, y2])
+        bbox_idx = tracker.update(obj_list)
+        person_count = len(bbox_idx)
 
-            bbox_idx = tracker.update(list)
-            count_message = f"Detected people: {len(bbox_idx)}"
+        count_message = f"Detected people: {person_count}"
 
-            # Send video frame to the client
-            frame_bytes = cv2.imencode('.jpg', frame)[1].tobytes()
-            client_socket.send(b'FRAME_START')
-            client_socket.send(frame_bytes)
-            client_socket.send(b'FRAME_END')
-            print("Sent a video frame.")
+        # Send the count information to the connected client
+        client_socket.send(count_message.encode())
 
-            # Send count information to the client
-            client_socket.send(count_message.encode())
-            print("Sent count information.")
+        # Serialize and send the current frame to the connected client
+        frame_data = pickle.dumps(frame)
+        client_socket.send(frame_data)
 
-    except Exception as e:
-        print(f"Error in sending video and count information: {e}")
+        for bbox in bbox_idx:
+            x3, y3, x4, y4, id = bbox
+            cx = int(x3 + x4) // 2
+            cy = int(y3 + y4) // 2
+            cv2.rectangle(frame, (x3, y3), (x4, y4), (0, 255, 0), 2)
+            cv2.putText(frame, str(int(id)), (x3, y3), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0), 1)
 
-# Start the thread for sending video frames and count information
-video_and_count_thread = threading.Thread(target=send_video_and_count)
+        cv2.imshow("RGB", frame)
+        if cv2.waitKey(1) & 0xFF == 27:
+            break
 
-# Start the thread
-video_and_count_thread.start()
+except Exception as e:
+    print(f"An error occurred: {e}")
 
-# Wait for the thread to finish
-video_and_count_thread.join()
-
-# Close the client socket and server socket
-client_socket.close()
-server_socket.close()
-cv2.destroyAllWindows()
+finally:
+    # Close the client socket, server socket, and OpenCV window
+    client_socket.close()
+    server_socket.close()
+    cv2.destroyAllWindows()
