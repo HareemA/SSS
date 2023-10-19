@@ -6,15 +6,23 @@ export function useApi() {
   return useContext(ApiContext);
 }
 
+
 export function ApiProvider({ children }) {
   const [apiData, setApiData] = useState({
     frame: null,
     count: null,
     groupCount: null,
     time: null,
+    male:null,
+    female:null,
+    unknown:null
   });
 
   const [sliderValue, setSliderValue] = useState(35);
+
+  // State variables to track maximum and minimum values within a minute
+  const [maxCountWithinMinute, setMaxCountWithinMinute] = useState(0);
+  const [minCountWithinMinute, setMinCountWithinMinute] = useState(0);
 
   const updateSliderValue = (value) => {
     setSliderValue(value);
@@ -23,7 +31,7 @@ export function ApiProvider({ children }) {
   // Function to fetch data from the API
   const fetchDataFromApi = async () => {
     try {
-      const response = await fetch(`http://172.23.17.3:8080/get_latest_processed_frame/${sliderValue}`);  //http://172.23.17.3:8080/get_latest_processed_frame/${sliderValue}
+      const response = await fetch(`http://192.168.100.10:8080/get_data/${sliderValue}`);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -31,11 +39,20 @@ export function ApiProvider({ children }) {
 
       const jsonData = await response.json();
 
+      // Update maximum and minimum values within a minute
+      if (jsonData.count !== null) {
+        setMaxCountWithinMinute((prevMax) => Math.max(prevMax, jsonData.count));
+        setMinCountWithinMinute((prevMin) => (prevMin === 0 ? jsonData.count : Math.min(prevMin, jsonData.count)));
+      }
+
       setApiData({
         frame: jsonData.frame,
         count: jsonData.count,
         groupCount: jsonData.groupCount,
         time: jsonData.time,
+        male: jsonData.male,
+        female: jsonData.female,
+        unknown: jsonData.unknown
       });
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -54,6 +71,8 @@ export function ApiProvider({ children }) {
 
   const apiContextValue = {
     apiData,
+    maxCountWithinMinute,
+    minCountWithinMinute,
     updateSliderValue,
   };
 

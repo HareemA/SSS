@@ -23,7 +23,7 @@ const Dashboard = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const { apiData } = useApi();
-    const { count, groupCount, time } = apiData;
+    const { count, groupCount, time, male, female, unknown } = apiData;
 
   
     return (
@@ -105,7 +105,7 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title="X"
+              title= {unknown}
               subtitle="MEN"
               progress="0.50"
               increase="+21%"
@@ -124,7 +124,7 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title="Y"
+              title= {female}
               subtitle="WOMEN"
               progress="0.30"
               increase="+5%"
