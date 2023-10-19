@@ -85,8 +85,8 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title={groupCount}
-              subtitle="GROUP COUNT"
+              title={unknown}
+              subtitle="UNKNOWN"
               progress="0.80"
               increase={time}
               icon={
@@ -105,7 +105,7 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title= {unknown}
+              title= {male}
               subtitle="MEN"
               progress="0.50"
               increase="+21%"
