@@ -13,6 +13,9 @@ export function ApiProvider({ children }) {
     count: null,
     groupCount: null,
     time: null,
+    male:null,
+    female:null,
+    unknown:null
   });
 
   const [sliderValue, setSliderValue] = useState(35);
@@ -28,7 +31,7 @@ export function ApiProvider({ children }) {
   // Function to fetch data from the API
   const fetchDataFromApi = async () => {
     try {
-      const response = await fetch(`http://172.23.17.3:8080/get_latest_processed_frame/${sliderValue}`);
+      const response = await fetch(`http://192.168.100.10:8080/get_data/${sliderValue}`);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -47,6 +50,9 @@ export function ApiProvider({ children }) {
         count: jsonData.count,
         groupCount: jsonData.groupCount,
         time: jsonData.time,
+        male: jsonData.male,
+        female: jsonData.female,
+        unknown: jsonData.unknown
       });
     } catch (error) {
       console.error('Error fetching data:', error);
