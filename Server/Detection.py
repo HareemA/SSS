@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from ultralytics import YOLO
 from tracker import *
+from deepface import DeepFace
 
 
 model=YOLO('yolov8s.pt')
@@ -17,7 +18,7 @@ def RGB(event, x, y, flags, param):
 cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
 
-cap=cv2.VideoCapture('store.mp4')
+cap=cv2.VideoCapture('H:\\Downloads\\people2\\people2.mp4')
 
 
 my_file = open("coco.txt", "r")
@@ -38,12 +39,12 @@ while True:
 
 
     frame=cv2.resize(frame,(1020,500))
-
+    
     conf_thresh = 0.5
 
     results=model.predict(frame,classes=[0])
  #   print(results)
-    a=results[0].boxes.boxes
+    a=results[0].boxes.data
     px=pd.DataFrame(a).astype("float")
 #    print(px)
     list=[]
@@ -61,16 +62,29 @@ while True:
             
     bbox_idx=tracker.update(list)
     
+    
     for bbox in bbox_idx:
         x3,y3,x4,y4,id=bbox
+        face = frame[y3:y4, x3:x4]
+    
+        cv2.imshow("Face",face)
+        if cv2.waitKey(0)&0xFF==27:
+            break
+        try:
+            gender_result = DeepFace.analyze(face, actions=['gender'])
+            gender = gender_result['gender']
+        except Exception as e:
+            gender='Unknown'
+        print(gender)
         cx=int(x3+x4)//2
         cy=int(y3+y4)//2
         cv2.rectangle(frame,(x3,y3),(x4,y4),(0,255,0),2)
         cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
+        cv2.putText(frame,str(gender),(x3,(y3+5)),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
         
            
     cv2.imshow("RGB", frame)
-    if cv2.waitKey(1)&0xFF==27:
+    if cv2.waitKey(0)&0xFF==27:
         break
 cap.release()
 cv2.destroyAllWindows()

@@ -23,7 +23,7 @@ model = YOLO('yolov8s.pt')
 # cv2.namedWindow('RGB')
 # cv2.setMouseCallback('RGB', RGB)
 
-cap = cv2.VideoCapture('H:\\Downloads\\rtsp___172.23.16.150_554 - VLC media player 2023-10-16 12-56-14.mp4')
+cap = cv2.VideoCapture('H:\\Downloads\\vid2.mp4')
 
 my_file = open("coco.txt", "r")
 data = my_file.read()
@@ -52,12 +52,15 @@ counter2 = []
 people_in_frame = 0
 
 #Gate 1
-area1=[(241,164),(332,173),(326,187),(234,171)]
-area2=[(248,150),(344,157),(339,171),(242,159)]
+# area1=[(241,164),(332,173),(326,187),(234,171)]
+# area2=[(248,150),(344,157),(339,171),(242,159)]
 
 #Gate 2
-area3=[(602,206),(695,221),(702,232),(602,218)]
-area4=[(606,183),(691,196),(693,212),(602,198)]
+# area3=[(602,206),(695,221),(702,232),(602,218)]
+# area4=[(606,183),(691,196),(693,212),(602,198)]
+
+area1=[(159,201),(811,307),(807,324),(139,210)]
+area2=[(185,186),(815,276),(812,301),(161,200)]
 
 
 def compute_data():
@@ -79,7 +82,8 @@ def compute_data():
     while True:
 
         if not cap:
-            cap = cv2.VideoCapture('rtsp://admin:Ncsael-123@172.23.16.150:554')
+            # cap = cv2.VideoCapture('rtsp://admin:Ncsael-123@172.23.16.150:554')
+            cap = cv2.VideoCapture('H:\\Downloads\\vid2.mp4')
 
         ret, frame = cap.read()
         if not ret:
@@ -97,8 +101,8 @@ def compute_data():
         cv2.polylines(frame, [np.array(area1, np.int32)], True, (0, 0, 255), 1)
         cv2.polylines(frame, [np.array(area2, np.int32)], True, (0, 255, 0), 1)
         # Gate 2
-        cv2.polylines(frame, [np.array(area3, np.int32)], True, (0, 0, 255), 1)
-        cv2.polylines(frame, [np.array(area4, np.int32)], True, (0, 255, 0), 1)
+        # cv2.polylines(frame, [np.array(area3, np.int32)], True, (0, 0, 255), 1)
+        # cv2.polylines(frame, [np.array(area4, np.int32)], True, (0, 255, 0), 1)
 
         conf = 0.5
 
@@ -177,46 +181,46 @@ def compute_data():
 
             # GATE 2
             # People Leave
-            results5 = cv2.pointPolygonTest(np.array(area3, np.int32), ((x_centre, y4)), False)
-            if results5 >= 0:
-                people_exit[id] = (x4, y4)
-            if id in people_exit:
-                results6 = cv2.pointPolygonTest(np.array(area4, np.int32), ((x_centre, y4)), False)
-                if results6 >= 0:
-                    if counter2.count(id) == 0:
-                        counter2.append(id)
-                        exit = exit + 1
-                        if detected != 0:
-                            detected = detected - 1
-                        print("Exit count: ", len(counter2))
+            # results5 = cv2.pointPolygonTest(np.array(area3, np.int32), ((x_centre, y4)), False)
+            # if results5 >= 0:
+            #     people_exit[id] = (x4, y4)
+            # if id in people_exit:
+            #     results6 = cv2.pointPolygonTest(np.array(area4, np.int32), ((x_centre, y4)), False)
+            #     if results6 >= 0:
+            #         if counter2.count(id) == 0:
+            #             counter2.append(id)
+            #             exit = exit + 1
+            #             if detected != 0:
+            #                 detected = detected - 1
+            #             print("Exit count: ", len(counter2))
 
-            # People Enter
-            results7 = cv2.pointPolygonTest(np.array(area4, np.int32), ((x_centre, y4)), False)
-            if results7 >= 0:
-                # print("result3:",results3)
-                people_enter[id] = (x4, y4)
-            if id in people_enter:
-                results8 = cv2.pointPolygonTest(np.array(area3, np.int32), ((x_centre, y4)), False)
-                if results8 >= 0:
-                    if counter1.count(id) == 0:
-                        counter1.append(id)
-                        detected = detected + 1
-                        enter = enter + 1
-                        try:
-                            gender_result = DeepFace.analyze(face, actions=['gender'])
-                            gender = gender_result['gender']
-                            if gender == 'Male':
-                                with frame_lock:
-                                    male = male + 1
-                            elif gender == 'Female':
-                                with frame_lock:
-                                    female = female + 1
+            # # People Enter
+            # results7 = cv2.pointPolygonTest(np.array(area4, np.int32), ((x_centre, y4)), False)
+            # if results7 >= 0:
+            #     # print("result3:",results3)
+            #     people_enter[id] = (x4, y4)
+            # if id in people_enter:
+            #     results8 = cv2.pointPolygonTest(np.array(area3, np.int32), ((x_centre, y4)), False)
+            #     if results8 >= 0:
+            #         if counter1.count(id) == 0:
+            #             counter1.append(id)
+            #             detected = detected + 1
+            #             enter = enter + 1
+            #             try:
+            #                 gender_result = DeepFace.analyze(face, actions=['gender'])
+            #                 gender = gender_result['gender']
+            #                 if gender == 'Male':
+            #                     with frame_lock:
+            #                         male = male + 1
+            #                 elif gender == 'Female':
+            #                     with frame_lock:
+            #                         female = female + 1
 
-                        except Exception as e:
-                            gender = 'Unknown'
-                            with frame_lock:
-                                unknown = unknown + 1
-                        print("Enter count: ", len(counter1))
+            #             except Exception as e:
+            #                 gender = 'Unknown'
+            #                 with frame_lock:
+            #                     unknown = unknown + 1
+            #             print("Enter count: ", len(counter1))
 
             with frame_lock:
                 latest_frame = frame
@@ -237,8 +241,6 @@ def compute_data():
         # if cv2.waitKey(1) & 0xFF == 27:
         #     break
 
-    cap.release()
-    cv2.destroyAllWindows()
 
 
 @app.route('/get_data/<int:group_threshold>', methods=['GET'])
@@ -261,7 +263,7 @@ def get_data(group_threshold):
         frame_bytes = base64.b64encode(encoded_frame)
         timestamp = datetime.now().strftime('%H:%M:%S')
         response_data = {
-            'count': people_in_frame,
+            'count': detected,
             'frame': frame_bytes.decode('utf-8'),  # Convert bytes to a string
             'groupCount': groupCount,
             'time': timestamp,

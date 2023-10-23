@@ -16,7 +16,7 @@ def RGB(event, x, y, flags, param):
 cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
 
-cap = cv2.VideoCapture('H:\\Downloads\\rtsp___172.23.16.150_554 - VLC media player 2023-10-16 12-56-14.mp4')
+cap = cv2.VideoCapture('H:\\Downloads\\vid2.mp4')
 
 my_file = open("coco.txt", "r")
 data = my_file.read()
@@ -34,13 +34,16 @@ tracker=Tracker()
 # area1=[(305,388),(513,468),(494,482),(298,399)]
 # area2=[(279,392),(250,397),(423,477),(454,469)]
 
-#Gate 1
-area1=[(241,164),(332,173),(326,187),(234,171)]
-area2=[(248,150),(344,157),(339,171),(242,159)]
+# Gate 1
+# area1=[(241,164),(332,173),(326,187),(234,171)]
+# area2=[(248,150),(344,157),(339,171),(242,159)]
 
-#Gate 2
-area3=[(602,206),(695,221),(702,232),(602,218)]
-area4=[(606,183),(691,196),(693,212),(602,198)]
+# Gate 2
+# area3=[(602,206),(695,221),(702,232),(602,218)]
+# area4=[(606,183),(691,196),(693,212),(602,198)]
+
+area1=[(159,201),(811,307),(807,324),(139,210)]
+area2=[(185,186),(815,276),(812,301),(161,200)]
 
 people_enter={}
 counter1=[]
@@ -66,19 +69,17 @@ while True:
     cv2.polylines(frame,[np.array(area1,np.int32)],True,(0,0,255),1)
     cv2.polylines(frame,[np.array(area2,np.int32)],True,(0,255,0),1)   
     #Gate 2
-    cv2.polylines(frame,[np.array(area3,np.int32)],True,(0,0,255),1)
-    cv2.polylines(frame,[np.array(area4,np.int32)],True,(0,255,0),1)   
-
-    conf = 0.5
+    # cv2.polylines(frame,[np.array(area3,np.int32)],True,(0,0,255),1)
+    # cv2.polylines(frame,[np.array(area4,np.int32)],True,(0,255,0),1)   
 
     results=model.predict(frame, conf = 0.3,classes=[0])
- #   print(results)
+
     a=results[0].boxes.data
     px=pd.DataFrame(a).astype("float")
-#    print(px)
+
     list=[]         
     for index,row in px.iterrows():
-#        print(row)
+
  
         x1=int(row[0])
         y1=int(row[1])
@@ -123,6 +124,9 @@ while True:
                     detected = detected + 1
                     enter=enter+1
                     cv2.imshow("Detected faces",face)
+                    if cv2.waitKey(1) & 0xFF == 27:
+                        break
+
                     #Gender detection
                     try:
                         gender_result = DeepFace.analyze(face,actions=['gender'])
@@ -144,42 +148,42 @@ while True:
 
         #GATE 2
         #People Leave
-        results5 = cv2.pointPolygonTest(np.array(area3,np.int32),((x_centre,y4)),False)
-        if results5>=0:
-            people_exit[id]=(x4,y4)
-        if id in people_exit:
-            results6 = cv2.pointPolygonTest(np.array(area4,np.int32),((x_centre,y4)),False)
-            if results6>=0:
-                if counter2.count(id)==0:
-                    counter2.append(id)
-                    exit=exit+1
-                    detected = detected - 1
-                    print("Exit count: ",len(counter2))
+        # results5 = cv2.pointPolygonTest(np.array(area3,np.int32),((x_centre,y4)),False)
+        # if results5>=0:
+        #     people_exit[id]=(x4,y4)
+        # if id in people_exit:
+        #     results6 = cv2.pointPolygonTest(np.array(area4,np.int32),((x_centre,y4)),False)
+        #     if results6>=0:
+        #         if counter2.count(id)==0:
+        #             counter2.append(id)
+        #             exit=exit+1
+        #             detected = detected - 1
+        #             print("Exit count: ",len(counter2))
 
-        #People Enter
-        results7 = cv2.pointPolygonTest(np.array(area4,np.int32),((x_centre,y4)),False)
-        if results7>=0:
-            #print("result3:",results3)
-            people_enter[id]=(x4,y4)
-        if id in people_enter:
-            results8 = cv2.pointPolygonTest(np.array(area3,np.int32),((x_centre,y4)),False)
-            if results8>=0:
-                if counter1.count(id)==0:
-                    counter1.append(id)
-                    detected = detected + 1
-                    enter=enter+1
-                    try:
-                        gender_result = DeepFace.analyze(face,actions=['gender'])
-                        gender= gender_result['gender']
-                        if gender=='Male':
-                            male=male+1
-                        elif gender=='Female':
-                            female=female+1
+        # #People Enter
+        # results7 = cv2.pointPolygonTest(np.array(area4,np.int32),((x_centre,y4)),False)
+        # if results7>=0:
+        #     #print("result3:",results3)
+        #     people_enter[id]=(x4,y4)
+        # if id in people_enter:
+        #     results8 = cv2.pointPolygonTest(np.array(area3,np.int32),((x_centre,y4)),False)
+        #     if results8>=0:
+        #         if counter1.count(id)==0:
+        #             counter1.append(id)
+        #             detected = detected + 1
+        #             enter=enter+1
+        #             try:
+        #                 gender_result = DeepFace.analyze(face,actions=['gender'])
+        #                 gender= gender_result['gender']
+        #                 if gender=='Male':
+        #                     male=male+1
+        #                 elif gender=='Female':
+        #                     female=female+1
                         
-                    except Exception as e:
-                        gender='Unknown'
-                        unknown= unknown +1
-                    print("Enter count: ",len(counter1))
+        #             except Exception as e:
+        #                 gender='Unknown'
+        #                 unknown= unknown +1
+        #             print("Enter count: ",len(counter1))
 
         #print("Detected people: ",detected)
         cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,255),1)
