@@ -75,6 +75,7 @@ while True:
             gender = gender_result['gender']
         except Exception as e:
             gender='Unknown'
+            
         print(gender)
         cx=int(x3+x4)//2
         cy=int(y3+y4)//2
