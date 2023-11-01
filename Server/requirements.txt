@@ -5,3 +5,5 @@ ultralytics
 Flask
 Flask-Cors
 pytube
+deepface
+tensorflow

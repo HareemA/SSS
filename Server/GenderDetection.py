@@ -4,8 +4,15 @@ import numpy as np
 from ultralytics import YOLO
 from tracker import*
 from deepface import DeepFace
+import os
+import face_recognition
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import img_to_array
 
-model=YOLO('yolov8s.pt')
+model=YOLO('yolov8n.pt')
+
+gender_model = load_model('gender_detection.model')
+classes = ['man', 'woman']
 
 def RGB(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE :  
@@ -16,7 +23,7 @@ def RGB(event, x, y, flags, param):
 cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
 
-cap = cv2.VideoCapture('H:\\Downloads\\vid2.mp4')
+cap = cv2.VideoCapture('H:\\Downloads\\vid2 - Trim.mp4')
 
 my_file = open("coco.txt", "r")
 data = my_file.read()
@@ -26,13 +33,9 @@ count=0
 detected = 0
 tracker=Tracker()
 
-#For shoppingmall
-# area1=[(708,239),(690,253),(945,334),(959,317)]
-# area2=[(681,257),(677,265),(927,353),(937,342)]
-
-#For People count1
-# area1=[(305,388),(513,468),(494,482),(298,399)]
-# area2=[(279,392),(250,397),(423,477),(454,469)]
+folder_name='data'
+if not os.path.exists(folder_name):
+    os.makedirs(folder_name)
 
 # Gate 1
 # area1=[(241,164),(332,173),(326,187),(234,171)]
@@ -42,8 +45,8 @@ tracker=Tracker()
 # area3=[(602,206),(695,221),(702,232),(602,218)]
 # area4=[(606,183),(691,196),(693,212),(602,198)]
 
-area1=[(159,201),(811,307),(807,324),(139,210)]
-area2=[(185,186),(815,276),(812,301),(161,200)]
+area1=[(135,186),(811,307),(807,324),(113,197)]
+area2=[(159,171),(815,276),(812,301),(135,186)]
 
 people_enter={}
 counter1=[]
@@ -56,6 +59,9 @@ unknown=0
 
 people_exit={}
 counter2=[]
+
+people = 0
+
 while True:    
     ret,frame = cap.read()
     if not ret:
@@ -72,38 +78,47 @@ while True:
     # cv2.polylines(frame,[np.array(area3,np.int32)],True,(0,0,255),1)
     # cv2.polylines(frame,[np.array(area4,np.int32)],True,(0,255,0),1)   
 
-    results=model.predict(frame, conf = 0.3,classes=[0])
-
+    results=model.track(frame, conf = 0.3,classes=[0],persist=True)
     a=results[0].boxes.data
     px=pd.DataFrame(a).astype("float")
+    
+    gender_label = 'none'
 
     list=[]         
     for index,row in px.iterrows():
-
- 
-        x1=int(row[0])
-        y1=int(row[1])
-        x2=int(row[2])
-        y2=int(row[3])
+        x3=int(row[0])
+        y3=int(row[1])
+        x4=int(row[2])
+        y4=int(row[3])
         d=int(row[5])
-        
-        list.append([x1,y1,x2,y2])
+        id = int(row[4])
+        # list.append([x1,y1,x2,y2])
 
-    bbox_id=tracker.update(list)
-    for bbox in bbox_id:
-        x3,y3,x4,y4,id=bbox
+    # bbox_id=tracker.update(list)
+    # for bbox in bbox_id:
+    #     x3,y3,x4,y4=bbox
         x_centre= (x3+x4)//2
+        y_centre=(y3+y4)//2
 
-        face=frame[y3:y4,x3:x4]
+        person=frame[y3:y4,x3:x4]
+        face_crop = cv2.resize(person, (96, 96))
+        face_crop = face_crop.astype("float") / 255.0
+        face_crop = img_to_array(face_crop)
+        face_crop = np.expand_dims(face_crop, axis=0)
+
+        gender_confidence = gender_model.predict(face_crop)[0]
+        gender_index = np.argmax(gender_confidence)
+        gender_label = classes[gender_index]
         #GATE 1
 
         #people leave
         #result is 1 if rerson inside that area and -1 if person isnt inside the area
-        results1 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y4)),False)
+        #x _centre,y4
+        results1 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y_centre)),False)
         if results1>=0:
             people_exit[id]=(x4,y4)
         if id in people_exit:
-            results2 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y4)),False)
+            results2 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
             if results2>=0:
                 if counter2.count(id)==0:
                     counter2.append(id)
@@ -112,36 +127,27 @@ while True:
                     print("Exit count: ",len(counter2))
 
         #People Enter
-        results3 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y4)),False)
+        results3 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
         if results3>=0:
             #print("result3:",results3)
             people_enter[id]=(x4,y4)
         if id in people_enter:
-            results4 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y4)),False)
+            results4 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y_centre)),False)
             if results4>=0:
                 if counter1.count(id)==0:
                     counter1.append(id)
                     detected = detected + 1
                     enter=enter+1
-                    cv2.imshow("Detected faces",face)
-                    if cv2.waitKey(1) & 0xFF == 27:
-                        break
+                    if gender_label == 'man':
+                        male = male + 1
+                    elif gender_label == 'women':
+                        female = female + 1
+                    else:
+                        unknown = unknown + 1
 
-                    #Gender detection
-                    try:
-                        gender_result = DeepFace.analyze(face,actions=['gender'])
-                        gender= gender_result['gender']
-                        print("Here")
-                        if gender=='Male':
-                            male=male+1
-                        elif gender=='Female':
-                            female=female+1
-                    except Exception as e:
-                        gender='Unknown'
-                        unknown=unknown+1
-                        print(e)
+                    #     file_name = os.path.join(folder_name,f'face_{people}.jpg')
+                    #     cv2.imwrite(file_name,face)
 
-                    print("GENDER: ",gender)
                     print("Enter count: ",len(counter1))
 
 
@@ -186,17 +192,18 @@ while True:
         #             print("Enter count: ",len(counter1))
 
         #print("Detected people: ",detected)
-        cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,255),1)
-        cv2.circle(frame,(x_centre,y4),4,(255,0,0),-1)
+        cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,0),1)
+        cv2.circle(frame,(x_centre,y_centre),4,(255,0,0),-1)
         cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
-        #Entry
-        cv2.putText(frame, f"Entry: {str(enter)}", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1)
-        #Exit
-        cv2.putText(frame, f"Exit: {str(exit)}", (30, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
-        #Gender
-        cv2.putText(frame,f"Male: {str(male)}",(30,140),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),1)
-        cv2.putText(frame,f"Female: {str(female)}",(30,160),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),1)
-        cv2.putText(frame,f"Unknown: {str(unknown)}",(30,180),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),1)
+        cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
+    #Entry
+    cv2.putText(frame, f"Entry: {str(enter)}", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+    #Exit
+    cv2.putText(frame, f"Exit: {str(exit)}", (30, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+    #Gender
+    cv2.putText(frame,f"Male: {str(male)}",(30,140),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),1)
+    cv2.putText(frame,f"Female: {str(female)}",(30,160),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),1)
+    cv2.putText(frame,f"Unknown: {str(unknown)}",(30,180),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),1)
 
     cv2.imshow("RGB", frame)
     if cv2.waitKey(1)&0xFF==27:
