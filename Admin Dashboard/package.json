@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@chartiful/react-native-chart-builder": "^0.1.8",
+    "@chartiful/react-native-horizontal-bar-graph": "^0.1.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.9",

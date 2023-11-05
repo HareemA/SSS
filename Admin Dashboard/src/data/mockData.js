@@ -264,3 +264,20 @@ export const mockLineDataGCount = [
   },
 ];
 
+export const mockDataGroup = 
+[
+    {
+      "id": "group",
+      "label": "Group",
+      "value": 45,
+      "color": "hsl(41, 70%, 50%)"
+    },
+    {
+      "id": "individual",
+      "label": "Individual",
+      "value": 55,
+      "color": "hsl(339, 70%, 50%)"
+    },
+    
+];
+

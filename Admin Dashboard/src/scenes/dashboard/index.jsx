@@ -17,351 +17,358 @@ import CCTVVideo from "../../components/CCTVVideo";
 import React from "react";
 import { useApi } from "../../scenes/global/ApiContext";
 import CountLiveMinute from "../../components/CountLiveMinute";
-
+import CustomerTable from "../../components/CustomerTable";
+import PieChartGroup from "../../components/PieChartGroup";
+import EngagementBarGraph from "../../components/EngagementBarGraph";
 
 const Dashboard = () => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-    const { apiData } = useApi();
-    const { count, groupCount, time, male, female, unknown } = apiData;
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const { apiData } = useApi();
+  const { count, groupCount, time, male, female, unknown } = apiData;
+  const users = [
+    { id: 1, name: 'Customer 1', visits: '10', gender: 'M', age: '10', group: 'N', timeIn: '10:15', timeOut: '12:35' },
+    { id: 2, name: 'Customer 2', visits: '8' },
+    { id: 3, name: 'Customer 3', visits: '2' },
+    { id: 4, name: 'Customer 4', visits: '9' },
+    { id: 5, name: 'Customer 5', visits: '11' },
+    // Add more user data as needed
+  ];
 
-  
-    return (
-      <Box m="20px">
-        {/* HEADER */}
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
-  
-          <Box>
-            <Button
-              sx={{
-                backgroundColor: colors.blueAccent[700],
-                color: colors.grey[100],
-                fontSize: "14px",
-                fontWeight: "bold",
-                padding: "10px 20px",
-              }}
-            >
-              <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-              Download Reports
-            </Button>
+
+  return (
+    <Box m="20px">
+      {/* HEADER */}
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+
+        <Box>
+          <Button
+            sx={{
+              backgroundColor: colors.blueAccent[700],
+              color: colors.grey[100],
+              fontSize: "14px",
+              fontWeight: "bold",
+              padding: "10px 20px",
+            }}
+          >
+            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
+            Download Reports
+          </Button>
+        </Box>
+      </Box>
+
+      {/* GRID & CHARTS */}
+      <Box
+        display="grid"
+        gridTemplateColumns="repeat(12, 1fr)"
+        gridAutoRows="140px"
+        gap="20px"
+      >
+        {/* ROW 1 */}
+
+        <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title={count}
+            subtitle="PEOPLE COUNT"
+            progress="0.75"
+            increase={time}
+            icon={
+              <PeopleIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box>
+
+        <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title={unknown}
+            subtitle="UNKNOWN"
+            progress="0.80"
+            increase={time}
+            icon={
+              <GroupsIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box>
+
+        <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title={male}
+            subtitle="MEN"
+            progress="0.50"
+            increase="+21%"
+            icon={
+              <ManIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box>
+        <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title={female}
+            subtitle="WOMEN"
+            progress="0.30"
+            increase="+5%"
+            icon={
+              <Woman2Icon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box>
+
+
+        {/* ROW 2 */}
+        <Box
+          gridColumn="span 5"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                CCTV VIDEO
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+                marginBottom="5px"
+              >
+                Live
+              </Typography>
+            </Box>
+          </Box>
+          <Box height="250px" m="0px 0 0 0"
+            display="flex"
+            justifyContent="center"
+          >
+            <CCTVVideo isDashboard={true} height="180vh" />
           </Box>
         </Box>
-  
-        {/* GRID & CHARTS */}
+
         <Box
-          display="grid"
-          gridTemplateColumns="repeat(12, 1fr)"
-          gridAutoRows="140px"
-          gap="20px"
+          gridColumn="span 7"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
         >
-          {/* ROW 1 */}
-
           <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
             alignItems="center"
-            justifyContent="center"
           >
-            <StatBox
-              title= {count}
-              subtitle="PEOPLE COUNT"
-              progress="0.75"
-              increase={time}
-              icon={
-                <PeopleIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                MIN/MAX COUNT PER MINUTE
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+              >
+                Min and Max people in a minute
+              </Typography>
+            </Box>
+            <Box>
+              <IconButton>
+                <DownloadOutlinedIcon
+                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
                 />
-              }
-            />
+              </IconButton>
+            </Box>
           </Box>
+          <Box height="250px" m="-20px 0 0 0">
+            <CountLiveMinute isDashboard={true} />
+          </Box>
+        </Box>
 
+        {/* Row 3 */}
+
+        <Box
+          gridColumn="span 12"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
           <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
             alignItems="center"
-            justifyContent="center"
           >
-            <StatBox
-              title={unknown}
-              subtitle="UNKNOWN"
-              progress="0.80"
-              increase={time}
-              icon={
-                <GroupsIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                />
-              }
-            />
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                LIVE COUNTS
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+              >
+                Individual | Group
+              </Typography>
+            </Box>
+
           </Box>
-          
+          <Box height="250px" m="-20px 0 0 0">
+            <CurrentCountsLine isDashboard={true} />
+          </Box>
+        </Box>
+
+
+        {/* ROW 4 */}
+        <Box
+          gridColumn="span 6"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
           <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
             alignItems="center"
-            justifyContent="center"
           >
-            <StatBox
-              title= {male}
-              subtitle="MEN"
-              progress="0.50"
-              increase="+21%"
-              icon={
-                <ManIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                GROUP COUNT HOURLY
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+              >
+                18 groups today
+              </Typography>
+            </Box>
+            <Box>
+              <IconButton>
+                <DownloadOutlinedIcon
+                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
                 />
-              }
-            />
+              </IconButton>
+            </Box>
           </Box>
+          <Box height="250px" m="-20px 0 0 0">
+            <GCountLineChart isDashboard={true} />
+          </Box>
+        </Box>
+
+
+        <Box
+          gridColumn="span 6"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            sx={{ padding: "30px 30px 0 30px" }}
+          >
+            WEEKLY GENDER DISTRIBUTION
+          </Typography>
+          <Box height="250px" mt="-20px">
+            <BarChart isDashboard={true} height="30vh" />
+          </Box>
+        </Box>
+
+        {/* ROW 5 */}
+
+        <Box
+          gridColumn="span 6"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
           <Box
-            gridColumn="span 3"
-            backgroundColor={colors.primary[400]}
-            display="flex"
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
             alignItems="center"
-            justifyContent="center"
           >
-            <StatBox
-              title= {female}
-              subtitle="WOMEN"
-              progress="0.30"
-              increase="+5%"
-              icon={
-                <Woman2Icon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                GENDER DISTRIBUTION
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+              >
+                Pie Chart
+              </Typography>
+            </Box>
+            <Box>
+              <IconButton>
+                <DownloadOutlinedIcon
+                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
                 />
-              }
-            />
-          </Box>
-          
-  
-          {/* ROW 2 */}
-          <Box
-            gridColumn="span 5"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-          >
-            <Box
-              mt="25px"
-              p="0 30px"
-              display="flex "
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                >
-                  CCTV VIDEO
-                </Typography>
-                <Typography
-                  variant="h3"
-                  fontWeight="bold"
-                  color={colors.greenAccent[500]}
-                  marginBottom="5px"
-                >
-                  Live
-                </Typography>
-              </Box>
-            </Box>
-            <Box height="250px" m="0px 0 0 0" 
-              display="flex"
-              justifyContent="center"     
-            >
-              <CCTVVideo isDashboard={true} height="180vh" />
+              </IconButton>
             </Box>
           </Box>
-
-          <Box
-            gridColumn="span 7"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-          >
-            <Box
-              mt="25px"
-              p="0 30px"
-              display="flex "
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                >
-                  MIN/MAX COUNT PER MINUTE
-                </Typography>
-                <Typography
-                  variant="h3"
-                  fontWeight="bold"
-                  color={colors.greenAccent[500]}
-                >
-                  Min and Max people in a minute
-                </Typography>
-              </Box>
-              <Box>
-                <IconButton>
-                  <DownloadOutlinedIcon
-                    sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                  />
-                </IconButton>
-              </Box>
-            </Box>
-            <Box height="250px" m="-20px 0 0 0">
-              <CountLiveMinute isDashboard={true} />
-            </Box>
-          </Box> 
-
-          {/* Row 3 */}
-
-          <Box
-            gridColumn="span 12"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-          >
-            <Box
-              mt="25px"
-              p="0 30px"
-              display="flex "
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                >
-                  LIVE COUNTS
-                </Typography>
-                <Typography
-                  variant="h3"
-                  fontWeight="bold"
-                  color={colors.greenAccent[500]}
-                >
-                  Individual | Group
-                </Typography>
-              </Box>
-              
-            </Box>
-            <Box height="250px" m="-20px 0 0 0">
-              <CurrentCountsLine isDashboard={true} />
-            </Box>
-          </Box> 
-
-          
-          {/* ROW 3 */}
-          <Box
-            gridColumn="span 6"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-          >
-            <Box
-              mt="25px"
-              p="0 30px"
-              display="flex "
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                >
-                  GROUP COUNT HOURLY
-                </Typography>
-                <Typography
-                  variant="h3"
-                  fontWeight="bold"
-                  color={colors.greenAccent[500]}
-                >
-                  18 groups today
-                </Typography>
-              </Box>
-              <Box>
-                <IconButton>
-                  <DownloadOutlinedIcon
-                    sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                  />
-                </IconButton>
-              </Box>
-            </Box>
-            <Box height="250px" m="-20px 0 0 0">
-              <GCountLineChart isDashboard={true} />
-            </Box>
+          <Box height="250px" m="-20px 0 0 0">
+            <PieChart isDashboard={true} />
           </Box>
+        </Box>
 
-
-          <Box
-            gridColumn="span 6"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-          >
-            <Typography
-              variant="h5"
-              fontWeight="600"
-              sx={{ padding: "30px 30px 0 30px" }}
-            >
-              WEEKLY GENDER DISTRIBUTION
-            </Typography>
-            <Box height="250px" mt="-20px">
-              <BarChart isDashboard={true} height="30vh" />
-            </Box>
-          </Box>
-
-              {/* ROW 4 */}
-
-                  
-   
-
-          <Box
-            gridColumn="span 6"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-          >
-            <Box
-              mt="25px"
-              p="0 30px"
-              display="flex "
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                >
-                  GENDER DISTRIBUTION
-                </Typography>
-                <Typography
-                  variant="h3"
-                  fontWeight="bold"
-                  color={colors.greenAccent[500]}
-                >
-                  Pie Chart
-                </Typography>
-              </Box>
-              <Box>
-                <IconButton>
-                  <DownloadOutlinedIcon
-                    sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                  />
-                </IconButton>
-              </Box>
-            </Box>
-            <Box height="250px" m="-20px 0 0 0">
-              <PieChart isDashboard={true} />
-            </Box>
-          </Box>    
-
-          <Box
+        <Box
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -388,52 +395,129 @@ const Dashboard = () => {
           </Box>
         </Box>
 
+        {/* Row 6 */}
         <Box
-            gridColumn="span 7"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
+          gridColumn="span 7"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
           >
-            <Box
-              mt="25px"
-              p="0 30px"
-              display="flex "
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                >
-                  HOURLY FOOTFALL
-                </Typography>
-                <Typography
-                  variant="h3"
-                  fontWeight="bold"
-                  color={colors.greenAccent[500]}
-                >
-                  XXX individuals today
-                </Typography>
-              </Box>
-              <Box>
-                <IconButton>
-                  <DownloadOutlinedIcon
-                    sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                  />
-                </IconButton>
-              </Box>
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                HOURLY FOOTFALL
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+              >
+                XXX individuals today
+              </Typography>
             </Box>
-            <Box height="250px" m="-20px 0 0 0">
-              <CountLineChart isDashboard={true} />
+            <Box>
+              <IconButton>
+                <DownloadOutlinedIcon
+                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
+                />
+              </IconButton>
             </Box>
           </Box>
-        </Box>        
+          <Box height="250px" m="-20px 0 0 0">
+            <CountLineChart isDashboard={true} />
+          </Box>
+        </Box>
+        {/* NEW BAR AND PIE CHART CODE */}
+        <Box
+          gridColumn="span 6"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                GROUP TREND
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+              >
+                Pie Chart
+              </Typography>
+            </Box>
+          </Box>
+          <Box height="250px" m="-20px 0 0 0">
+            <PieChartGroup isDashboard={true} />
+          </Box>
         </Box>
 
-        
+        <Box
+          gridColumn="span 6"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+          p="30px"
+        >
+          <Typography variant="h5" fontWeight="600">
+            ENGAGEMENT
+          </Typography>
+          {/* <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mt="25px"
+          >
+            <EngagementBarGraph isDashboard={true} height="30vh"/>
+            
+          </Box> */}
+          <Box height="250px" mt="-20px">
+            <EngagementBarGraph isDashboard={true} height="30vh" />
+          </Box>
+        </Box>
 
-    );
+        {/* USERS DATA TABLE */}
+        <Box
+          gridColumn="span 12"
+          height={300}
+          backgroundColor={colors.primary[400]}
+        >
+          {/* <Typography
+                variant="h5"
+                fontWeight="600"
+                sx={{ padding: "30px 30px 0 30px" }}
+              >
+                USER TABLE
+              </Typography> */}
+
+          <Box height={350}>
+            <CustomerTable isDashboard={true} users={users} height="300px" />
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+
+
+
+  );
 };
-  
-  export default Dashboard;
+
+export default Dashboard;
