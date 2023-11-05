@@ -8,7 +8,7 @@ import threading
 from flask_cors import CORS 
 import base64
 from datetime import datetime
-from group_test_server import *
+from GroupDetection import *
 from pytube import YouTube
 import threading
 

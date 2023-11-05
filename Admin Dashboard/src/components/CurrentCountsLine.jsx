@@ -117,6 +117,7 @@ const CurrentCountsLine = ({ isCustomLineColors = false, isDashboard = false }) 
       axisLeft={{
         orient: "left",
         // tickValues: 5, // added
+        // format: e => Math.floor(e) === e && e,
         tickSize: 3,
         tickPadding: 5,
         tickRotation: 0,

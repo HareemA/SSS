@@ -115,6 +115,7 @@ const CountLiveMinute = ({ isCustomLineColors = false, isDashboard = false }) =>
         axisLeft={{
             tickSize: 3,
             tickPadding: 5,
+            // format: e => Math.floor(e) === e && e,
             tickRotation: 0,
             legend: 'count',
             legendOffset: -36,
