@@ -14,6 +14,9 @@ import Pie from "./scenes/pie";
 import CCTV from "./scenes/Video";
 import CurrentCountsLine from "./scenes/liveCount";
 import CountLiveMinute from "./scenes/lineMinutes";
+import DailyLineChart from './scenes/DailyLine';
+import WeeklyLineChart from './scenes/WeeklyLine';
+import MonthlyLineChart from './scenes/MonthlyLine';
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -36,6 +39,9 @@ function App() {
               <Route path="/liveCount" element={<CurrentCountsLine />} />
               <Route path="/video" element={<CCTV />} />
               <Route path="/liveCountMinute" element={<CountLiveMinute />} />
+              <Route path="/DailyLineChart" element={<DailyLineChart />} />
+              <Route path="/WeeklyLineChart" element={<WeeklyLineChart />} />
+              <Route path="/MonthlyLineChart" element={<MonthlyLineChart />} />
             </Routes>
           </main>
         </div>
