@@ -12,11 +12,9 @@ if img is not None:
     size = (150, 150)
     resized_img = cv2.resize(img, size)
 
-    # Histogram Equalization
-    equalized_img = cv2.equalizeHist(resized_img)
 
     # Gaussian Blur
-    blurred_img = cv2.GaussianBlur(equalized_img, (5, 5), 0)
+    blurred_img = cv2.GaussianBlur(resized_img, (7, 7), 2)
 
     cv2.imshow("Face", blurred_img)
 
