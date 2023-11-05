@@ -1,20 +1,31 @@
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Typography,
+  useTheme,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { tokens } from "../../theme";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import PeopleIcon from '@mui/icons-material/People';
-import ManIcon from '@mui/icons-material/Man';
-import Woman2Icon from '@mui/icons-material/Woman2';
-import GroupsIcon from '@mui/icons-material/Groups';
+import PeopleIcon from "@mui/icons-material/People";
+import ManIcon from "@mui/icons-material/Man";
+import Woman2Icon from "@mui/icons-material/Woman2";
+import GroupsIcon from "@mui/icons-material/Groups";
 import Header from "../../components/Header";
 import CountLineChart from "../../components/CountLineChart";
 import GCountLineChart from "../../components/GCountLineChart";
+import DailyLineChart from "../../components/DailyLine";
+import WeeklyLineChart from "../../components/WeeklyLine";
+import MonthlyLineChart from "../../components/MonthlyLine";
 import CurrentCountsLine from "../../components/CurrentCountsLine";
 import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
 import CCTVVideo from "../../components/CCTVVideo";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useApi } from "../../scenes/global/ApiContext";
 import CountLiveMinute from "../../components/CountLiveMinute";
 import CustomerTable from "../../components/CustomerTable";
@@ -36,25 +47,61 @@ const Dashboard = () => {
   ];
 
 
+  const [chartType, setChartType] = useState("Today");
+  const [currentTime, setCurrentTime] = useState("");
+  const [currentDate, setCurrentDate] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
+      const seconds = now.getSeconds().toString().padStart(2, "0");
+      setCurrentTime(`${hours}:${minutes}:${seconds}`);
+
+      const day = now.getDate().toString().padStart(2, "0");
+      const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const month = monthNames[now.getMonth()];
+      const year = now.getFullYear();
+      setCurrentDate(`${day} ${month} ${year}`);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const renderChart = () => {
+    if (chartType === "Today") {
+      return <DailyLineChart isDashboard={true} />;
+    } else if (chartType === "Weekly") {
+      return <WeeklyLineChart isDashboard={true} />;
+    } else if (chartType === "Monthly") {
+      return <MonthlyLineChart isDashboard={true} />;
+    }
+  };
+
   return (
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+        <Header title="CSE DEPARTMENT" subtitle={"Surveillance Analytics"} />
 
         <Box>
-          <Button
-            sx={{
-              backgroundColor: colors.blueAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Download Reports
-          </Button>
+          <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+            {currentTime} | {currentDate}
+          </Typography>
         </Box>
       </Box>
 
@@ -65,7 +112,120 @@ const Dashboard = () => {
         gridAutoRows="140px"
         gap="20px"
       >
-        {/* ROW 1 */}
+        {/* ROW 1 : Footfall Line Graph*/}
+
+        <Box
+          gridColumn="span 12"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                FOOTFALL
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+              >
+                {chartType}
+              </Typography>
+            </Box>
+            <Box>
+              <Select
+                value={chartType}
+                onChange={(e) => setChartType(e.target.value)}
+                sx={{
+                  width: 150,
+                  height: 35,
+                }}
+              >
+                <MenuItem value="Today">Today</MenuItem>
+                <MenuItem value="Weekly">This Week</MenuItem>
+                <MenuItem value="Monthly">This Month</MenuItem>
+              </Select>
+            </Box>
+          </Box>
+          <Box height="250px" m="-20px 0 0 0">
+            {renderChart()}
+          </Box>
+        </Box>
+
+        {/* Row 2: CCTV Video */}
+
+        <Box
+          gridColumn="span 9"
+          gridRow="span 3"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            mt="10px"
+            p="0 0px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                margin="15px 0 0 25px"
+                color={colors.grey[100]}
+              >
+                CCTV VIDEO
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                marginLeft="25px"
+                color={colors.greenAccent[500]}
+                marginBottom="5px"
+              >
+                Live
+              </Typography>
+            </Box>
+          </Box>
+          <Box
+            height="250px"
+            m="0px 0 0 0"
+            display="flex"
+            justifyContent="center"
+          >
+            <CCTVVideo isDashboard={true} height="315vh" />
+          </Box>
+        </Box>
+
+        {/* gender ratio Box */}
+        <Box
+          gridColumn="span 4"
+          gridRow="span 2"
+          // paddingLeft="20px"
+          // paddingRight="20px"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box mt="25px" ml="20px">
+            <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+              GENDER RATIO
+            </Typography>
+          </Box>
+
+          <Box height="220px" >
+            <PieChart isDashboard={true} />
+          </Box>
+        </Box>
+
+        {/* ROW 2 : four stat boxes  */}
 
         <Box
           gridColumn="span 3"
@@ -95,8 +255,8 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={unknown}
-            subtitle="UNKNOWN"
+            title={groupCount}
+            subtitle="GROUP COUNT"
             progress="0.80"
             increase={time}
             icon={
@@ -115,7 +275,7 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={male}
+            title={unknown}
             subtitle="MEN"
             progress="0.50"
             increase="+21%"
@@ -146,8 +306,7 @@ const Dashboard = () => {
           />
         </Box>
 
-
-        {/* ROW 2 */}
+        {/* ROW 3: CCTV Video and Min/Max Count per minute Line Graph */}
         <Box
           gridColumn="span 5"
           gridRow="span 2"
@@ -178,7 +337,9 @@ const Dashboard = () => {
               </Typography>
             </Box>
           </Box>
-          <Box height="250px" m="0px 0 0 0"
+          <Box
+            height="250px"
+            m="0px 0 0 0"
             display="flex"
             justifyContent="center"
           >
@@ -257,15 +418,13 @@ const Dashboard = () => {
                 Individual | Group
               </Typography>
             </Box>
-
           </Box>
           <Box height="250px" m="-20px 0 0 0">
             <CurrentCountsLine isDashboard={true} />
           </Box>
         </Box>
 
-
-        {/* ROW 4 */}
+        {/* ROW 3 */}
         <Box
           gridColumn="span 6"
           gridRow="span 2"
@@ -307,7 +466,6 @@ const Dashboard = () => {
           </Box>
         </Box>
 
-
         <Box
           gridColumn="span 6"
           gridRow="span 2"
@@ -325,48 +483,8 @@ const Dashboard = () => {
           </Box>
         </Box>
 
-        {/* ROW 5 */}
 
-        <Box
-          gridColumn="span 6"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                GENDER DISTRIBUTION
-              </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.greenAccent[500]}
-              >
-                Pie Chart
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                />
-              </IconButton>
-            </Box>
-          </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <PieChart isDashboard={true} />
-          </Box>
-        </Box>
+        {/* ROW 4 */}
 
         <Box
           gridColumn="span 4"

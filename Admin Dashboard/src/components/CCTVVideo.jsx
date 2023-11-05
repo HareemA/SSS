@@ -25,7 +25,7 @@ const CCTVVideo = ({ isDashboard = false, height }) => {
 
 
   return (
-    <div className="cctv-video">
+    <div className="cctv-video" style={{ padding: '10px' }}>
       <div className="video-container">
         {/* Use apiData.frame instead of frameData.frame */}
         <img
@@ -34,7 +34,7 @@ const CCTVVideo = ({ isDashboard = false, height }) => {
           height={height}
         />
       </div>
-      <div className="slider-container">
+      <div className="slider-container" style={{ padding: '10px' }}>
         <Slider
           value={sliderValue}
           onChange={handleSliderChange}

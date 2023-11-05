@@ -31,7 +31,7 @@ export function ApiProvider({ children }) {
   // Function to fetch data from the API
   const fetchDataFromApi = async () => {
     try {
-      const response = await fetch(`http://192.168.100.10:8080/get_data/${sliderValue}`);
+      const response = await fetch(`http://192.168.18.132:8080/get_data/${sliderValue}`);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
