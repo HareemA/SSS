@@ -9,10 +9,12 @@ import {
 } from "@mui/material";
 import { tokens } from "../../theme";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import PeopleIcon from "@mui/icons-material/People";
-import ManIcon from "@mui/icons-material/Man";
-import Woman2Icon from "@mui/icons-material/Woman2";
+import LoginIcon from "@mui/icons-material/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
+import StorefrontIcon from "@mui/icons-material/Storefront";
 import GroupsIcon from "@mui/icons-material/Groups";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import ReplayIcon from "@mui/icons-material/Replay";
 import Header from "../../components/Header";
 import CountLineChart from "../../components/CountLineChart";
 import GCountLineChart from "../../components/GCountLineChart";
@@ -207,6 +209,235 @@ const Dashboard = () => {
           >
             <CCTVVideo isDashboard={true} height="315vh" />
           </Box>
+        </Box>
+
+        {/* CARD */}
+        <Box
+          gridColumn="span 3"
+          gridRow="span 3"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            mt="10px"
+            p="0 0px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="700"
+                margin="15px 0 15px 35px"
+                alignItems="center"
+                color={colors.grey[200]}
+              >
+                CUSTOMERS TODAY
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box
+            display="flex"
+            flexDirection="column" // Set the container to display items vertically
+            alignItems="center"
+          >
+            <Box
+              m="15px 0" // Margin for the first row
+              p="0 30px"
+              display="flex"
+              justifyContent="space-between"
+            >
+              <Box display="flex" alignItems="space-between" mr="25px">
+                <LoginIcon
+                  sx={{
+                    fontSize: "26px",
+                    color: colors.greenAccent[500],
+                    ml: "15px",
+                    mr:"10px",
+                  }}
+                />
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                  // mr="15px"
+                >
+                  Entered
+                </Typography>
+              </Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+                mr="15px"
+              >
+                XXX
+              </Typography>
+            </Box>
+
+            <Box
+              m="15px 0" // 10px margin for the second row
+              p="0 30px"
+              display="flex"
+              justifyContent="space-between"
+            >
+              <Box display="flex" alignItems="space-between" mr="25px">
+                <LogoutIcon
+                  sx={{
+                    fontSize: "26px",
+                    color: colors.greenAccent[500],
+                    mr: "10px",
+                  }}
+                />
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                  mr="15px"
+                >
+                  Left
+                </Typography>
+              </Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+                alignContent="right"
+              >
+                XXX
+              </Typography>
+            </Box>
+            <Box
+              m="15px 0" // Margin for the thrid row
+              p="0 30px"
+              display="flex"
+              justifyContent="space-between"
+            >
+              <Box display="flex" alignItems="space-between" mr="25px">
+                <StorefrontIcon
+                  sx={{
+                    fontSize: "26px",
+                    color: colors.greenAccent[500],
+                    mr: "10px",
+                  }}
+                />
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                  mr="15px"
+                >
+                  In-Store
+                </Typography>
+              </Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                XXX
+              </Typography>
+            </Box>
+
+            <Box
+              m="15px 0" // 10px margin for the 4th row
+              p="0 30px"
+              display="flex"
+              justifyContent="space-between"
+            >
+              <Box display="flex" alignItems="space-between" mr="25px">
+                <PersonAddIcon
+                  sx={{
+                    fontSize: "26px",
+                    color: colors.greenAccent[500],
+                    mr: "10px",
+                  }}
+                />
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                  mr="15px"
+                >
+                  New
+                </Typography>
+              </Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                XXX
+              </Typography>
+            </Box>
+            <Box
+              m="15px 0" // Margin for the 5throw
+              p="0 30px"
+              display="flex"
+              justifyContent="space-between"
+            >
+              <Box display="flex" alignItems="space-between" mr="25px">
+                <ReplayIcon
+                  sx={{
+                    fontSize: "26px",
+                    color: colors.greenAccent[500],
+                    mr: "10px",
+                  }}
+                />
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                  mr="15px"
+                >
+                  Returning
+                </Typography>
+              </Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                XXX
+              </Typography>
+            </Box>
+
+            <Box
+              m="15px 0" // 10px margin for the 6th row
+              p="0 30px"
+              display="flex"
+              justifyContent="space-between"
+            >
+              <Box display="flex" alignItems="space-between" mr="25px">
+                <GroupsIcon
+                  sx={{
+                    fontSize: "26px",
+                    color: colors.greenAccent[500],
+                    mr: "10px",
+                  }}
+                />
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                  mr="15px"
+                >
+                  Groups
+                </Typography>
+              </Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                XXX
+              </Typography>
+            </Box>
+          </Box>
+          
+                   
+          
         </Box>
 
         {/* ROW 3: Gender, Repeat Ratio Pie Chart, Group Trend, Engagement, BAR Graph */}
