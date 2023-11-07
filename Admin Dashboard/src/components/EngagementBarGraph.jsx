@@ -7,15 +7,15 @@ const generateMockData = () => {
   return [
     {
       metric: "Max",
-      value: Math.floor(Math.random() * 100),
+      value: 45,
     },
     {
       metric: "Min",
-      value: Math.floor(Math.random() * 100),
+      value: 8,
     },
     {
       metric: "Avg",
-      value: Math.floor(Math.random() * 100),
+      value: 23,
     },
   ];
 };

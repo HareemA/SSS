@@ -38,14 +38,22 @@ const Dashboard = () => {
   const { apiData } = useApi();
   const { count, groupCount, time, male, female, unknown } = apiData;
   const users = [
-    { id: 1, name: 'Customer 1', visits: '10', gender: 'M', age: '10', group: 'N', timeIn: '10:15', timeOut: '12:35' },
-    { id: 2, name: 'Customer 2', visits: '8' },
-    { id: 3, name: 'Customer 3', visits: '2' },
-    { id: 4, name: 'Customer 4', visits: '9' },
-    { id: 5, name: 'Customer 5', visits: '11' },
+    {
+      id: 1,
+      name: "Customer 1",
+      visits: "10",
+      gender: "M",
+      age: "10",
+      group: "N",
+      timeIn: "10:15",
+      timeOut: "12:35",
+    },
+    { id: 2, name: "Customer 2", visits: "8" },
+    { id: 3, name: "Customer 3", visits: "2" },
+    { id: 4, name: "Customer 4", visits: "9" },
+    { id: 5, name: "Customer 5", visits: "11" },
     // Add more user data as needed
   ];
-
 
   const [chartType, setChartType] = useState("Today");
   const [currentTime, setCurrentTime] = useState("");
@@ -162,7 +170,7 @@ const Dashboard = () => {
           </Box>
         </Box>
 
-        {/* Row 2: CCTV Video */}
+        {/* Row 2: CCTV Video + card to make*/}
 
         <Box
           gridColumn="span 9"
@@ -206,7 +214,8 @@ const Dashboard = () => {
           </Box>
         </Box>
 
-        {/* gender ratio Box */}
+        {/* ROW 3: Gender, Repeat Ratio Pie Chart, Group Trend, Engagement, BAR Graph */}
+        {/* Gender Ratio Pie */}
         <Box
           gridColumn="span 4"
           gridRow="span 2"
@@ -220,12 +229,128 @@ const Dashboard = () => {
             </Typography>
           </Box>
 
-          <Box height="220px" >
+          <Box height="220px">
             <PieChart isDashboard={true} />
           </Box>
         </Box>
 
-        {/* ROW 2 : four stat boxes  */}
+        <Box
+          gridColumn="span 4"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+          p="30px"
+        >
+          <Typography variant="h5" fontWeight="600">
+            REPEAT RATIO
+          </Typography>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mt="25px"
+          >
+            <ProgressCircle size="125" />
+            <Typography
+              variant="h5"
+              color={colors.greenAccent[500]}
+              sx={{ mt: "15px" }}
+            >
+              67%
+            </Typography>
+            <Typography>Returned this week</Typography>
+          </Box>
+        </Box>
+
+        <Box
+          gridColumn="span 4"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                GROUP TREND
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+              >
+                Pie Chart
+              </Typography>
+            </Box>
+          </Box>
+          <Box height="250px" m="-20px 0 0 0">
+            <PieChartGroup isDashboard={true} />
+          </Box>
+        </Box>
+
+        {/* ROW: ENgagement ad Gender BARS */}
+
+        <Box
+          gridColumn="span 6"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            sx={{ padding: "30px 30px 0 30px" }}
+          >
+            WEEKLY GENDER DISTRIBUTION
+          </Typography>
+          <Box height="250px" mt="-20px">
+            <BarChart isDashboard={true} height="30vh" />
+          </Box>
+        </Box>
+
+        <Box
+          gridColumn="span 6"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+          p="30px"
+        >
+          <Typography variant="h5" fontWeight="600">
+            ENGAGEMENT
+          </Typography>
+          {/* <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mt="25px"
+          >
+            <EngagementBarGraph isDashboard={true} height="30vh"/>
+            
+          </Box> */}
+          <Box height="250px" mt="-20px">
+            <EngagementBarGraph isDashboard={true} height="30vh" />
+          </Box>
+        </Box>
+
+        {/* USERS DATA TABLE */}
+        <Box
+          gridColumn="span 12"
+          height={300}
+          backgroundColor={colors.primary[400]}
+        >
+          <Box height={350} sx={{ marginBotton: "35px" }}>
+            <CustomerTable isDashboard={true} users={users} height="300px" />
+          </Box>
+        </Box>
+
+        {/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */}
+
+        {/*  four stat boxes 
 
         <Box
           gridColumn="span 3"
@@ -304,10 +429,10 @@ const Dashboard = () => {
               />
             }
           />
-        </Box>
+        </Box> */}
 
         {/* ROW 3: CCTV Video and Min/Max Count per minute Line Graph */}
-        <Box
+        {/* <Box
           gridColumn="span 5"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -345,9 +470,9 @@ const Dashboard = () => {
           >
             <CCTVVideo isDashboard={true} height="180vh" />
           </Box>
-        </Box>
+        </Box> */}
 
-        <Box
+        {/* <Box
           gridColumn="span 7"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -386,11 +511,11 @@ const Dashboard = () => {
           <Box height="250px" m="-20px 0 0 0">
             <CountLiveMinute isDashboard={true} />
           </Box>
-        </Box>
+        </Box> */}
 
-        {/* Row 3 */}
+        {/* LINE live */}
 
-        <Box
+        {/* <Box
           gridColumn="span 12"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -422,10 +547,10 @@ const Dashboard = () => {
           <Box height="250px" m="-20px 0 0 0">
             <CurrentCountsLine isDashboard={true} />
           </Box>
-        </Box>
+        </Box> */}
 
-        {/* ROW 3 */}
-        <Box
+        {/* LINE GCOUNT */}
+        {/* <Box
           gridColumn="span 6"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -453,68 +578,16 @@ const Dashboard = () => {
                 18 groups today
               </Typography>
             </Box>
-            <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                />
-              </IconButton>
-            </Box>
           </Box>
           <Box height="250px" m="-20px 0 0 0">
             <GCountLineChart isDashboard={true} />
           </Box>
-        </Box>
-
-        <Box
-          gridColumn="span 6"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
-            WEEKLY GENDER DISTRIBUTION
-          </Typography>
-          <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} height="30vh" />
-          </Box>
-        </Box>
-
+        </Box> */}
 
         {/* ROW 4 */}
 
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          p="30px"
-        >
-          <Typography variant="h5" fontWeight="600">
-            FOOTFALL PROGRESS
-          </Typography>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-          >
-            <ProgressCircle size="125" />
-            <Typography
-              variant="h5"
-              color={colors.greenAccent[500]}
-              sx={{ mt: "15px" }}
-            >
-              11%
-            </Typography>
-            <Typography>MONTHLY GROWTH IN FOOTFALL</Typography>
-          </Box>
-        </Box>
-
-        {/* Row 6 */}
-        <Box
+        {/* LINE */}
+        {/* <Box
           gridColumn="span 7"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -553,88 +626,9 @@ const Dashboard = () => {
           <Box height="250px" m="-20px 0 0 0">
             <CountLineChart isDashboard={true} />
           </Box>
-        </Box>
-        {/* NEW BAR AND PIE CHART CODE */}
-        <Box
-          gridColumn="span 6"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                GROUP TREND
-              </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.greenAccent[500]}
-              >
-                Pie Chart
-              </Typography>
-            </Box>
-          </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <PieChartGroup isDashboard={true} />
-          </Box>
-        </Box>
-
-        <Box
-          gridColumn="span 6"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          p="30px"
-        >
-          <Typography variant="h5" fontWeight="600">
-            ENGAGEMENT
-          </Typography>
-          {/* <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-          >
-            <EngagementBarGraph isDashboard={true} height="30vh"/>
-            
-          </Box> */}
-          <Box height="250px" mt="-20px">
-            <EngagementBarGraph isDashboard={true} height="30vh" />
-          </Box>
-        </Box>
-
-        {/* USERS DATA TABLE */}
-        <Box
-          gridColumn="span 12"
-          height={300}
-          backgroundColor={colors.primary[400]}
-        >
-          {/* <Typography
-                variant="h5"
-                fontWeight="600"
-                sx={{ padding: "30px 30px 0 30px" }}
-              >
-                USER TABLE
-              </Typography> */}
-
-          <Box height={350}>
-            <CustomerTable isDashboard={true} users={users} height="300px" />
-          </Box>
-        </Box>
+        </Box> */}
       </Box>
     </Box>
-
-
-
   );
 };
 
