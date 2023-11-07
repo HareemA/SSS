@@ -838,3 +838,17 @@ export const mockDataGroup =
     
 ];
 
+export const mockUserData = 
+[
+  { id: 1,name: "Customer 1",visits: "10",gender: "M",age: "10",group: "N",timeIn: "10:15",timeOut: "12:35"},
+    { id: 2, name: "Customer 2", visits: 15, gender: "F", age: 25, group: "A", timeIn: "11:30", timeOut: "14:45" },
+    { id: 3, name: "Customer 3", visits: 8, gender: "M", age: 30, group: "N", timeIn: "09:45", timeOut: "12:20" },
+    { id: 4, name: "Customer 4", visits: 12, gender: "F", age: 22, group: "A", timeIn: "10:00", timeOut: "13:15" },
+    { id: 5, name: "Customer 5", visits: 18, gender: "M", age: 35, group: "N", timeIn: "08:15", timeOut: "11:30" },
+    { id: 6, name: "Customer 6", visits: 14, gender: "F", age: 28, group: "A", timeIn: "11:45", timeOut: "15:00" },
+    { id: 7, name: "Customer 7", visits: 9, gender: "M", age: 40, group: "N", timeIn: "09:00", timeOut: "12:15" },
+    { id: 8, name: "Customer 8", visits: 11, gender: "F", age: 32, group: "A", timeIn: "10:30", timeOut: "13:45" },
+    { id: 9, name: "Customer 9", visits: 16, gender: "M", age: 45, group: "N", timeIn: "08:45", timeOut: "12:00" },
+    { id: 10, name: "Customer 10", visits: 20, gender: "F", age: 26, group: "A", timeIn: "12:00", timeOut: "15:15" }
+];
+

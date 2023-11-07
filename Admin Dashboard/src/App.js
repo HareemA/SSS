@@ -17,6 +17,7 @@ import CountLiveMinute from "./scenes/lineMinutes";
 import DailyLineChart from './scenes/DailyLine';
 import WeeklyLineChart from './scenes/WeeklyLine';
 import MonthlyLineChart from './scenes/MonthlyLine';
+import FiveMinuteLineChart from './scenes/FiveMinuteLine';
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -42,6 +43,7 @@ function App() {
               <Route path="/DailyLineChart" element={<DailyLineChart />} />
               <Route path="/WeeklyLineChart" element={<WeeklyLineChart />} />
               <Route path="/MonthlyLineChart" element={<MonthlyLineChart />} />
+              <Route path="/FiveMinuteLineChart" element={<FiveMinuteLineChart />} />
             </Routes>
           </main>
         </div>

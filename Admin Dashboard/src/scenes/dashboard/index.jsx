@@ -21,6 +21,7 @@ import GCountLineChart from "../../components/GCountLineChart";
 import DailyLineChart from "../../components/DailyLine";
 import WeeklyLineChart from "../../components/WeeklyLine";
 import MonthlyLineChart from "../../components/MonthlyLine";
+import FiveMinuteLineChart from "../../components/FiveMinuteLine";
 import CurrentCountsLine from "../../components/CurrentCountsLine";
 import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
@@ -33,29 +34,15 @@ import CountLiveMinute from "../../components/CountLiveMinute";
 import CustomerTable from "../../components/CustomerTable";
 import PieChartGroup from "../../components/PieChartGroup";
 import EngagementBarGraph from "../../components/EngagementBarGraph";
+import { mockUserData as userData } from "../../data/mockData";
+
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { apiData } = useApi();
   const { count, groupCount, time, male, female, unknown } = apiData;
-  const users = [
-    {
-      id: 1,
-      name: "Customer 1",
-      visits: "10",
-      gender: "M",
-      age: "10",
-      group: "N",
-      timeIn: "10:15",
-      timeOut: "12:35",
-    },
-    { id: 2, name: "Customer 2", visits: "8" },
-    { id: 3, name: "Customer 3", visits: "2" },
-    { id: 4, name: "Customer 4", visits: "9" },
-    { id: 5, name: "Customer 5", visits: "11" },
-    // Add more user data as needed
-  ];
+ 
 
   const [chartType, setChartType] = useState("Today");
   const [currentTime, setCurrentTime] = useState("");
@@ -71,18 +58,7 @@ const Dashboard = () => {
 
       const day = now.getDate().toString().padStart(2, "0");
       const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
+        "January","February","March","April","May","June","July","August","September","October","November","December",
       ];
       const month = monthNames[now.getMonth()];
       const year = now.getFullYear();
@@ -99,6 +75,8 @@ const Dashboard = () => {
       return <WeeklyLineChart isDashboard={true} />;
     } else if (chartType === "Monthly") {
       return <MonthlyLineChart isDashboard={true} />;
+    } else if (chartType === "MinutesLive") {
+      return <FiveMinuteLineChart isDashboard={true} />;
     }
   };
 
@@ -164,6 +142,7 @@ const Dashboard = () => {
                 <MenuItem value="Today">Today</MenuItem>
                 <MenuItem value="Weekly">This Week</MenuItem>
                 <MenuItem value="Monthly">This Month</MenuItem>
+                <MenuItem value="MinutesLive">5 Minute</MenuItem>
               </Select>
             </Box>
           </Box>
@@ -574,8 +553,8 @@ const Dashboard = () => {
           height={300}
           backgroundColor={colors.primary[400]}
         >
-          <Box height={350} sx={{ marginBotton: "35px" }}>
-            <CustomerTable isDashboard={true} users={users} height="300px" />
+          <Box height={350} sx={{ marginBottom: "35px" }}>
+            <CustomerTable isDashboard={true} users={userData} height="300px" />
           </Box>
         </Box>
 
