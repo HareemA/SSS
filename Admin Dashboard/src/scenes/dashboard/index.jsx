@@ -38,7 +38,7 @@ const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { apiData } = useApi();
-  const { count, groupCount, time, male, female, unknown } = apiData;
+  const { inStore, groupCount, time, male, female, unknown, enter, exit } = apiData;
   const users = [
     { id: 1,name: "Customer 1",visits: "10",gender: "M",age: "10",group: "N",timeIn: "10:15",timeOut: "12:35"},
     { id: 2, name: "Customer 2", visits: 15, gender: "F", age: 25, group: "A", timeIn: "11:30", timeOut: "14:45" },
@@ -272,7 +272,7 @@ const Dashboard = () => {
                 color={colors.grey[100]}
                 mr="15px"
               >
-                XXX
+                {apiData.enter}
               </Typography>
             </Box>
 
@@ -305,7 +305,7 @@ const Dashboard = () => {
                 color={colors.grey[100]}
                 alignContent="right"
               >
-                XXX
+                {apiData.exit}
               </Typography>
             </Box>
             <Box
@@ -336,7 +336,7 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                XXX
+                {apiData.inStore}
               </Typography>
             </Box>
 

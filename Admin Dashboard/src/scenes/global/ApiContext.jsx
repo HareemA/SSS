@@ -10,14 +10,14 @@ export function useApi() {
 export function ApiProvider({ children }) {
   const [apiData, setApiData] = useState({
     frame: null,
-    inStore: null,
-    groupCount: null,
+    inStore: 0,
+    groupCount: 0,
     time: null,
-    male:null,
-    female:null,
-    enter:null,
-    exit:null,
-    unknown:null
+    male:0,
+    female:0,
+    enter:0,
+    exit:0,
+    unknown:0
 
   });
 
