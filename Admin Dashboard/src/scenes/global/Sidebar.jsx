@@ -7,7 +7,11 @@ import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ContactPageIcon from '@mui/icons-material/ContactPage';
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
+import LogoutIcon from "@mui/icons-material/Logout";
 import VideocamIcon from '@mui/icons-material/Videocam';
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
@@ -84,7 +88,7 @@ const Sidebar = () => {
                 ml="15px"
               >
                 <Typography variant="h5" color={colors.grey[100]}>
-                  SURVEILLANCE.
+                  PULSSE.
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -111,7 +115,7 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  ADMIN USER
+                  ADMIN 
                 </Typography>
                 {/* <Typography variant="h6" color={colors.greenAccent[500]}>
                   Surveillance System Admin
@@ -136,9 +140,31 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Charts
+              User
             </Typography>
             <Item
+              title="Logout User"
+              to="/"
+              icon={<LogoutIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Settings"
+              to="/"
+              icon={<SettingsIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Contact"
+              to="/"
+              icon={<ContactPageIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            
+            {/* <Item
               title="Daily Footfall"
               to="/bar"
               icon={<BarChartOutlinedIcon />}
@@ -158,8 +184,8 @@ const Sidebar = () => {
               icon={<TrendingUpIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
-            <Item
+            /> */}
+            {/* <Item
               title="Count Per Minute"
               to="/liveCountMinute"
               icon={<TrendingUpIcon />}
@@ -179,6 +205,13 @@ const Sidebar = () => {
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+            /> */}
+            <Item
+              title="Profile Form"
+              to="/form"
+              icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
             />
             <Item
               title="CCTV Video"
@@ -194,13 +227,27 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Profile
+              Department
             </Typography>
             
             <Item
-              title="Profile Form"
+              title="CS Department"
               to="/form"
-              icon={<PersonOutlinedIcon />}
+              icon={<LocationOnIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="IS Department"
+              to="/form"
+              icon={<LocationOnIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="EE Department"
+              to="/form"
+              icon={<LocationOnIcon />}
               selected={selected}
               setSelected={setSelected}
             />

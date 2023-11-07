@@ -272,7 +272,7 @@ const Dashboard = () => {
             {item.label}
           </Typography>
         </Box>
-        <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+        <Typography variant="h5" fontWeight="600" color={colors.grey[100]} paddingRight="8px">
           {item.value}
         </Typography>
       </Box>
