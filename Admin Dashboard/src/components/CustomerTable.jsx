@@ -6,7 +6,7 @@ import { BorderClear } from "@mui/icons-material";
 
 const CustomerTable = ({isDashboard = false, users, height}) => {
     const columns = [
-        {field:'id',headerName:'ID',flex:1},
+        {field:'id',headerName:'ID',flex:1,sortable: true, sortComparator: (a, b) => a - b},
         {field: 'name', headerName:'Name',width:'150'},
         {field: 'visits', headerName:'No. of Visits',flex:1},
         {field: 'gender', headerName:'Gender',flex:1},
@@ -27,6 +27,7 @@ const CustomerTable = ({isDashboard = false, users, height}) => {
                 checkboxSelection 
                 pagination={false}
                 rowHeight={38}
+                sortingMode="client"
                 
                 />
         </div>

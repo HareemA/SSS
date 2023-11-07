@@ -8,18 +8,26 @@ const FiveMinuteLine = ({ isCustomLineColors = false, isDashboard = false }) => 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { apiData, maxCountWithinMinute, minCountWithinMinute } = useApi();
-  const { count, time } = apiData;
+  const { enter, exit, time } = apiData;
 
   // State to store the line chart data
   const [chartData, setChartData] = useState([
     {
-      id: "maxCount",
+      id: "entry",
       data: [],
     },
     {
-      id: "minCount",
+      id: "exit",
       data: [],
     },
+    {
+        id: "max",
+        data: [],
+      },
+      {
+        id: "min",
+        data: [],
+      },
   ]);
 
 
@@ -34,21 +42,33 @@ const FiveMinuteLine = ({ isCustomLineColors = false, isDashboard = false }) => 
         x: new Date().toLocaleTimeString(),
         y: minCountWithinMinute,
       };
+      const newEnterPoint = {
+        x: new Date().toLocaleTimeString(),
+        y: enter,
+      };
+      const newExitPoint = {
+        x: new Date().toLocaleTimeString(),
+        y: exit,
+      };
 
       // Create a copy of the chart data and update it with the new data point
       const newChartData = [...chartData];
       newChartData[0].data.push(newMaxCountDataPoint);
       newChartData[1].data.push(newMinCountDataPoint);
+      newChartData[2].data.push(newEnterPoint);
+      newChartData[3].data.push(newExitPoint);
 
       // Limit the number of data points to keep on the chart (e.g., 10 data points)
       if (newChartData[0].data.length > 5) {
         newChartData[0].data.shift();
         newChartData[1].data.shift();
+        newChartData[2].data.shift();
+        newChartData[3].data.shift();
       }
 
       // Set the new chart data
       setChartData(newChartData);
-    }, 60000); // 60000 milliseconds = 1 minute
+    }, 100); // 300000 milliseconds = 5 minute
 
     // Cleanup the timeout on component unmount or when dependencies change
     return () => clearTimeout(timeoutId);

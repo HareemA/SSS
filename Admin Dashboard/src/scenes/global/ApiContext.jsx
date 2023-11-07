@@ -10,12 +10,15 @@ export function useApi() {
 export function ApiProvider({ children }) {
   const [apiData, setApiData] = useState({
     frame: null,
-    count: null,
-    groupCount: null,
+    inStore: 0,
+    groupCount: 0,
     time: null,
-    male:null,
-    female:null,
-    unknown:null
+    male:0,
+    female:0,
+    enter:0,
+    exit:0,
+    unknown:0
+
   });
 
   const [sliderValue, setSliderValue] = useState(35);
@@ -40,19 +43,21 @@ export function ApiProvider({ children }) {
       const jsonData = await response.json();
 
       // Update maximum and minimum values within a minute
-      if (jsonData.count !== null) {
-        setMaxCountWithinMinute((prevMax) => Math.max(prevMax, jsonData.count));
-        setMinCountWithinMinute((prevMin) => (prevMin === 0 ? jsonData.count : Math.min(prevMin, jsonData.count)));
+      if (jsonData.inStore !== null) {
+        setMaxCountWithinMinute((prevMax) => Math.max(prevMax, jsonData.inStore));
+        setMinCountWithinMinute((prevMin) => (prevMin === 0 ? jsonData.inStore : Math.min(prevMin, jsonData.inStore)));
       }
 
       setApiData({
         frame: jsonData.frame,
-        count: jsonData.count,
-        groupCount: jsonData.groupCount,
+        inStore: jsonData.inStore,
+        groupCount: jsonData.group_count,
         time: jsonData.time,
         male: jsonData.male,
         female: jsonData.female,
-        unknown: jsonData.unknown
+        unknown: jsonData.unknown,
+        enter: jsonData.enter,
+        exit: jsonData.exit
       });
     } catch (error) {
       console.error('Error fetching data:', error);

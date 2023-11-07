@@ -2,14 +2,45 @@ import { useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
 import { mockBarData as data } from "../data/mockData";
+import React, { useState, useEffect } from "react";
+import { useApi } from "../scenes/global/ApiContext";
 
 const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  const { apiData } = useApi();
+  const { male, female, unknown } = apiData;
+
+
+  const [chartData, setChartData] = useState([
+    {
+      time: "Entry 1",
+      Men: male,
+      Women: 0,
+      Unidentified: 0,
+    },
+  ]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setChartData((prevData) => [
+        ...prevData,
+        {
+          time: `Entry ${prevData.length + 1}`,
+          Men: male,
+          Women: female,
+          Unidentified: unknown,
+        },
+      ]);
+    }, 100); // 120000 milliseconds = 2 minutes
+
+    return () => clearInterval(intervalId);
+  }, [male, female, unknown]);
+
   return (
     <ResponsiveBar
-      data={data}
+      data={chartData}
       theme={{
         // added
         axis: {

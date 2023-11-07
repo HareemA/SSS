@@ -8,6 +8,7 @@ import os
 import face_recognition
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
+from Group_Gender import *
 
 model=YOLO('yolov8n.pt')
 
@@ -25,9 +26,9 @@ cv2.setMouseCallback('RGB', RGB)
 
 cap = cv2.VideoCapture('H:\\Downloads\\vid2 - Trim.mp4')
 
-my_file = open("coco.txt", "r")
-data = my_file.read()
-class_list = data.split("\n") 
+# my_file = open("coco.txt", "r")
+# data = my_file.read()
+# class_list = data.split("\n") 
 
 count=0
 detected = 0
@@ -45,8 +46,8 @@ if not os.path.exists(folder_name):
 # area3=[(602,206),(695,221),(702,232),(602,218)]
 # area4=[(606,183),(691,196),(693,212),(602,198)]
 
-area1=[(135,186),(811,307),(807,324),(113,197)]
-area2=[(159,171),(815,276),(812,301),(135,186)]
+area1=[(135,186),(811,307),(802,342),(103,203)]
+area2=[(176,159),(818,263),(812,301),(135,186)]
 
 people_enter={}
 counter1=[]
@@ -64,6 +65,7 @@ people = 0
 
 while True:    
     ret,frame = cap.read()
+    
     if not ret:
         break
     count += 1
@@ -71,6 +73,10 @@ while True:
         continue
     
     frame=cv2.resize(frame,(1020,500))
+    
+    original_coordinates = []  
+    group_threshold = 50
+        
     #Gate 1
     cv2.polylines(frame,[np.array(area1,np.int32)],True,(0,0,255),1)
     cv2.polylines(frame,[np.array(area2,np.int32)],True,(0,255,0),1)   
@@ -99,7 +105,9 @@ while True:
     #     x3,y3,x4,y4=bbox
         x_centre= (x3+x4)//2
         y_centre=(y3+y4)//2
-
+        
+        original_coordinates.append([x3, y3, x4, y4])
+        
         person=frame[y3:y4,x3:x4]
         face_crop = cv2.resize(person, (96, 96))
         face_crop = face_crop.astype("float") / 255.0
@@ -140,9 +148,10 @@ while True:
                     enter=enter+1
                     if gender_label == 'man':
                         male = male + 1
-                    elif gender_label == 'women':
+                    elif gender_label == 'woman':
                         female = female + 1
                     else:
+                        print(gender_label)
                         unknown = unknown + 1
 
                     #     file_name = os.path.join(folder_name,f'face_{people}.jpg')
@@ -196,6 +205,19 @@ while True:
         cv2.circle(frame,(x_centre,y_centre),4,(255,0,0),-1)
         cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
         cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
+        
+    coordinate_groups = group_coordinates(original_coordinates, group_threshold)
+
+    #Iterate through the grouped coordinates and draw bounding boxes around groups
+    for group_key, group_coord in coordinate_groups.items():
+        if len(group_coord) >= 2:
+            #print("Group detected, key:", group_key)
+            group_count = group_count + 1
+            min_x = min([x1 for (x1, y1, x2, y2) in group_coord])
+            min_y = min([y1 for (x1, y1, x2, y2) in group_coord])
+            max_x = max([x2 for (x1, y1, x2, y2) in group_coord])
+            max_y = max([y2 for (x1, y1, x2, y2) in group_coord])
+            cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
     #Entry
     cv2.putText(frame, f"Entry: {str(enter)}", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
     #Exit

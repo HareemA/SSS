@@ -41,8 +41,8 @@ const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { apiData } = useApi();
-  const { count, groupCount, time, male, female, unknown } = apiData;
- 
+  const { inStore, groupCount, time, male, female, unknown, enter, exit } = apiData;
+  
 
   const [chartType, setChartType] = useState("Today");
   const [currentTime, setCurrentTime] = useState("");
@@ -256,7 +256,7 @@ const Dashboard = () => {
                 color={colors.grey[100]}
                 mr="15px"
               >
-                XXX
+                {apiData.enter}
               </Typography>
             </Box>
 
@@ -289,7 +289,7 @@ const Dashboard = () => {
                 color={colors.grey[100]}
                 alignContent="right"
               >
-                XXX
+                {apiData.exit}
               </Typography>
             </Box>
             <Box
@@ -320,7 +320,7 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                XXX
+                {apiData.inStore}
               </Typography>
             </Box>
 
