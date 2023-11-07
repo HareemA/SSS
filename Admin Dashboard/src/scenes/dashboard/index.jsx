@@ -151,7 +151,7 @@ const Dashboard = () => {
           </Box>
         </Box>
 
-        {/* Row 2: CCTV Video + card to make*/}
+        {/* Row 2: CCTV Video + card */}
 
         <Box
           gridColumn="span 9"
@@ -197,228 +197,89 @@ const Dashboard = () => {
 
         {/* CARD */}
         <Box
-          gridColumn="span 3"
-          gridRow="span 3"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="10px"
-            p="0 0px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="700"
-                margin="15px 0 15px 35px"
-                alignItems="center"
-                color={colors.grey[200]}
-              >
-                CUSTOMERS TODAY
-              </Typography>
-            </Box>
-          </Box>
+  gridColumn="span 3"
+  gridRow="span 3"
+  backgroundColor={colors.primary[400]}
+>
+  <Box
+    mt="10px"
+    p="0 0px"
+    display="flex "
+    justifyContent="space-between"
+    alignItems="center"
+  >
+    <Box>
+      <Typography
+        variant="h5"
+        fontWeight="700"
+        margin="15px 0 15px 35px"
+        alignItems="center"
+        color={colors.grey[200]}
+      >
+        CUSTOMERS TODAY
+      </Typography>
+    </Box>
+  </Box>
 
-          <Box
-            display="flex"
-            flexDirection="column" // Set the container to display items vertically
-            alignItems="center"
-          >
-            <Box
-              m="15px 0" // Margin for the first row
-              p="0 30px"
-              display="flex"
-              justifyContent="space-between"
-            >
-              <Box display="flex" alignItems="space-between" mr="25px">
-                <LoginIcon
-                  sx={{
-                    fontSize: "26px",
-                    color: colors.greenAccent[500],
-                    ml: "15px",
-                    mr:"10px",
-                  }}
-                />
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                  // mr="15px"
-                >
-                  Entered
-                </Typography>
-              </Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-                mr="15px"
-              >
-                {apiData.enter}
-              </Typography>
-            </Box>
+  <Box
+    display="flex"
+    flexDirection="column" // Set the container to display items vertically
+    alignItems="center"
+  >
+    {[
+      {
+        icon: <LoginIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
+        label: "Entered",
+        value: apiData.enter,
+      },
+      {
+        icon: <LogoutIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
+        label: "Left",
+        value: apiData.exit,
+      },
+      {
+        icon: <StorefrontIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
+        label: "In-Store",
+        value: apiData.inStore,
+      },
+      {
+        icon: <PersonAddIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
+        label: "New",
+        value: "X",
+      },
+      {
+        icon: <ReplayIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
+        label: "Returning",
+        value: "X",
+      },
+      {
+        icon: <GroupsIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
+        label: "Groups",
+        value: "X",
+      },
+    ].map((item, index) => (
+      <Box
+        key={index}
+        p="15px 15px"
+        m="0px 25px"
+        display="flex"
+        justifyContent="space-between"
+        width="100%" // Make each row equally spaced and centered
+      >
+        <Box display="flex" alignItems="center" >
+          {item.icon}
+          <Typography variant="h5" fontWeight="600" color={colors.grey[100]} paddingLeft="10px">
+            {item.label}
+          </Typography>
+        </Box>
+        <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+          {item.value}
+        </Typography>
+      </Box>
+    ))}
+  
+</Box>
 
-            <Box
-              m="15px 0" // 10px margin for the second row
-              p="0 30px"
-              display="flex"
-              justifyContent="space-between"
-            >
-              <Box display="flex" alignItems="space-between" mr="25px">
-                <LogoutIcon
-                  sx={{
-                    fontSize: "26px",
-                    color: colors.greenAccent[500],
-                    mr: "10px",
-                  }}
-                />
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                  mr="15px"
-                >
-                  Left
-                </Typography>
-              </Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-                alignContent="right"
-              >
-                {apiData.exit}
-              </Typography>
-            </Box>
-            <Box
-              m="15px 0" // Margin for the thrid row
-              p="0 30px"
-              display="flex"
-              justifyContent="space-between"
-            >
-              <Box display="flex" alignItems="space-between" mr="25px">
-                <StorefrontIcon
-                  sx={{
-                    fontSize: "26px",
-                    color: colors.greenAccent[500],
-                    mr: "10px",
-                  }}
-                />
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                  mr="15px"
-                >
-                  In-Store
-                </Typography>
-              </Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                {apiData.inStore}
-              </Typography>
-            </Box>
-
-            <Box
-              m="15px 0" // 10px margin for the 4th row
-              p="0 30px"
-              display="flex"
-              justifyContent="space-between"
-            >
-              <Box display="flex" alignItems="space-between" mr="25px">
-                <PersonAddIcon
-                  sx={{
-                    fontSize: "26px",
-                    color: colors.greenAccent[500],
-                    mr: "10px",
-                  }}
-                />
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                  mr="15px"
-                >
-                  New
-                </Typography>
-              </Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                XXX
-              </Typography>
-            </Box>
-            <Box
-              m="15px 0" // Margin for the 5throw
-              p="0 30px"
-              display="flex"
-              justifyContent="space-between"
-            >
-              <Box display="flex" alignItems="space-between" mr="25px">
-                <ReplayIcon
-                  sx={{
-                    fontSize: "26px",
-                    color: colors.greenAccent[500],
-                    mr: "10px",
-                  }}
-                />
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                  mr="15px"
-                >
-                  Returning
-                </Typography>
-              </Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                XXX
-              </Typography>
-            </Box>
-
-            <Box
-              m="15px 0" // 10px margin for the 6th row
-              p="0 30px"
-              display="flex"
-              justifyContent="space-between"
-            >
-              <Box display="flex" alignItems="space-between" mr="25px">
-                <GroupsIcon
-                  sx={{
-                    fontSize: "26px",
-                    color: colors.greenAccent[500],
-                    mr: "10px",
-                  }}
-                />
-                <Typography
-                  variant="h5"
-                  fontWeight="600"
-                  color={colors.grey[100]}
-                  mr="15px"
-                >
-                  Groups
-                </Typography>
-              </Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                XXX
-              </Typography>
-            </Box>
-          </Box>
           
                    
           
