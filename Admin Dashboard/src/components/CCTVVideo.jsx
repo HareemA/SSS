@@ -10,6 +10,7 @@ const CCTVVideo = ({ isDashboard = false, height }) => {
   const colors = tokens(theme.palette.mode);
 
   const { apiData, sliderValue, updateSliderValue } = useApi();
+  const { frame } = apiData;
 
   const handleSliderChange = (event, newValue) => {
     //updateSliderValue(newValue);
