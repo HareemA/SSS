@@ -9,38 +9,50 @@ const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const { apiData } = useApi();
-  const { male, female, unknown } = apiData;
+  // const { apiData } = useApi();
+  // const { male, female, unknown, time } = apiData;
 
+  // const currentTime = new Date();
+  // const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' , second:'2-digit'});
 
-  const [chartData, setChartData] = useState([
-    {
-      time: "Entry 1",
-      Men: male,
-      Women: 0,
-      Unidentified: 0,
-    },
-  ]);
+  // const [chartData, setChartData] = useState([
+  //   {
+  //     time: formattedTime,
+  //     Men: male,
+  //     Women: 0,
+  //     Unidentified: 0,
+  //   },
+  // ]);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setChartData((prevData) => [
-        ...prevData,
-        {
-          time: `Entry ${prevData.length + 1}`,
-          Men: male,
-          Women: female,
-          Unidentified: unknown,
-        },
-      ]);
-    }, 100); // 120000 milliseconds = 2 minutes
-
-    return () => clearInterval(intervalId);
-  }, [male, female, unknown]);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     // Create a new data entry
+  //     const newDataEntry = {
+  //       time: formattedTime,
+  //       Men: male,
+  //       Women: female,
+  //       Unidentified: unknown,
+  //     };
+  
+  //     // Create a copy of the chart data and update it with the new data entry
+  //     setChartData((prevData) => {
+  //       const newChartData = [newDataEntry, ...prevData.slice(0, 4)];
+        
+  //       // Limit the number of data entries to keep on the chart (e.g., 5 entries)
+  //       if (newChartData.length > 5) {
+  //         newChartData.pop(); // Use pop() instead of shift() to remove the last entry
+  //       }
+  
+  //       return newChartData;
+  //     });
+  //   }, 100); // 1000 milliseconds = 1 second for testing, change it accordingly
+  
+  //   return () => clearInterval(intervalId);
+  // }, [male, female, unknown]);
 
   return (
     <ResponsiveBar
-      data={chartData}
+      data={data}
       theme={{
         // added
         axis: {
@@ -72,8 +84,10 @@ const BarChart = ({ isDashboard = false }) => {
       }}
       keys={["Men", "Women", "Unidentified"]}
       indexBy="time"
-      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-      padding={0.3}
+      // margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+      // padding={0.3}
+      margin={{ top: 50, right: 30, bottom: 50, left: 60 }} // Adjusted right margin
+      padding={0.5} // Adjusted padding for narrower bars
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
       colors={{ scheme: "nivo" }}
@@ -154,6 +168,7 @@ const BarChart = ({ isDashboard = false }) => {
       barAriaLabel={function (e) {
         return e.id + ": " + e.formattedValue + " in Day: " + e.indexValue;
       }}
+      barWidth={5}
     />
   );
 };
