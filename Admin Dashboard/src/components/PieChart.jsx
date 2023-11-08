@@ -2,14 +2,41 @@ import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
 import { mockPieData as data } from "../data/mockData";
+import React, { useState, useEffect } from "react";
+import { useApi } from "../scenes/global/ApiContext";
 
 const PieChart = (isDashboard = false) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const { apiData } = useApi();
+  const { male, female, unknown, time } = apiData;
+
+  const currentTime = new Date();
+  const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' , second:'2-digit'});
+
+  const [chartData, setChartData] = useState([
+    { id: "Male", label: "Male", value: 0 },
+    { id: "Female", label: "Female", value: 0 },
+    { id: "Unknown", label: "Unknown", value: 0 },
+  ]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      // Update the chart data with the latest values from the API
+      setChartData([
+        { id: "Male", label: "Male", value: male },
+        { id: "Female", label: "Female", value: female },
+        { id: "Unknown", label: "Unknown", value: unknown },
+      ]);
+    }, 5000); // Fetch data every 5 seconds
+
+    return () => clearInterval(intervalId);
+  }, [male, female, unknown]);
   
   return (
     <ResponsivePie
-      data={data}
+      data={chartData}
       theme={{
         axis: {
           domain: {
