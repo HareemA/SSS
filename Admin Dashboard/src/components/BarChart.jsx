@@ -9,50 +9,56 @@ const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // const { apiData } = useApi();
-  // const { male, female, unknown, time } = apiData;
+  const { apiData } = useApi();
+  const { male, female, unknown, time } = apiData;
 
-  // const currentTime = new Date();
-  // const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' , second:'2-digit'});
+  const currentTime = new Date();
+  const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' , second:'2-digit'});
 
-  // const [chartData, setChartData] = useState([
-  //   {
-  //     time: formattedTime,
-  //     Men: male,
-  //     Women: 0,
-  //     Unidentified: 0,
-  //   },
-  // ]);
+  const [chartData, setChartData] = useState([
+    {
+      time: formattedTime,
+      Men: male,
+      Women: 0,
+      Unidentified: 0,
+    },
+  ]);
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     // Create a new data entry
-  //     const newDataEntry = {
-  //       time: formattedTime,
-  //       Men: male,
-  //       Women: female,
-  //       Unidentified: unknown,
-  //     };
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const currentTime = new Date();
+      const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const uniqueId = currentTime.getTime(); // Use a unique identifier
   
-  //     // Create a copy of the chart data and update it with the new data entry
-  //     setChartData((prevData) => {
-  //       const newChartData = [newDataEntry, ...prevData.slice(0, 4)];
-        
-  //       // Limit the number of data entries to keep on the chart (e.g., 5 entries)
-  //       if (newChartData.length > 5) {
-  //         newChartData.pop(); // Use pop() instead of shift() to remove the last entry
-  //       }
+      // Create a new data entry
+      const newDataEntry = {
+        id: uniqueId,
+        time: formattedTime,
+        Men: male,
+        Women: female,
+        Unidentified: unknown,
+      };
   
-  //       return newChartData;
-  //     });
-  //   }, 100); // 1000 milliseconds = 1 second for testing, change it accordingly
+      // Create a copy of the chart data and update it with the new data entry
+      setChartData((prevData) => {
+        const newChartData = [...prevData, newDataEntry];
+
+        // Limit the number of data entries to keep on the chart (e.g., 5 entries)
+        if (newChartData.length > 5) {
+          newChartData.shift(); // Remove the first entry to keep the latest on the right
+        }
+
+        return newChartData;
+      });
+    }, 5000); // 1000 milliseconds = 1 second for testing, change it accordingly
   
-  //   return () => clearInterval(intervalId);
-  // }, [male, female, unknown]);
+    return () => clearInterval(intervalId);
+  }, [male, female, unknown]);
+  
 
   return (
     <ResponsiveBar
-      data={data}
+      data={chartData}
       theme={{
         // added
         axis: {
