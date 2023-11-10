@@ -244,18 +244,18 @@ const Dashboard = () => {
       },
       {
         icon: <PersonAddIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
-        label: "New",
-        value: "X",
+        label: "Male",
+        value: apiData.male,
       },
       {
         icon: <ReplayIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
-        label: "Returning",
-        value: "X",
+        label: "Female",
+        value: apiData.female,
       },
       {
         icon: <GroupsIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
-        label: "Groups",
-        value: "X",
+        label: "Unknown",
+        value: apiData.unknown,
       },
     ].map((item, index) => (
       <Box

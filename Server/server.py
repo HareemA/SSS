@@ -26,8 +26,8 @@ classes = ['man', 'woman']
 
 count = detected = enter = exit = male = female = unknown = people = group_count = 0
 
-area1=[(135,186),(811,307),(807,324),(113,197)]
-area2=[(159,171),(815,276),(812,301),(135,186)]
+area1=[(135,186),(811,307),(802,342),(103,203)]
+area2=[(176,159),(818,263),(812,301),(135,186)]
 
 people_enter={}
 counter1=[]
@@ -37,7 +37,7 @@ counter2=[]
 
 frame_to_send = None
 
-cap = cv2.VideoCapture('H:\\Downloads\\vid2 - Trim.mp4')
+cap = cv2.VideoCapture('H:\\Downloads\\26102023_2.mp4')
 
 def processing():
     
@@ -48,7 +48,7 @@ def processing():
         ret,frame = cap.read()
         
         if not cap:
-            cap = cv2.VideoCapture('H:\\Downloads\\vid2 - Trim.mp4')
+            cap = cv2.VideoCapture('H:\\Downloads\\26102023_2.mp4')
             
         if not ret:
             cap.release()
@@ -136,6 +136,7 @@ def processing():
             cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,0),1)
             cv2.circle(frame,(x_centre,y_centre),4,(255,0,0),-1)
             cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
+            cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
           
         coordinate_groups = group_coordinates(original_coordinates, group_threshold)
 
