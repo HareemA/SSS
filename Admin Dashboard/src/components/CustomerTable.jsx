@@ -28,6 +28,8 @@ const CustomerTable = ({isDashboard = false, users, height}) => {
                 pagination={false}
                 rowHeight={38}
                 sortingMode="client"
+                headerClassName="custom-header"
+                cellClassName="custom-cell"
                 
                 />
         </div>
@@ -35,3 +37,5 @@ const CustomerTable = ({isDashboard = false, users, height}) => {
 };
 
 export default CustomerTable;
+
+

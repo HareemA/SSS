@@ -36,13 +36,12 @@ import PieChartGroup from "../../components/PieChartGroup";
 import EngagementBarGraph from "../../components/EngagementBarGraph";
 import { mockUserData as userData } from "../../data/mockData";
 
-
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { apiData } = useApi();
-  const { inStore, groupCount, time, male, female, unknown, enter, exit } = apiData;
-  
+  const { inStore, groupCount, time, male, female, unknown, enter, exit } =
+    apiData;
 
   const [chartType, setChartType] = useState("Today");
   const [currentTime, setCurrentTime] = useState("");
@@ -58,7 +57,18 @@ const Dashboard = () => {
 
       const day = now.getDate().toString().padStart(2, "0");
       const monthNames = [
-        "January","February","March","April","May","June","July","August","September","October","November","December",
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
       ];
       const month = monthNames[now.getMonth()];
       const year = now.getFullYear();
@@ -106,6 +116,8 @@ const Dashboard = () => {
           gridColumn="span 12"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          border={`1px solid ${colors.primary[900]}`}
+          borderRadius="20px"
         >
           <Box
             mt="25px"
@@ -125,7 +137,11 @@ const Dashboard = () => {
               <Typography
                 variant="h3"
                 fontWeight="bold"
-                color={colors.greenAccent[500]}
+                color={
+                  theme.palette.mode === "dark"
+                    ? colors.greenAccent[500]
+                    : colors.blueAccent[150]
+                }
               >
                 {chartType}
               </Typography>
@@ -157,6 +173,8 @@ const Dashboard = () => {
           gridColumn="span 9"
           gridRow="span 3"
           backgroundColor={colors.primary[400]}
+          border={`1px solid ${colors.primary[900]}`}
+          borderRadius="20px"
         >
           <Box
             mt="10px"
@@ -178,7 +196,11 @@ const Dashboard = () => {
                 variant="h3"
                 fontWeight="bold"
                 marginLeft="25px"
-                color={colors.greenAccent[500]}
+                color={
+                  theme.palette.mode === "dark"
+                    ? colors.greenAccent[500]
+                    : colors.blueAccent[150]
+                }
                 marginBottom="5px"
               >
                 Live
@@ -197,92 +219,159 @@ const Dashboard = () => {
 
         {/* CARD */}
         <Box
-  gridColumn="span 3"
-  gridRow="span 3"
-  backgroundColor={colors.primary[400]}
->
-  <Box
-    mt="10px"
-    p="0 0px"
-    display="flex "
-    justifyContent="space-between"
-    alignItems="center"
-  >
-    <Box>
-      <Typography
-        variant="h5"
-        fontWeight="700"
-        margin="15px 0 15px 35px"
-        alignItems="center"
-        color={colors.grey[200]}
-      >
-        CUSTOMERS TODAY
-      </Typography>
-    </Box>
-  </Box>
+          gridColumn="span 3"
+          gridRow="span 3"
+          backgroundColor={colors.primary[400]}
+          border={`1px solid ${colors.primary[900]}`}
+          borderRadius="20px"
+        >
+          <Box
+            mt="10px"
+            p="0 0px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="700"
+                margin="15px 0 15px 35px"
+                alignItems="center"
+                color={colors.grey[200]}
+              >
+                CUSTOMERS TODAY
+              </Typography>
+            </Box>
+          </Box>
 
-  <Box
-    display="flex"
-    flexDirection="column" // Set the container to display items vertically
-    alignItems="center"
-  >
-    {[
-      {
-        icon: <LoginIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
-        label: "Entered",
-        value: apiData.enter,
-      },
-      {
-        icon: <LogoutIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
-        label: "Left",
-        value: apiData.exit,
-      },
-      {
-        icon: <StorefrontIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
-        label: "In-Store",
-        value: apiData.inStore,
-      },
-      {
-        icon: <PersonAddIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
-        label: "Male",
-        value: apiData.male,
-      },
-      {
-        icon: <ReplayIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
-        label: "Female",
-        value: apiData.female,
-      },
-      {
-        icon: <GroupsIcon sx={{ fontSize: "26px", color: colors.redAccent[500] }} />,
-        label: "Unknown",
-        value: apiData.unknown,
-      },
-    ].map((item, index) => (
-      <Box
-        key={index}
-        p="15px 15px"
-        m="0px 25px"
-        display="flex"
-        justifyContent="space-between"
-        width="100%" // Make each row equally spaced and centered
-      >
-        <Box display="flex" alignItems="center" >
-          {item.icon}
-          <Typography variant="h5" fontWeight="600" color={colors.grey[100]} paddingLeft="10px">
-            {item.label}
-          </Typography>
-        </Box>
-        <Typography variant="h5" fontWeight="600" color={colors.grey[100]} paddingRight="8px">
-          {item.value}
-        </Typography>
-      </Box>
-    ))}
-  
-</Box>
-
-          
-                   
-          
+          <Box
+            display="flex"
+            flexDirection="column" // Set the container to display items vertically
+            alignItems="center"
+          >
+            {[
+              {
+                icon: (
+                  <LoginIcon
+                    sx={{
+                      fontSize: "26px",
+                      color:
+                        theme.palette.mode === "dark"
+                          ? colors.redAccent[500]
+                          : colors.blueAccent[150],
+                    }}
+                  />
+                ),
+                label: "Entered",
+                value: apiData.enter,
+              },
+              {
+                icon: (
+                  <LogoutIcon
+                    sx={{
+                      fontSize: "26px",
+                      color:
+                        theme.palette.mode === "dark"
+                          ? colors.redAccent[500]
+                          : colors.blueAccent[150],
+                    }}
+                  />
+                ),
+                label: "Left",
+                value: apiData.exit,
+              },
+              {
+                icon: (
+                  <StorefrontIcon
+                    sx={{
+                      fontSize: "26px",
+                      color:
+                        theme.palette.mode === "dark"
+                          ? colors.redAccent[500]
+                          : colors.blueAccent[150],
+                    }}
+                  />
+                ),
+                label: "In-Store",
+                value: apiData.inStore,
+              },
+              {
+                icon: (
+                  <PersonAddIcon
+                    sx={{
+                      fontSize: "26px",
+                      color:
+                        theme.palette.mode === "dark"
+                          ? colors.redAccent[500]
+                          : colors.blueAccent[150],
+                    }}
+                  />
+                ),
+                label: "Male",
+                value: apiData.male,
+              },
+              {
+                icon: (
+                  <ReplayIcon
+                    sx={{
+                      fontSize: "26px",
+                      color:
+                        theme.palette.mode === "dark"
+                          ? colors.redAccent[500]
+                          : colors.blueAccent[150],
+                    }}
+                  />
+                ),
+                label: "Female",
+                value: apiData.female,
+              },
+              {
+                icon: (
+                  <GroupsIcon
+                    sx={{
+                      fontSize: "26px",
+                      color:
+                        theme.palette.mode === "dark"
+                          ? colors.redAccent[500]
+                          : colors.blueAccent[150],
+                    }}
+                  />
+                ),
+                label: "Unknown",
+                value: apiData.unknown,
+              },
+            ].map((item, index) => (
+              <Box
+                key={index}
+                p="15px 15px"
+                m="0px 25px"
+                display="flex"
+                justifyContent="space-between"
+                width="100%" // Make each row equally spaced and centered
+              >
+                <Box display="flex" alignItems="center">
+                  {item.icon}
+                  <Typography
+                    variant="h5"
+                    fontWeight="600"
+                    color={colors.grey[100]}
+                    paddingLeft="10px"
+                  >
+                    {item.label}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                  paddingRight="8px"
+                >
+                  {item.value}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
         </Box>
 
         {/* ROW 3: Gender, Repeat Ratio Pie Chart, Group Trend, Engagement, BAR Graph */}
@@ -293,6 +382,8 @@ const Dashboard = () => {
           // paddingLeft="20px"
           // paddingRight="20px"
           backgroundColor={colors.primary[400]}
+          border={`1px solid ${colors.primary[900]}`}
+          borderRadius="20px"
         >
           <Box mt="25px" ml="20px">
             <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
@@ -310,6 +401,8 @@ const Dashboard = () => {
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
           p="30px"
+          border={`1px solid ${colors.primary[900]}`}
+          borderRadius="20px"
         >
           <Typography variant="h5" fontWeight="600">
             REPEAT RATIO
@@ -328,7 +421,15 @@ const Dashboard = () => {
             >
               67%
             </Typography>
-            <Typography>Returned this week</Typography>
+            <Typography
+              color={
+                theme.palette.mode === "dark"
+                  ? colors.greenAccent[500]
+                  : "#0772d3"
+              }
+            >
+              Returned this week
+            </Typography>
           </Box>
         </Box>
 
@@ -336,6 +437,8 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          border={`1px solid ${colors.primary[900]}`}
+          borderRadius="20px"
         >
           <Box
             mt="25px"
@@ -352,13 +455,6 @@ const Dashboard = () => {
               >
                 GROUP TREND
               </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.greenAccent[500]}
-              >
-                Pie Chart
-              </Typography>
             </Box>
           </Box>
           <Box height="250px" m="-20px 0 0 0">
@@ -372,6 +468,8 @@ const Dashboard = () => {
           gridColumn="span 6"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          border={`1px solid ${colors.primary[900]}`}
+          borderRadius="20px"
         >
           <Typography
             variant="h5"
@@ -390,6 +488,8 @@ const Dashboard = () => {
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
           p="30px"
+          border={`1px solid ${colors.primary[900]}`}
+          borderRadius="20px"
         >
           <Typography variant="h5" fontWeight="600">
             ENGAGEMENT

@@ -58,19 +58,20 @@ const Sidebar = () => {
           padding: "5px 35px 5px 20px !important",
         },
         "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
+          color: "#187ed9 !important", //#187ed9
         },
         "& .pro-menu-item.active": {
-          color: "#6870fa !important",
+          color: "#096ac1 !important",
         },
 
       }}
     >
       
       <ProSidebar collapsed={isCollapsed} 
-        style={{ height: "330vh" }}
+        style={{ height: "330vh", borderRight: `1px solid ${colors.primary[900]}` }}
+
       >
-        <Menu iconShape="square">
+        <Menu iconShape="square" >
           {/* LOGO AND MENU ICON */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -87,10 +88,10 @@ const Sidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h5" color={colors.grey[100]}>
+                <Typography variant="h4" color={colors.grey[100]}>
                   PULSSE.
                 </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                <IconButton onClick={() => setIsCollapsed(!isCollapsed)} style={{ color: colors.yourColor }}>
                   <MenuOutlinedIcon />
                 </IconButton>
               </Box>
@@ -227,7 +228,7 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Department
+              {isCollapsed ? 'Dept' : 'Department'}
             </Typography>
             
             <Item

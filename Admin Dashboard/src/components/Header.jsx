@@ -14,7 +14,12 @@ const Header = ({ title, subtitle }) => {
       >
         {title}
       </Typography>
-      <Typography variant="h6" color={colors.greenAccent[400]}>
+      <Typography
+        variant="h6"
+        color={
+          theme.palette.mode === "dark" ? colors.greenAccent[500] : colors.blueAccent[150]
+        }
+      >
         {subtitle}
       </Typography>
     </Box>
