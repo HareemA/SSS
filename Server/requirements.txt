@@ -8,3 +8,4 @@ pytube
 deepface
 tensorflow
 psycopg2-binary
+face_recognition
