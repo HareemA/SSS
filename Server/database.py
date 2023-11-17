@@ -160,9 +160,112 @@ def get_all_encodings():
         print("Error fetching encodings:", error)
         return []
 
+#FRONT-END CHARTS
+def get_daily_gender_distribution():
+    try:
+        with conn, conn.cursor() as cur:
+            # Query to get daily gender distribution
+            print("in pie data 2")
+            current_date = datetime.now().strftime('%d %m %y')
+            print(current_date)
+            cur.execute("""
+                SELECT
+                    COUNT(CASE WHEN c.gender = 'Male' THEN 1 END) as male_count,
+                    COUNT(CASE WHEN c.gender = 'Female' THEN 1 END) as female_count,
+                    COUNT(CASE WHEN c.gender NOT IN ('Male', 'Female') THEN 1 END) as unknown_count,
+                    COUNT(*) as total_count
+                FROM customer c
+                WHERE c.created_at = %s
+            """, (current_date,))
+            print("in pie data 4")
+
+            row = cur.fetchone()
+
+            if row:
+                male_count = row[0] or 0
+                female_count = row[1] or 0
+                unknown_count = row[2] or 0
+                total_count = row[3] or 1  # Avoid division by zero
+
+                # Calculate percentages
+                male_percentage = (male_count / total_count) * 100
+                female_percentage = (female_count / total_count) * 100
+                unknown_percentage = (unknown_count / total_count) * 100
+
+                print("in pie data 5")
+
+                return {
+                    'male_percentage': round(male_percentage, 2),
+                    'female_percentage': round(female_percentage, 2),
+                    'unknown_percentage': round(unknown_percentage, 2),
+                }
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching gender distribution:", error)
+        return {
+            'male_percentage': 0,
+            'female_percentage': 0,
+            'unknown_percentage': 0,
+        }
+
+
+#get Daily Line CHart data
+def get_daily_line_data():
+    try:
+        with conn, conn.cursor() as cur:
+            # Get the current date in the specified format
+            current_date = datetime.now().strftime('%d %m %y')
+
+            # Initialize the result dictionary with hourly intervals
+            result = {f'{hour:02}:00-{(hour + 1) % 24:02}:00': {'Enter': 0, 'Exit': 0, 'Min': 0, 'Max': 0} for hour in range(8, 22)}
+
+            # Query to get entered counts on an hourly basis for the current date
+            cur.execute("""
+                SELECT EXTRACT(HOUR FROM TO_TIMESTAMP(time_in, 'HH24:MI:SS'))::integer AS hour, COUNT(*) as count
+                FROM visits
+                WHERE date = '16 11 23'
+                GROUP BY hour
+            """, (current_date,))
+
+            rows = cur.fetchall()
+
+            # Update the result dictionary with the entered counts
+            for row in rows:
+                hour_interval = f'{row[0]:02}:00-{(row[0] + 1) % 24:02}:00'
+                result[hour_interval]['Enter'] = row[1]
+
+            # Query to get exited counts on an hourly basis for the current date
+            cur.execute("""
+                SELECT EXTRACT(HOUR FROM TO_TIMESTAMP(time_out, 'HH24:MI:SS'))::integer AS hour, COUNT(*) as count
+                FROM visits
+                WHERE date = '16 11 23'
+                GROUP BY hour
+            """, (current_date,))
+
+            rows = cur.fetchall()
+
+            # Update the result dictionary with the exited counts
+            for row in rows:
+                hour_interval = f'{row[0]:02}:00-{(row[0] + 1) % 24:02}:00'
+                result[hour_interval]['Exit'] = row[1]
+
+            # Calculate Min and Max values for each hour
+            for hour_interval in result:
+                result[hour_interval]['Min'] = min(result[hour_interval]['Enter'], result[hour_interval]['Exit'])
+                result[hour_interval]['Max'] = max(result[hour_interval]['Enter'], result[hour_interval]['Exit'])
+
+            return result
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching line data:", error)
+        return {}
 
 
 
+
+
+hourly_data = get_daily_line_data()
+print(hourly_data)
 
    
 

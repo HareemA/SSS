@@ -7,6 +7,7 @@ from deepface import DeepFace
 from flask import Flask, jsonify, Response
 from flask_cors import CORS
 import base64
+from database import *
 from datetime import datetime
 from threading import Lock
 import face_recognition
@@ -37,7 +38,7 @@ counter2=[]
 
 frame_to_send = None
 
-cap = cv2.VideoCapture('H:\\Downloads\\26102023_2.mp4')
+cap = cv2.VideoCapture('E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4')
 
 def processing():
     
@@ -48,7 +49,7 @@ def processing():
         ret,frame = cap.read()
         
         if not cap:
-            cap = cv2.VideoCapture('H:\\Downloads\\26102023_2.mp4')
+            cap = cv2.VideoCapture('E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4')
             
         if not ret:
             cap.release()
@@ -190,10 +191,78 @@ def get_data(group_threshold):
         }
 
         return jsonify(response_data)
+    
+
+
+    
+@app.route('/get_gender_pie_data', methods=['GET'])
+def get_gender_pie_data():
+    print("in pie data 1")
+    data = get_daily_gender_distribution()  # Use the function from the previous response
+
+    gender_pie_data = [
+        {
+            'id': 'Man',
+            'label': 'Man',
+            'value': data['male_percentage'],  # Replace with the actual percentage for men
+            'color': 'hsl(104, 70%, 50%)',
+        },
+        {
+            'id': 'Woman',
+            'label': 'Woman',
+            'value': data['female_percentage'],  # Replace with the actual percentage for women
+            'color': 'hsl(162, 70%, 50%)',
+        },
+        {
+            'id': 'Unidentified',
+            'label': 'Unidentified',
+            'value': data['unknown_percentage'],  # Replace with the actual percentage for unidentified
+            'color': 'hsl(291, 70%, 50%)',
+        },
+    ]
+
+    print(gender_pie_data)
+    return jsonify(gender_pie_data)
+
+
+#API for Line CHart
+@app.route('/daily_line_chart', methods=['GET'])
+def daily_line_chart():
+    data = get_daily_line_data()
+
+    # # Format the data as per the provided structure
+    # lineChartDataDaily = [
+    #     {
+    #         'id': 'ENTERED',
+    #         'color': 'tokens("dark").redAccent[600]',
+    #         'data': [{'x': interval, 'y': data[interval]['Enter']} for interval in data]
+    #     },
+    #     {
+    #         'id': 'LEFT',
+    #         'color': 'tokens("dark").blueAccent[400]',
+    #         'data': [{'x': interval, 'y': data[interval]['Exit']} for interval in data]
+    #     },
+    #     {
+    #         'id': 'MIN',
+    #         'color': 'tokens("dark").greenAccent[600]',
+    #         'data': [{'x': interval, 'y': data[interval]['Min']} for interval in data]
+    #     },
+    #     {
+    #         'id': 'MAX',
+    #         'color': 'tokens("dark").redAccent[300]',
+    #         'data': [{'x': interval, 'y': data[interval]['Max']} for interval in data]
+    #     },
+    # ]
+
+    print(data)
+
+    return jsonify(data)
+
+  
 
 
 if __name__ == '__main__':
     thread = threading.Thread(target=processing)
     thread.start()
-    app.run(host='192.168.100.10', port=8080)
+    app.run(host='192.168.18.132', port=8080)
 
