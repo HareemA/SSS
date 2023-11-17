@@ -223,7 +223,7 @@ def get_daily_line_data():
             cur.execute("""
                 SELECT EXTRACT(HOUR FROM TO_TIMESTAMP(time_in, 'HH24:MI:SS'))::integer AS hour, COUNT(*) as count
                 FROM visits
-                WHERE date = '16 11 23'
+                WHERE date = %s
                 GROUP BY hour
             """, (current_date,))
 
@@ -238,7 +238,7 @@ def get_daily_line_data():
             cur.execute("""
                 SELECT EXTRACT(HOUR FROM TO_TIMESTAMP(time_out, 'HH24:MI:SS'))::integer AS hour, COUNT(*) as count
                 FROM visits
-                WHERE date = '16 11 23'
+                WHERE date = %s
                 GROUP BY hour
             """, (current_date,))
 
