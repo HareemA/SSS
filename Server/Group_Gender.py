@@ -11,28 +11,24 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from database import *
 
-frame_lock = threading.Lock()
-
 
 model=YOLO('yolov8n.pt')
 
 gender_model = load_model('gender_detection.model')
 classes = ['man', 'woman']
-def RGB(event, x, y, flags, param):
-    if event == cv2.EVENT_MOUSEMOVE :  
-        colorsBGR = [x, y]
-        print(colorsBGR)
+# def RGB(event, x, y, flags, param):
+#     if event == cv2.EVENT_MOUSEMOVE :  
+#         colorsBGR = [x, y]
+#         print(colorsBGR)
         
-cv2.namedWindow('RGB')
-cv2.setMouseCallback('RGB', RGB)
+# cv2.namedWindow('RGB')
+# cv2.setMouseCallback('RGB', RGB)
+
 count = detected = enter = exit = male = female = unknown = people = group_count = 0
 
-# area1=[(135,186),(811,307),(802,342),(103,203)]
-# area2=[(176,159),(818,263),(812,301),(135,186)]
-
-# area2=[(0,409),(792,407),(774,477),(1,454)]
 area1=[(1,367),(800,357),(792,406),(1,403)]
 area2=[(2,322),(807,317),(801,355),(4,360)]
+
 people_enter={}
 counter1=[]
 
@@ -43,19 +39,25 @@ frame_to_send = None
 
 group_val = False
 
-cap = cv2.VideoCapture('H:\\Downloads\\26102023_2.mp4')
+group_threshold = 55
+
+group_lock = threading.Lock()
+
+video_link = 'H:\\Downloads\\26102023_2.mp4'
+
+cap = cv2.VideoCapture(video_link)
 
 def processing():
     
     global cap, count, group_count, detected, area1, area2, people_enter, people_exit, counter1, group_val
-    global counter2, enter, exit, male, female, unknown, people, frame_to_send, frame_lock
+    global counter2, enter, exit, male, female, unknown, people, frame_to_send, group_threshold, video_link
     
 
     while True:    
         ret,frame = cap.read()
         
         if not cap:
-            cap = cv2.VideoCapture('H:\\Downloads\\26102023_2.mp4')
+            cap = cv2.VideoCapture(video_link)
             
         if not ret:
             cap.release()
@@ -69,7 +71,6 @@ def processing():
         frame=cv2.resize(frame,(1020,500))
         
         original_coordinates = []  
-        group_threshold = 55
         
         group_stat={}
         
@@ -97,7 +98,9 @@ def processing():
             #For group detection
             original_coordinates.append({'id': id, 'coord': [x3, y3, x4, y4]})
             
-        coordinate_groups = group_coordinates(original_coordinates, group_threshold)
+        with group_lock:
+            coordinate_groups = group_coordinates(original_coordinates, group_threshold)
+            
         group_stat=process_groups(coordinate_groups)
         print("Group_stat: ",group_stat)
 
@@ -175,11 +178,11 @@ def processing():
             cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
             cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
         
-        cv2.imshow("RGB", frame)
-        if cv2.waitKey(1)&0xFF==27:
-            break
-    cap.release()
-    cv2.destroyAllWindows()
+    #     cv2.imshow("RGB", frame)
+    #     if cv2.waitKey(1)&0xFF==27:
+    #         break
+    # cap.release()
+    # cv2.destroyAllWindows()
 
 
 def clear_lists():
@@ -257,4 +260,4 @@ def process_groups(coordinate_groups):
          
          
            
-processing()
+# processing()

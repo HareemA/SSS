@@ -9,25 +9,6 @@ import math
 model = YOLO('yolov8s.pt')
 
 
-# def RGB(event, x, y, flags, param):
-#     if event == cv2.EVENT_MOUSEMOVE:
-#         colorsBGR = [x, y]
-#         print(colorsBGR)
-
-# cv2.namedWindow('RGB')
-# cv2.setMouseCallback('RGB', RGB)
-
-# cap = cv2.VideoCapture('vidp.mp4')
-
-my_file = open("coco.txt", "r")
-data = my_file.read()
-class_list = data.split("\n")
-
-count = 0
-tracker = Tracker()
-
-
-
 # Using Euclidean distance
 def calculate_distance(coord1, coord2):
     x1, y1, x2, y2 = coord1
@@ -68,62 +49,62 @@ def group_coordinates(coordinates, group_threshold):
     return coordinate_groups
 
  
-def main(frame,threshold):
+# def main(frame,threshold):
 
-    group_threshold = threshold
+#     group_threshold = threshold
 
-    frame = cv2.resize(frame, (1020, 500))
+#     frame = cv2.resize(frame, (1020, 500))
     
-    conf_thresh = 0.1
+#     conf_thresh = 0.1
 
-    results = model.predict(frame, classes=[0])
-    #contains info about all the detected people
-    a = results[0].boxes.data
-    #converts them in a pandas dataset
-    px = pd.DataFrame(a).astype("float")
+#     results = model.predict(frame, classes=[0])
+#     #contains info about all the detected people
+#     a = results[0].boxes.data
+#     #converts them in a pandas dataset
+#     px = pd.DataFrame(a).astype("float")
 
-    original_coordinates = []  
-    list=[]
-    detected_persons_count = 0
-    grpCount = 0
+#     original_coordinates = []  
+#     list=[]
+#     detected_persons_count = 0
+#     grpCount = 0
 
-    for index, row in px.iterrows():
-        x1 = int(row[0])
-        y1 = int(row[1])
-        x2 = int(row[2])
-        y2 = int(row[3])
-        list.append([x1,y1,x2,y2])
-        # Store the original coordinates
-        #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 225, 0), 2)  # Draw individual bounding boxes
+#     for index, row in px.iterrows():
+#         x1 = int(row[0])
+#         y1 = int(row[1])
+#         x2 = int(row[2])
+#         y2 = int(row[3])
+#         list.append([x1,y1,x2,y2])
+#         # Store the original coordinates
+#         #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 225, 0), 2)  # Draw individual bounding boxes
 
-    bbox_idx=tracker.update(list)
-    detected_persons_count = len(bbox_idx)
+#     bbox_idx=tracker.update(list)
+#     detected_persons_count = len(bbox_idx)
     
-    for bbox in bbox_idx:
-        x3,y3,x4,y4,id=bbox
-        #cx=int(x3+x4)//2
-        #cy=int(y3+y4)//2
-        original_coordinates.append([x3, y3, x4, y4])
-        cv2.rectangle(frame,(x3,y3),(x4,y4),(0,255,0),2)
-        cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
+#     for bbox in bbox_idx:
+#         x3,y3,x4,y4,id=bbox
+#         #cx=int(x3+x4)//2
+#         #cy=int(y3+y4)//2
+#         original_coordinates.append([x3, y3, x4, y4])
+#         cv2.rectangle(frame,(x3,y3),(x4,y4),(0,255,0),2)
+#         cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
         
 
-    coordinate_groups = group_coordinates(original_coordinates, group_threshold)
-    #print(coordinate_groups)
+#     coordinate_groups = group_coordinates(original_coordinates, group_threshold)
+#     #print(coordinate_groups)
 
-    # Iterate through the grouped coordinates and draw bounding boxes around groups
-    for group_key, group_coord in coordinate_groups.items():
-        if len(group_coord) >= 2:
-            #print("Group detected, key:", group_key)
-            grpCount = grpCount + 1
-            min_x = min([x1 for (x1, y1, x2, y2) in group_coord])
-            min_y = min([y1 for (x1, y1, x2, y2) in group_coord])
-            max_x = max([x2 for (x1, y1, x2, y2) in group_coord])
-            max_y = max([y2 for (x1, y1, x2, y2) in group_coord])
-            cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
+#     # Iterate through the grouped coordinates and draw bounding boxes around groups
+#     for group_key, group_coord in coordinate_groups.items():
+#         if len(group_coord) >= 2:
+#             #print("Group detected, key:", group_key)
+#             grpCount = grpCount + 1
+#             min_x = min([x1 for (x1, y1, x2, y2) in group_coord])
+#             min_y = min([y1 for (x1, y1, x2, y2) in group_coord])
+#             max_x = max([x2 for (x1, y1, x2, y2) in group_coord])
+#             max_y = max([y2 for (x1, y1, x2, y2) in group_coord])
+#             cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
 
-    print("Group Count: ", grpCount)
+#     print("Group Count: ", grpCount)
 
-    return frame,detected_persons_count,grpCount
+#     return frame,detected_persons_count,grpCount
 
         
