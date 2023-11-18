@@ -134,7 +134,7 @@ def get_gender_pie_data():
     print("in pie data 1")
     data = get_daily_gender_distribution()  
 
-    print(data)
+    # print(data)
     return jsonify(data)
 
 
@@ -142,7 +142,7 @@ def get_gender_pie_data():
 @app.route('/daily_line_chart', methods=['GET'])
 def daily_line_chart():
     data = get_daily_line_data()
-    print(data)
+    # print(data)
 
     return jsonify(data)
 
@@ -150,7 +150,7 @@ def daily_line_chart():
 @app.route('/weekly_line_chart', methods=['GET'])
 def weekly_line_chart():
     data = get_weekly_line_data()
-    print(data)
+    # print(data)
 
     return jsonify(data)
 
@@ -158,10 +158,16 @@ def weekly_line_chart():
 @app.route('/monthly_line_chart', methods=['GET'])
 def monthly_line_chart():
     data = get_monthly_line_data()
-    print(data)
+    # print(data)
 
     return jsonify(data)
 
+@app.route('/get_card_data',methods=['GET'])
+def get_card_data():
+    data=chart_data()
+    return jsonify(data)
+
+    
 #API for Repeat Ratio Pie
 @app.route('/repeat_ratio_pie', methods=['GET'])
 def repeat_ratio_pie():
@@ -205,6 +211,6 @@ if __name__ == '__main__':
     processing_thread.start()
     
 
-    app.run(host='192.168.18.132', port=8080)
+    app.run(host='192.168.100.10', port=8080)
     
 

@@ -12,7 +12,7 @@ const MonthlyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://192.168.18.132:8080/monthly_line_chart");
+      const response = await fetch("http://192.168.100.10:8080/monthly_line_chart");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
