@@ -1,42 +1,72 @@
 import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
-import { mockPieData as data } from "../data/mockData";
 import React, { useState, useEffect } from "react";
-import { useApi } from "../scenes/global/ApiContext";
 
-const PieChart = (isDashboard = false) => {
+const PieChart = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const { apiData } = useApi();
-  const { male, female, unknown, time } = apiData;
-
-  const currentTime = new Date();
-  const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' , second:'2-digit'});
-
   const [chartData, setChartData] = useState([
-    { id: "Male", label: "Male", value: 0 },
-    { id: "Female", label: "Female", value: 0 },
-    { id: "Unknown", label: "Unknown", value: 0 },
+    { id: "Man", label: "Man", value: 10, color: 'hsl(104, 70%, 50%)' },
+    { id: "Woman", label: "Woman", value: 10, color: 'hsl(162, 70%, 50%)' },
+    { id: "Unidentified", label: "Unidentified", value: 10, color: 'hsl(291, 70%, 50%)' },
   ]);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      // Update the chart data with the latest values from the API
-      setChartData([
-        { id: "Male", label: "Male", value: male },
-        { id: "Female", label: "Female", value: female },
-        { id: "Unknown", label: "Unknown", value: unknown },
-      ]);
-    }, 5000); // Fetch data every 5 seconds
+    const fetchGenderPieData = async () => {
+      try {
+        const response = await fetch('http://192.168.18.132:8080/get_gender_pie_data');
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const jsonData = await response.json();
+
+        const genderPieData = [
+          {
+            id: 'Man',
+            label: `M : ${jsonData.male_percentage}`,
+            value: jsonData.male_percentage === 0 ? 10000 : jsonData.male_percentage,
+            color: 'hsl(219, 55%, 64%)',
+          },
+          {
+            id: 'Woman',
+            label: `W : ${jsonData.female_percentage}`,
+            value: jsonData.female_percentage === 0 ? 10000 : jsonData.female_percentage,
+            color: 'hsl(162, 70%, 50%)',
+          },
+          {
+            id: 'Unidentified',
+            label: `U : ${jsonData.unknown_percentage}`,
+            value: jsonData.unknown_percentage === 0 ? 10000 : jsonData.unknown_percentage,
+            color: "hsl(274, 70%, 50%)",
+          },
+        ];
+
+        // Update the chart data with the latest values from the API
+        setChartData(genderPieData);
+        // console.log("Gender Pie Data: ",genderPieData);
+      } catch (error) {
+        console.error('Error fetching gender pie chart data:', error);
+      }
+    };
+
+    // Fetch gender pie chart data initially and then every 10 minutes
+    fetchGenderPieData();
+    const intervalId = setInterval(fetchGenderPieData, 600);  
+
 
     return () => clearInterval(intervalId);
-  }, [male, female, unknown]);
-  
+  }, []);
+
+  const customColors = ['#7171d6', '#1d47e0', '#495891'];
+
   return (
     <ResponsivePie
       data={chartData}
+      colors={customColors}
       theme={{
         axis: {
           domain: {
@@ -74,7 +104,6 @@ const PieChart = (isDashboard = false) => {
         from: "color",
         modifiers: [["darker", 0.2]],
       }}
-      enableArcLinkLabels={false}
       arcLinkLabelsSkipAngle={10}
       arcLinkLabelsTextColor={colors.grey[100]}
       arcLinkLabelsThickness={2}
@@ -112,14 +141,14 @@ const PieChart = (isDashboard = false) => {
           direction: "row",
           justify: false,
           translateX: 0,
-          translateY: 56,
-          itemsSpacing: -20,
-          itemWidth: 100,
+          translateY: 72,
+          itemsSpacing: 0,
+          itemWidth: 80,
           itemHeight: 18,
           itemTextColor: "#999",
           itemDirection: "left-to-right",
           itemOpacity: 1,
-          symbolSize: 15,
+          symbolSize: 18,
           symbolShape: "circle",
           effects: [
             {

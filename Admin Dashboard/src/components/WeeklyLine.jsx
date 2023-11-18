@@ -1,4 +1,5 @@
 import { ResponsiveLine } from "@nivo/line";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { mockLineDataWeekly as data } from "../data/mockData";
@@ -7,9 +8,88 @@ const WeeklyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  const [lineChartData, setLineChartData] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("http://192.168.18.132:8080/weekly_line_chart");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const jsonData = await response.json();
+
+      // Convert the received data into the required format
+      const convertedData = [
+        {
+          id: "ENTERED",
+          color: tokens("dark").redAccent[600],
+          data: jsonData.Entered ? jsonData.Entered.map((value, index) => ({
+            x: getDayOfWeek(index + 1),
+            y: value === null ? 0 : value,
+          })) : [],
+        },
+        {
+          id: "LEFT",
+          color: tokens("dark").blueAccent[400],
+          data: jsonData.Left ? jsonData.Left.map((value, index) => ({
+            x: getDayOfWeek(index + 1),
+            y: value === null ? 0 : value,
+          })) : [],
+        },
+        {
+          id: "MIN",
+          color: tokens("dark").greenAccent[600],
+          data: jsonData.Min ? jsonData.Min.map((value, index) => ({
+            x: getDayOfWeek(index + 1),
+            y: value === null ? 0 : value,
+          })) : [],
+        },
+        {
+          id: "MAX",
+          color: tokens("dark").redAccent[300],
+          data: jsonData.Max ? jsonData.Max.map((value, index) => ({
+            x: getDayOfWeek(index + 1),
+            y: value === null ? 0 : value,
+          })) : [],
+        },
+      ];
+
+      setLineChartData(convertedData);
+      console.log(convertedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const getDayOfWeek = (index) => {
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    // Adjust the index to wrap around
+    const adjustedIndex = (index % daysOfWeek.length + daysOfWeek.length) % daysOfWeek.length;
+  
+    return daysOfWeek[adjustedIndex];
+  };
+
+  useEffect(() => {
+    fetchData(); // Initial fetch
+
+    // Fetch data every hour (3600000 milliseconds)
+    const intervalId = setInterval(() => {
+      fetchData();
+    }, 600); // Set the interval to a more reasonable value, e.g., 3600000 milliseconds (1 hour)
+
+    // Clean up interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, []); // Fetch data once when the component mounts
+
+  if (!lineChartData) {
+    // Render loading or placeholder if data is not yet available
+    return <div>Loading...</div>;
+  }
+
   return (
     <ResponsiveLine
-      data={data}
+      data={lineChartData}
       theme={{
         axis: {
           domain: {

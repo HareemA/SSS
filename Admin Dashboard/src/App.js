@@ -18,6 +18,7 @@ import DailyLineChart from './scenes/DailyLine';
 import WeeklyLineChart from './scenes/WeeklyLine';
 import MonthlyLineChart from './scenes/MonthlyLine';
 import FiveMinuteLineChart from './scenes/FiveMinuteLine';
+import RepeatRatioPieChart from './scenes/RepeatRatioPie';
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -44,6 +45,7 @@ function App() {
               <Route path="/WeeklyLineChart" element={<WeeklyLineChart />} />
               <Route path="/MonthlyLineChart" element={<MonthlyLineChart />} />
               <Route path="/FiveMinuteLineChart" element={<FiveMinuteLineChart />} />
+              <Route path="/RepeatRatioPieChart" element={<RepeatRatioPieChart />} />
             </Routes>
           </main>
         </div>

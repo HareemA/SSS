@@ -35,6 +35,7 @@ import CustomerTable from "../../components/CustomerTable";
 import PieChartGroup from "../../components/PieChartGroup";
 import EngagementBarGraph from "../../components/EngagementBarGraph";
 import { mockUserData as userData } from "../../data/mockData";
+import RepeatRatioPie from "../../components/RepeatRatioPie";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -157,7 +158,7 @@ const Dashboard = () => {
               >
                 <MenuItem value="Today">Today</MenuItem>
                 <MenuItem value="Weekly">This Week</MenuItem>
-                <MenuItem value="Monthly">This Month</MenuItem>
+                <MenuItem value="Monthly">Last Month</MenuItem>
                 <MenuItem value="MinutesLive">5 Minute</MenuItem>
               </Select>
             </Box>
@@ -407,14 +408,16 @@ const Dashboard = () => {
           <Typography variant="h5" fontWeight="600">
             REPEAT RATIO
           </Typography>
+          <Box height="220px">
+            <PieChart isDashboard={true} />
+          </Box>
           <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
+            // display="flex"
+            // flexDirection="column"
+            // alignItems="center"
+            // mt="25px"
           >
-            <ProgressCircle size="125" />
-            <Typography
+            {/* <Typography
               variant="h5"
               color={colors.greenAccent[500]}
               sx={{ mt: "15px" }}
@@ -429,7 +432,7 @@ const Dashboard = () => {
               }
             >
               Returned this week
-            </Typography>
+            </Typography> */}
           </Box>
         </Box>
 
@@ -476,7 +479,7 @@ const Dashboard = () => {
             fontWeight="600"
             sx={{ padding: "30px 30px 0 30px" }}
           >
-            WEEKLY GENDER DISTRIBUTION
+            DAILY GENDER DISTRIBUTION
           </Typography>
           <Box height="250px" mt="-20px">
             <BarChart isDashboard={true} height="30vh" />
