@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime
 from datetime import datetime, timedelta
 import calendar
+import statistics
 from collections import defaultdict
 import face_recognition
 import numpy as np
@@ -503,12 +504,55 @@ def get_daily_gender_bar_data():
     except(Exception, psycopg2.DatabaseError) as error:
         print("Error fetching daily gender bar data:", error)
         return []
+    
+
+#
+def get_engagement_bar_data():
+    try:
+        # Get the current date in the required format
+        current_date = datetime.now().strftime('%d %m %y')
+
+        with conn, conn.cursor() as cur:
+            # Query to get customer and visit data for the current day
+            cur.execute("""
+                SELECT c.id, v.time_in, v.time_out
+                FROM customer c
+                LEFT JOIN visits v ON c.id = v.customer_id AND v.date = '16 11 23'
+            """, (current_date,))
+
+            rows = cur.fetchall()
+
+            # Calculate time spent for each customer
+            time_spent_per_customer = []
+            for row in rows:
+                _, time_in, time_out = row
+                if time_in and time_out:
+                    time_in_dt = datetime.strptime(time_in, '%H:%M:%S')
+                    time_out_dt = datetime.strptime(time_out, '%H:%M:%S')
+                    time_spent = (time_out_dt - time_in_dt).total_seconds() / 60.0
+                    time_spent_per_customer.append(time_spent)
+
+            # Calculate average, minimum, and maximum time spent
+            average_time_spent = statistics.mean(time_spent_per_customer) if time_spent_per_customer else 0
+            min_time_spent = min(time_spent_per_customer) if time_spent_per_customer else 0
+            max_time_spent = max(time_spent_per_customer) if time_spent_per_customer else 0
+
+            return [
+                {"metric": "Max", "value": round(max_time_spent, 2)},
+                {"metric": "Min", "value": round(min_time_spent, 2)},
+                {"metric": "Avg", "value": round(average_time_spent, 2)}
+            ]
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching engagement bar data:", error)
+        return []
+    
 
 
 # monthly_data = get_monthly_line_data()
 # print(monthly_data) 
  
-pie_data = get_daily_gender_distribution()
-print("pie data gender: ",pie_data)       
+bar_data = get_engagement_bar_data()
+print("bar: ",bar_data)       
     
 # create_tables()

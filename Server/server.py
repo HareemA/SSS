@@ -180,8 +180,16 @@ def group_ratio_pie():
 
 #API for Bar Daily Gender Distribution
 @app.route('/daily_gender_bar', methods=['GET'])
-def daily_gender_bare():
+def daily_gender_bar():
     data = get_daily_gender_bar_data()
+    print(data)
+
+    return jsonify(data)
+
+#API for Bar Engagement Graph
+@app.route('/daily_engagement_bar', methods=['GET'])
+def daily_engagement_bar():
+    data = get_engagement_bar_data()
     print(data)
 
     return jsonify(data)
