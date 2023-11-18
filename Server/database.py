@@ -3,6 +3,8 @@ import psycopg2
 import os
 import uuid
 from datetime import datetime
+from datetime import datetime, timedelta
+import calendar
 import face_recognition
 import numpy as np
 
@@ -207,6 +209,7 @@ def get_daily_gender_distribution():
             'female_percentage': 0,
             'unknown_percentage': 0,
         }
+    
 
 
 #get Daily Line CHart data
@@ -260,15 +263,124 @@ def get_daily_line_data():
         print("Error fetching line data:", error)
         return {}
 
+# hourly_data = get_daily_line_data()
+# print(hourly_data)
 
 
+#weekly line chart data
+def get_weekly_line_data():
+    try:
+        with conn, conn.cursor() as cur:
+            # Calculate the date range for the last 7 days
+            end_date = datetime.now().date()
+            start_date = end_date - timedelta(days=6)
 
+            # Initialize the data dictionary
+            weekly_data = {'Entered': [], 'Left': [], 'Min': [], 'Max': []}
 
-hourly_data = get_daily_line_data()
-print(hourly_data)
+            # Loop through each day in the week
+            for single_date in (start_date + timedelta(n) for n in range(7)):
+                date_str = single_date.strftime('%d %m %y')
+
+                # Get the count of people who entered and left the shop on the current day
+                cur.execute("""
+                    SELECT COUNT(DISTINCT v.customer_id), COUNT(DISTINCT CASE WHEN v.time_out IS NOT NULL THEN v.customer_id END)
+                    FROM visits v
+                    WHERE v.date = %s
+                """, (date_str,))
+
+                entered, left = cur.fetchone()
+
+                # Get the min and max count of people present in the shop at one time on the current day
+                cur.execute("""
+                    SELECT MIN(people_count), MAX(people_count)
+                    FROM (
+                        SELECT COUNT(DISTINCT customer_id) AS people_count
+                        FROM visits
+                        WHERE date = %s
+                        GROUP BY time_in
+                    ) AS counts
+                """, (date_str,))
+
+                min_count, max_count = cur.fetchone()
+
+                # Append the data to the weekly_data dictionary
+                weekly_data['Entered'].append(entered)
+                weekly_data['Left'].append(left)
+                weekly_data['Min'].append(min_count)
+                weekly_data['Max'].append(max_count)
+            
+            return weekly_data
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching weekly line data:", error)
+        return {}
+    
+
+from datetime import datetime, timedelta
+import calendar
+
+def get_monthly_line_data():
+    try:
+        with conn, conn.cursor() as cur:
+            # Calculate the date range for the previous month
+            today = datetime.now()
+            first_day_of_current_month = today.replace(day=1)
+            last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+            first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
+
+            # Initialize the data dictionary
+            monthly_data = {'Entered': [], 'Left': [], 'Min': [], 'Max': []}
+
+            # Loop through each day of the previous month
+            current_date = first_day_of_previous_month
+            while current_date <= last_day_of_previous_month:
+                date_str = current_date.strftime('%d %m %y')
+
+                # Get the count of people who entered and left the shop on the current day
+                cur.execute("""
+                    SELECT COUNT(DISTINCT v.customer_id), COUNT(DISTINCT CASE WHEN v.time_out IS NOT NULL THEN v.customer_id END)
+                    FROM visits v
+                    WHERE v.date = %s
+                """, (date_str,))
+
+                entered, left = cur.fetchone()
+
+                # Get the min and max count of people present in the shop at one time on the current day
+                cur.execute("""
+                    SELECT MIN(people_count), MAX(people_count)
+                    FROM (
+                        SELECT COUNT(DISTINCT customer_id) AS people_count
+                        FROM visits
+                        WHERE date = %s
+                        GROUP BY time_in
+                    ) AS counts
+                """, (date_str,))
+
+                min_count, max_count = cur.fetchone()
+
+                # Append the data to the monthly_data dictionary
+                monthly_data['Entered'].append(entered)
+                monthly_data['Left'].append(left)
+                monthly_data['Min'].append(min_count)
+                monthly_data['Max'].append(max_count)
+
+                # Move to the next day
+                current_date += timedelta(days=1)
+
+            return monthly_data
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching monthly line data:", error)
+        return {}
+
 
    
 
-        
+# monthly_data = get_monthly_line_data()
+# print(monthly_data) 
+ 
+pie_data = get_daily_gender_distribution()
+print("pie data gender: ",pie_data)       
     
 # create_tables()

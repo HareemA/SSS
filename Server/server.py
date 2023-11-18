@@ -200,60 +200,30 @@ def get_gender_pie_data():
     print("in pie data 1")
     data = get_daily_gender_distribution()  # Use the function from the previous response
 
-    gender_pie_data = [
-        {
-            'id': 'Man',
-            'label': 'Man',
-            'value': data['male_percentage'],  # Replace with the actual percentage for men
-            'color': 'hsl(104, 70%, 50%)',
-        },
-        {
-            'id': 'Woman',
-            'label': 'Woman',
-            'value': data['female_percentage'],  # Replace with the actual percentage for women
-            'color': 'hsl(162, 70%, 50%)',
-        },
-        {
-            'id': 'Unidentified',
-            'label': 'Unidentified',
-            'value': data['unknown_percentage'],  # Replace with the actual percentage for unidentified
-            'color': 'hsl(291, 70%, 50%)',
-        },
-    ]
-
-    print(gender_pie_data)
-    return jsonify(gender_pie_data)
+    print(data)
+    return jsonify(data)
 
 
-#API for Line CHart
+#API for Line CHart Daily
 @app.route('/daily_line_chart', methods=['GET'])
 def daily_line_chart():
     data = get_daily_line_data()
+    print(data)
 
-    # # Format the data as per the provided structure
-    # lineChartDataDaily = [
-    #     {
-    #         'id': 'ENTERED',
-    #         'color': 'tokens("dark").redAccent[600]',
-    #         'data': [{'x': interval, 'y': data[interval]['Enter']} for interval in data]
-    #     },
-    #     {
-    #         'id': 'LEFT',
-    #         'color': 'tokens("dark").blueAccent[400]',
-    #         'data': [{'x': interval, 'y': data[interval]['Exit']} for interval in data]
-    #     },
-    #     {
-    #         'id': 'MIN',
-    #         'color': 'tokens("dark").greenAccent[600]',
-    #         'data': [{'x': interval, 'y': data[interval]['Min']} for interval in data]
-    #     },
-    #     {
-    #         'id': 'MAX',
-    #         'color': 'tokens("dark").redAccent[300]',
-    #         'data': [{'x': interval, 'y': data[interval]['Max']} for interval in data]
-    #     },
-    # ]
+    return jsonify(data)
 
+#API for Line CHart Weekly
+@app.route('/weekly_line_chart', methods=['GET'])
+def weekly_line_chart():
+    data = get_weekly_line_data()
+    print(data)
+
+    return jsonify(data)
+
+#API for Line CHart Monthly
+@app.route('/monthly_line_chart', methods=['GET'])
+def monthly_line_chart():
+    data = get_monthly_line_data()
     print(data)
 
     return jsonify(data)
