@@ -204,7 +204,9 @@ def get_daily_gender_distribution():
                 # Calculate percentages
                 male_percentage = (male_count / total_count) * 100
                 female_percentage = (female_count / total_count) * 100
+                print("Unknown: ",unknown_count)
                 unknown_percentage = (unknown_count / total_count) * 100
+                print(unknown_percentage)
 
                 print("in pie data 5")
 
@@ -387,12 +389,48 @@ def get_monthly_line_data():
         return {}
 
 
-   
+def chart_data():
+    current_date = datetime.now().strftime("%d %m %y")
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(f"""
+                SELECT
+                    (SELECT COUNT(*) FROM visits WHERE date = '{current_date}' AND time_in IS NOT NULL) AS entered,
+                    (SELECT COUNT(*) FROM visits WHERE date = '{current_date}' AND time_out IS NOT NULL) AS left,
+                    (SELECT COUNT(*) FROM visits WHERE date = '{current_date}' AND time_in IS NOT NULL AND time_out IS NULL) AS instore,
+                    (SELECT COUNT(DISTINCT v.customer_id) FROM visits v
+                     LEFT JOIN customer c ON v.customer_id = c.id
+                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at= '{current_date}') AS returning_customers,
+                    (SELECT COUNT(DISTINCT v.customer_id) FROM visits v
+                     LEFT JOIN customer c ON v.customer_id = c.id
+                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at != '{current_date}') AS new_customers,
+                    (SELECT COUNT(DISTINCT v.customer_id) FROM visits v
+                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND v.group_val = TRUE) AS groups;
+            """)
+
+            result = cur.fetchone()
+
+            if result:
+                column_names = ["entered", "left", "instore", "returning", "new", "groups"]
+                result_dict = dict(zip(column_names, result))
+                return result_dict
+            else:
+                return {"error": "No data found"}
+
+    except (Exception, psycopg2.DatabaseError) as e:
+        print(f"Error: {e}")
+        return {"error": str(e)}
 
 # monthly_data = get_monthly_line_data()
 # print(monthly_data) 
  
-pie_data = get_daily_gender_distribution()
-print("pie data gender: ",pie_data)       
+# pie_data = get_daily_gender_distribution()
+# print("pie data gender: ",pie_data)       
     
 # create_tables()
+
+# result=chart_data()
+# print(result)
+
+
+get_daily_gender_distribution()
