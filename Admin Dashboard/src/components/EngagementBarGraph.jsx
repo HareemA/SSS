@@ -2,29 +2,58 @@ import React from "react";
 import { useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
+import { useState, useEffect } from "react";
 
-const generateMockData = () => {
-  return [
-    {
-      metric: "Max",
-      value: 45,
-    },
-    {
-      metric: "Min",
-      value: 8,
-    },
-    {
-      metric: "Avg",
-      value: 23,
-    },
-  ];
-};
 
 const EngagementBarGraph = ({ isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const data = generateMockData();
+  const [chartData, setChartData] = useState([
+    {
+      metric: "Max",
+      value: 0,
+    },
+    {
+      metric: "Min",
+      value: 0,
+    },
+    {
+      metric: "Avg",
+      value: 0,
+    },
+  ]);
+
+  useEffect(() => {
+    const fetchGenderBarData = async () => {
+      try {
+        const response = await fetch('http://192.168.18.132:8080/daily_engagement_bar');
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const jsonData = await response.json();
+
+        const genderBarData = jsonData;
+
+        // Update the chart data with the latest values from the API
+        setChartData(genderBarData);
+        // console.log("Gender Bar Data: ",genderBarData);
+      } catch (error) {
+        console.error('Error fetching gender pie chart data:', error);
+      }
+    };
+
+    // Fetch gender pie chart data initially and then every x minutes
+    fetchGenderBarData();
+    const intervalId = setInterval(fetchGenderBarData, 6000);  
+
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const customColors = ['#065e91', '#8eb7de', '#0f6abf'];
 
   return (
     <ResponsiveBar
@@ -57,7 +86,8 @@ const EngagementBarGraph = ({ isDashboard = false }) => {
           },
         },
       }}
-      data={data}
+      data={chartData}
+      colors={customColors}
       keys={["value"]}
       indexBy="metric"
       layout="horizontal"
@@ -65,7 +95,6 @@ const EngagementBarGraph = ({ isDashboard = false }) => {
       padding={0.3}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
-      colors={{ scheme: "nivo" }}
       defs={[
         {
           id: "dots",

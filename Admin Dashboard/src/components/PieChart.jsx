@@ -27,19 +27,19 @@ const PieChart = () => {
         const genderPieData = [
           {
             id: 'Man',
-            label: `M : ${jsonData.male_percentage}`,
+            label: `M : ${jsonData.male_percentage}%`,
             value: jsonData.male_percentage === 0 ? 10000 : jsonData.male_percentage,
             color: 'hsl(219, 55%, 64%)',
           },
           {
             id: 'Woman',
-            label: `W : ${jsonData.female_percentage}`,
+            label: `W : ${jsonData.female_percentage}%`,
             value: jsonData.female_percentage === 0 ? 10000 : jsonData.female_percentage,
             color: 'hsl(162, 70%, 50%)',
           },
           {
             id: 'Unidentified',
-            label: `U : ${jsonData.unknown_percentage}`,
+            label: `U : ${jsonData.unknown_percentage}%`,
             value: jsonData.unknown_percentage === 0 ? 10000 : jsonData.unknown_percentage,
             color: "hsl(274, 70%, 50%)",
           },
@@ -47,7 +47,7 @@ const PieChart = () => {
 
         // Update the chart data with the latest values from the API
         setChartData(genderPieData);
-        // console.log("Gender Pie Data: ",genderPieData);
+        console.log("Gender Pie Data: ",genderPieData);
       } catch (error) {
         console.error('Error fetching gender pie chart data:', error);
       }
@@ -55,13 +55,13 @@ const PieChart = () => {
 
     // Fetch gender pie chart data initially and then every 10 minutes
     fetchGenderPieData();
-    const intervalId = setInterval(fetchGenderPieData, 600);  
+    const intervalId = setInterval(fetchGenderPieData, 6000);  
 
 
     return () => clearInterval(intervalId);
   }, []);
 
-  const customColors = ['#7171d6', '#1d47e0', '#495891'];
+  const customColors = ['#8eb7de', '#1d47e0', '#0f6abf'];
 
   return (
     <ResponsivePie
@@ -142,7 +142,7 @@ const PieChart = () => {
           justify: false,
           translateX: 0,
           translateY: 72,
-          itemsSpacing: 0,
+          itemsSpacing: 10,
           itemWidth: 80,
           itemHeight: 18,
           itemTextColor: "#999",

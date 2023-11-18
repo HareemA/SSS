@@ -3,62 +3,93 @@ import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
 import { mockBarData as data } from "../data/mockData";
 import React, { useState, useEffect } from "react";
-import { useApi } from "../scenes/global/ApiContext";
 
 const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const { apiData } = useApi();
-  const { male, female, unknown, time } = apiData;
-
-  const currentTime = new Date();
-  const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' , second:'2-digit'});
-
   const [chartData, setChartData] = useState([
     {
-      time: formattedTime,
-      Men: male,
+      time: "8:00",
+      Men: 0,
+      Women: 0,
+      Unidentified: 0,
+    },
+    {
+      time: "9:00",
+      Men: 0,
+      Women: 0,
+      Unidentified: 0,
+    },
+    {
+      time: "10:00",
+      Men: 0,
       Women: 0,
       Unidentified: 0,
     },
   ]);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      const currentTime = new Date();
-      const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const uniqueId = currentTime.getTime(); // Use a unique identifier
-  
-      // Create a new data entry
-      const newDataEntry = {
-        id: uniqueId,
-        time: formattedTime,
-        Men: male,
-        Women: female,
-        Unidentified: unknown,
-      };
-  
-      // Create a copy of the chart data and update it with the new data entry
-      setChartData((prevData) => {
-        const newChartData = [...prevData, newDataEntry];
+    const fetchGenderBarData = async () => {
+      try {
+        const response = await fetch('http://192.168.18.132:8080/daily_gender_bar');
 
-        // Limit the number of data entries to keep on the chart (e.g., 5 entries)
-        if (newChartData.length > 5) {
-          newChartData.shift(); // Remove the first entry to keep the latest on the right
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
 
-        return newChartData;
-      });
-    }, 5000); // 1000 milliseconds = 1 second for testing, change it accordingly
-  
+        const jsonData = await response.json();
+
+        const genderBarData = convertApiData(jsonData);
+
+        // Update the chart data with the latest values from the API
+        setChartData(genderBarData);
+        // console.log("Gender Bar Data: ",genderBarData);
+      } catch (error) {
+        console.error('Error fetching gender pie chart data:', error);
+      }
+    };
+
+    // Fetch gender pie chart data initially and then every x minutes
+    fetchGenderBarData();
+    const intervalId = setInterval(fetchGenderBarData, 6000);  
+
+
     return () => clearInterval(intervalId);
-  }, [male, female, unknown]);
+  }, []);
+
+  const convertApiData = (data) => {
+    // Sort the data based on the 'time' property in ascending order
+    const sortedData = data.sort((a, b) => {
+      const timeA = a.time;
+      const timeB = b.time;
+      return new Date('1970-01-01T' + timeA) - new Date('1970-01-01T' + timeB);
+    });
+  
+    // Convert the sorted data into the desired format
+    return sortedData.map(entry => {
+      const convertedEntry = { time: entry.time };
+  
+      // Loop through keys other than 'time' and convert the data
+      Object.keys(entry).forEach(key => {
+        if (key !== 'time') {
+          convertedEntry[key] = entry[key];
+        }
+      });
+  
+      return convertedEntry;
+    });
+  };
+  
+
+  const customColors = ['#065e91', '#8eb7de', '#0f6abf'];
+  
   
 
   return (
     <ResponsiveBar
       data={chartData}
+      colors={customColors}
       theme={{
         // added
         axis: {
@@ -96,7 +127,6 @@ const BarChart = ({ isDashboard = false }) => {
       padding={0.5} // Adjusted padding for narrower bars
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
-      colors={{ scheme: "nivo" }}
       defs={[
         {
           id: "dots",

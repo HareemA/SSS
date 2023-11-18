@@ -86,9 +86,10 @@ const Dashboard = () => {
       return <WeeklyLineChart isDashboard={true} />;
     } else if (chartType === "Monthly") {
       return <MonthlyLineChart isDashboard={true} />;
-    } else if (chartType === "MinutesLive") {
-      return <FiveMinuteLineChart isDashboard={true} />;
-    }
+    } 
+    //else if (chartType === "MinutesLive") {
+      //return <FiveMinuteLineChart isDashboard={true} />;
+   // }
   };
 
   return (
@@ -159,7 +160,7 @@ const Dashboard = () => {
                 <MenuItem value="Today">Today</MenuItem>
                 <MenuItem value="Weekly">This Week</MenuItem>
                 <MenuItem value="Monthly">Last Month</MenuItem>
-                <MenuItem value="MinutesLive">5 Minute</MenuItem>
+                {/* <MenuItem value="MinutesLive">5 Minute</MenuItem> */}
               </Select>
             </Box>
           </Box>
@@ -380,8 +381,6 @@ const Dashboard = () => {
         <Box
           gridColumn="span 4"
           gridRow="span 2"
-          // paddingLeft="20px"
-          // paddingRight="20px"
           backgroundColor={colors.primary[400]}
           border={`1px solid ${colors.primary[900]}`}
           borderRadius="20px"
@@ -401,38 +400,17 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
-          p="30px"
           border={`1px solid ${colors.primary[900]}`}
           borderRadius="20px"
         >
-          <Typography variant="h5" fontWeight="600">
-            REPEAT RATIO
-          </Typography>
-          <Box height="220px">
-            <PieChart isDashboard={true} />
-          </Box>
-          <Box
-            // display="flex"
-            // flexDirection="column"
-            // alignItems="center"
-            // mt="25px"
-          >
-            {/* <Typography
-              variant="h5"
-              color={colors.greenAccent[500]}
-              sx={{ mt: "15px" }}
-            >
-              67%
+          <Box mt="25px" ml="20px">
+            <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+              REPEAT RATIO
             </Typography>
-            <Typography
-              color={
-                theme.palette.mode === "dark"
-                  ? colors.greenAccent[500]
-                  : "#0772d3"
-              }
-            >
-              Returned this week
-            </Typography> */}
+          </Box>
+
+          <Box height="220px">
+            <RepeatRatioPie isDashboard={true} />
           </Box>
         </Box>
 
@@ -443,24 +421,13 @@ const Dashboard = () => {
           border={`1px solid ${colors.primary[900]}`}
           borderRadius="20px"
         >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                GROUP TREND
-              </Typography>
-            </Box>
+          <Box mt="25px" ml="20px">
+            <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+              GROUP RATIO
+            </Typography>
           </Box>
-          <Box height="250px" m="-20px 0 0 0">
+
+          <Box height="220px">
             <PieChartGroup isDashboard={true} />
           </Box>
         </Box>
@@ -497,15 +464,6 @@ const Dashboard = () => {
           <Typography variant="h5" fontWeight="600">
             ENGAGEMENT
           </Typography>
-          {/* <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-          >
-            <EngagementBarGraph isDashboard={true} height="30vh"/>
-            
-          </Box> */}
           <Box height="250px" mt="-20px">
             <EngagementBarGraph isDashboard={true} height="30vh" />
           </Box>

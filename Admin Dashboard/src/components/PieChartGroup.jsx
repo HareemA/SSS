@@ -8,48 +8,51 @@ const PieChartGroup = (isDashboard = false) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const { apiData } = useApi();
-  const { inStore, groupCount } = apiData;
-
-  
-
   const [chartData, setChartData] = useState([
-    {
-      "id": "group",
-      "label": "Group",
-      "value": 0,
-      "color": "hsl(41, 70%, 50%)"
-    },
-    {
-      "id": "individual",
-      "label": "Individual",
-      "value": 0,
-      "color": "hsl(339, 70%, 50%)"
-    },
+    { id: "Individual", label: "Individual", value: 1000, color: 'hsl(104, 70%, 50%)' },
+    { id: "Group", label: "Group", value: 1000, color: 'hsl(162, 70%, 50%)' },
   ]);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      
-      setChartData([
-        {
-          "id": "group",
-          "label": `Group: ${apiData.groupCount}`,
-          "value": apiData.groupCount ===0 ? 100 : apiData.groupCount,
-          "color": "hsla(203, 100%, 50%, 0.9)"
-        },
-        {
-          "id": "individual",
-          "label": `Indiv : ${apiData.inStore}`,
-          "value": apiData.groupCount ===0 ? 100 : apiData.groupCount,
-          "color": "hsla(228, 100%, 50%, 0.9)"
-        },
-      ]);
-    }, 600); // 5 minutes interval
-
-    // Clear the interval on component unmount
+    const fetchGRPieData = async () => {
+      try {
+        const response = await fetch('http://192.168.18.132:8080/group_ratio_pie');
+  
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+  
+        const jsonData = await response.json();
+  
+        const GRPieData = [
+          {
+            id: 'Individual',
+            label: `Individual: ${jsonData.total_customers -( jsonData.customers_in_groups || 0)}`,
+            value: jsonData.total_customers  === 0 ? 10000 : (jsonData.total_customers - jsonData.customers_in_groups),
+            color: 'hsl(219, 55%, 64%)',
+          },
+          {
+            id: 'Group',
+            label: `Group: ${jsonData.customers_in_groups || 0}`,
+            value: jsonData.customers_in_groups === 0 ? 10000 : jsonData.customers_in_groups ,
+            color: 'hsl(162, 70%, 50%)',
+          },
+        ];
+  
+        // Update the chart data with the latest values from the API
+        setChartData(GRPieData);
+      } catch (error) {
+        console.error('Error fetching repeat ratio pie chart data:', error);
+      }
+    };
+  
+    // Fetch gender pie chart data initially and then every x minutes
+    fetchGRPieData();
+    const intervalId = setInterval( fetchGRPieData, 6000);
+  
     return () => clearInterval(intervalId);
-  }, [apiData, "hsla(203, 100%, 50%, 0.9)" , "hsla(228, 100%, 50%, 0.9)" ]);
+  }, []);
+
 
   const customColors = ['#8eb7de', '#0f6abf'];
 
@@ -88,7 +91,7 @@ const PieChartGroup = (isDashboard = false) => {
         },
       }}
       margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
-      innerRadius={0}
+      innerRadius={0.5}
       padAngle={0.7}
       cornerRadius={3}
       activeOuterRadiusOffset={8}
@@ -134,7 +137,7 @@ const PieChartGroup = (isDashboard = false) => {
           justify: false,
           translateX: 0,
           translateY: 72,
-          itemsSpacing: 5,
+          itemsSpacing: 25,
           itemWidth: 80,
           itemHeight: 18,
           itemTextColor: "#999",

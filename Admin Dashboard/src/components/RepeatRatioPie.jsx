@@ -8,60 +8,51 @@ const RepeatRatioPie = () => {
   const colors = tokens(theme.palette.mode);
 
   const [chartData, setChartData] = useState([
-    { id: "Man", label: "Man", value: 10, color: 'hsl(104, 70%, 50%)' },
-    { id: "Woman", label: "Woman", value: 10, color: 'hsl(162, 70%, 50%)' },
-    { id: "Unidentified", label: "Unidentified", value: 10, color: 'hsl(291, 70%, 50%)' },
+    { id: "Repeated", label: "Repeated", value: 10, color: 'hsl(104, 70%, 50%)' },
+    { id: "Old", label: "Old", value: 10, color: 'hsl(162, 70%, 50%)' },
   ]);
 
   useEffect(() => {
-    const fetchGenderPieData = async () => {
+    const fetchRRPieData = async () => {
       try {
-        const response = await fetch('http://192.168.18.132:8080/get_gender_pie_data');
-
+        const response = await fetch('http://192.168.18.132:8080/repeat_ratio_pie');
+  
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-
+  
         const jsonData = await response.json();
-
-        const genderPieData = [
+  
+        const RRPieData = [
           {
-            id: 'Man',
-            label: `M : ${jsonData.male_percentage}`,
-            value: jsonData.male_percentage === 0 ? 10000 : jsonData.male_percentage,
+            id: 'Repeated Customers',
+            label: `Repeat: ${jsonData.repeat_customers || 0}`,
+            value: jsonData.total_customers === 0 ? 10000 : jsonData.repeat_customers,
             color: 'hsl(219, 55%, 64%)',
           },
           {
-            id: 'Woman',
-            label: `W : ${jsonData.female_percentage}`,
-            value: jsonData.female_percentage === 0 ? 10000 : jsonData.female_percentage,
+            id: 'Old',
+            label: `Old: ${jsonData.total_customers - (jsonData.repeat_customers || 0)}`,
+            value: jsonData.total_customers === 0 ? 10000 : jsonData.total_customers - (jsonData.repeat_customers || 0),
             color: 'hsl(162, 70%, 50%)',
           },
-          {
-            id: 'Unidentified',
-            label: `U : ${jsonData.unknown_percentage}`,
-            value: jsonData.unknown_percentage === 0 ? 10000 : jsonData.unknown_percentage,
-            color: "hsl(274, 70%, 50%)",
-          },
         ];
-
+  
         // Update the chart data with the latest values from the API
-        setChartData(genderPieData);
-        // console.log("Gender Pie Data: ",genderPieData);
+        setChartData(RRPieData);
       } catch (error) {
-        console.error('Error fetching gender pie chart data:', error);
+        console.error('Error fetching repeat ratio pie chart data:', error);
       }
     };
-
+  
     // Fetch gender pie chart data initially and then every 10 minutes
-    fetchGenderPieData();
-    const intervalId = setInterval(fetchGenderPieData, 600);  
-
-
+    fetchRRPieData();
+    const intervalId = setInterval( fetchRRPieData, 600);
+  
     return () => clearInterval(intervalId);
   }, []);
 
-  const customColors = ['#7171d6', '#1d47e0', '#495891'];
+  const customColors = ['#326887', '#1885c4',];
 
   return (
     <ResponsivePie
@@ -142,7 +133,7 @@ const RepeatRatioPie = () => {
           justify: false,
           translateX: 0,
           translateY: 72,
-          itemsSpacing: 0,
+          itemsSpacing: 25,
           itemWidth: 80,
           itemHeight: 18,
           itemTextColor: "#999",
