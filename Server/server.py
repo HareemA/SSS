@@ -20,7 +20,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-video_link = "H:\\Downloads\\26102023_4.mp4"
+video_link = '"E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4"'
 cap = cv2.VideoCapture(video_link)
 
 model=YOLO('yolov8n.pt')
@@ -128,11 +128,11 @@ def get_frame(group_thresh):
 
         return jsonify(response_data)
     
-    
+#API for Pie for gender distribution Daily    
 @app.route('/get_gender_pie_data', methods=['GET'])
 def get_gender_pie_data():
     print("in pie data 1")
-    data = get_daily_gender_distribution()  # Use the function from the previous response
+    data = get_daily_gender_distribution()  
 
     # print(data)
     return jsonify(data)
@@ -162,13 +162,39 @@ def monthly_line_chart():
 
     return jsonify(data)
 
+<<<<<<< HEAD
 @app.route('/get_card_data',methods=['GET'])
 def get_card_data():
     data=chart_data()
     
+=======
+#API for Repeat Ratio Pie
+@app.route('/repeat_ratio_pie', methods=['GET'])
+def repeat_ratio_pie():
+    data = get_repeat_ratio_pie_data()
+    print(data)
+
+    return jsonify(data)
+
+#API for Group Ratio Pie
+@app.route('/group_ratio_pie', methods=['GET'])
+def group_ratio_pie():
+    data = get_group_pie_data()
+    print(data)
+
+    return jsonify(data)
+
+#API for Bar Daily Gender Distribution
+@app.route('/daily_gender_bar', methods=['GET'])
+def daily_gender_bare():
+    data = get_daily_gender_bar_data()
+    print(data)
+
+>>>>>>> 2201ffe104790d60497652ac30aed714456727ff
     return jsonify(data)
 
   
+
 if __name__ == '__main__':
     frame_thread = threading.Thread(target=frame_to_send)
     processing_thread = threading.Thread(target=processing)
@@ -178,6 +204,10 @@ if __name__ == '__main__':
     processing_thread.start()
     
 
+<<<<<<< HEAD
     app.run(host='192.168.100.10', port=8080)
+=======
+    app.run(host='192.168.18.132', port=8080)
+>>>>>>> 2201ffe104790d60497652ac30aed714456727ff
     
 
