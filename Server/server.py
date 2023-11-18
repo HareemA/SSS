@@ -14,42 +14,35 @@ import face_recognition
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from Group_Gender import *
+from GroupDetection import *
 
 app = Flask(__name__)
 CORS(app)
 
-frame_lock = Lock()
+
+video_link = 'H:\\Downloads\\26102023_2.mp4'
+cap = cv2.VideoCapture(video_link)
 
 model=YOLO('yolov8n.pt')
 
-gender_model = load_model('gender_detection.model')
-classes = ['man', 'woman']
+frame_lock = threading.Lock()
 
-count = detected = enter = exit = male = female = unknown = people = group_count = 0
+frame_to_send=None
 
-area1=[(135,186),(811,307),(802,342),(103,203)]
-area2=[(176,159),(818,263),(812,301),(135,186)]
+count=0
 
-people_enter={}
-counter1=[]
+area1=[(1,367),(800,357),(792,406),(1,403)]
+area2=[(2,322),(807,317),(801,355),(4,360)]
 
-people_exit={}
-counter2=[]
-
-frame_to_send = None
-
-cap = cv2.VideoCapture('E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4')
-
-def processing():
+def frame_to_send():
     
-    global cap, count, group_count, detected, area1, area2, people_enter, people_exit, counter1
-    global counter2, enter, exit, male, female, unknown, people, frame_to_send, frame_lock
+    global cap, area1, area2, group_lock, group_threshold,count, frame_to_send
 
     while True:    
         ret,frame = cap.read()
         
         if not cap:
-            cap = cv2.VideoCapture('E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4')
+            cap = cv2.VideoCapture(video_link)
             
         if not ret:
             cap.release()
@@ -62,9 +55,6 @@ def processing():
         
         frame=cv2.resize(frame,(1020,500))
         
-        original_coordinates = []  
-        group_threshold = 35
-        
         #Dfining areas for detection
         cv2.polylines(frame,[np.array(area1,np.int32)],True,(0,0,255),1)
         cv2.polylines(frame,[np.array(area2,np.int32)],True,(0,255,0),1)   
@@ -73,8 +63,8 @@ def processing():
         a=results[0].boxes.data
         px=pd.DataFrame(a).astype("float")
         
-        gender_label = 'none'
-
+        original_coordinates = []  
+        
         list=[]         
         for index,row in px.iterrows():
             x3=int(row[0])
@@ -84,62 +74,13 @@ def processing():
             d=int(row[5])
             id = int(row[4])
             
-            #For group detection
             original_coordinates.append([x3, y3, x4, y4])
-    
-            x_centre= (x3+x4)//2
-            y_centre=(y3+y4)//2
 
-            person=frame[y3:y4,x3:x4]
-            face_crop = cv2.resize(person, (96, 96))
-            face_crop = face_crop.astype("float") / 255.0
-            face_crop = img_to_array(face_crop)
-            face_crop = np.expand_dims(face_crop, axis=0)
-
-            gender_confidence = gender_model.predict(face_crop)[0]
-            gender_index = np.argmax(gender_confidence)
-            gender_label = classes[gender_index]
-
-            #people leave
-            #result is 1 if rerson inside that area and -1 if person isnt inside the area
-            #x _centre,y4
-            results1 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y_centre)),False)
-            if results1>=0:
-                people_exit[id]=(x4,y4)
-            if id in people_exit:
-                results2 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
-                if results2>=0:
-                    if counter2.count(id)==0:
-                        counter2.append(id)
-                        exit=exit+1
-     
-            #People Enter
-            results3 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
-            if results3>=0:
-                #print("result3:",results3)
-                people_enter[id]=(x4,y4)
-            if id in people_enter:
-                results4 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y_centre)),False)
-                if results4>=0:
-                    if counter1.count(id)==0:
-                        counter1.append(id)
-                        enter=enter+1
-                        if gender_label == 'man':
-                            male = male + 1
-                        elif gender_label == 'woman':
-                            female = female + 1
-                        else:
-                            unknown = unknown + 1
-     
-            if(enter>exit):      
-                detected = enter - exit
                         
             cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,0),1)
-            cv2.circle(frame,(x_centre,y_centre),4,(255,0,0),-1)
-            cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
-            cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
-          
-        coordinate_groups = group_coordinates(original_coordinates, group_threshold)
+            
+        with group_lock:
+            coordinate_groups = group_coordinates(original_coordinates, group_threshold)
 
         #Iterate through the grouped coordinates and draw bounding boxes around groups
         for group_key, group_coord in coordinate_groups.items():
@@ -156,18 +97,16 @@ def processing():
             frame_to_send = frame
         
 
-@app.route('/get_data/<int:group_threshold>', methods=['GET'])
-def get_data(group_threshold):
-    global frame_to_send, detected, group_count, enter, exit, male, female, unknown, frame_lock
-    print("In server")
-    print("Enter count: ",enter)
-    print("Exit count:", exit)
-    print("Men: ",male)
-    print("Women: ",female)
-    print("InStore: ", detected)
+@app.route('/get_frame/<int:group_thresh>', methods=['GET'])
+def get_data(group_thresh):
+    global frame_to_send, group_lock, group_threshold
+    
+    with group_lock:
+        group_threshold = group_thresh
     
     with frame_lock:
         if frame_to_send is None:
+            print("No frame found")
             return Response('Error: No frame available', status=500)
 
         _, encoded_frame = cv2.imencode('.jpg', frame_to_send)
@@ -179,13 +118,6 @@ def get_data(group_threshold):
         frame_bytes = base64.b64encode(encoded_frame)
         timestamp = datetime.now().strftime('%H:%M:%S')
         response_data = {
-            'inStore': detected,
-            'group_count': group_count,
-            'enter': enter,
-            'exit': exit,
-            'male': male,
-            'female': female,
-            'unknown': unknown,
             'frame': frame_bytes.decode('utf-8'),
             'time': timestamp
         }
@@ -229,10 +161,14 @@ def monthly_line_chart():
     return jsonify(data)
 
   
-
-
 if __name__ == '__main__':
-    thread = threading.Thread(target=processing)
-    thread.start()
-    app.run(host='192.168.18.132', port=8080)
+    processing_thread = threading.Thread(target=processing)
+    frame_thread = threading.Thread(target=frame_to_send)
+
+    frame_thread.start()
+    processing_thread.start()
+    
+
+    app.run(host='192.168.100.10', port=8080)
+    
 
