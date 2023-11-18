@@ -41,8 +41,6 @@ const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { apiData } = useApi();
-  const { inStore, groupCount, time, male, female, unknown, enter, exit } =
-    apiData;
 
   const [chartType, setChartType] = useState("Today");
   const [currentTime, setCurrentTime] = useState("");
@@ -265,7 +263,7 @@ const Dashboard = () => {
                   />
                 ),
                 label: "Entered",
-                value: apiData.enter,
+                value: apiData.entered,
               },
               {
                 icon: (
@@ -280,7 +278,7 @@ const Dashboard = () => {
                   />
                 ),
                 label: "Left",
-                value: apiData.exit,
+                value: apiData.left,
               },
               {
                 icon: (
@@ -295,7 +293,7 @@ const Dashboard = () => {
                   />
                 ),
                 label: "In-Store",
-                value: apiData.inStore,
+                value: apiData.instore,
               },
               {
                 icon: (
@@ -309,8 +307,8 @@ const Dashboard = () => {
                     }}
                   />
                 ),
-                label: "Male",
-                value: apiData.male,
+                label: "New",
+                value: apiData.new,
               },
               {
                 icon: (
@@ -324,8 +322,8 @@ const Dashboard = () => {
                     }}
                   />
                 ),
-                label: "Female",
-                value: apiData.female,
+                label: "Returning",
+                value: apiData.returning,
               },
               {
                 icon: (
@@ -339,8 +337,8 @@ const Dashboard = () => {
                     }}
                   />
                 ),
-                label: "Unknown",
-                value: apiData.unknown,
+                label: "Groups",
+                value: apiData.groups,
               },
             ].map((item, index) => (
               <Box

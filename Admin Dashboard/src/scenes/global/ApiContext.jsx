@@ -9,32 +9,19 @@ export function useApi() {
 
 export function ApiProvider({ children }) {
   const [apiData, setApiData] = useState({
-    frame: null,
-    inStore: 0,
-    groupCount: 0,
-    time: null,
-    male:0,
-    female:0,
-    enter:0,
-    exit:0,
-    unknown:0
-
+    entered:0,
+    left:0,
+    instore:0,
+    returning:0,
+    new:0,
+    groups:0
   });
 
   const [sliderValue, setSliderValue] = useState(35);
 
-  // State variables to track maximum and minimum values within a minute
-  const [maxCountWithinMinute, setMaxCountWithinMinute] = useState(0);
-  const [minCountWithinMinute, setMinCountWithinMinute] = useState(0);
-
-  const updateSliderValue = (value) => {
-    setSliderValue(value);
-  };
-
-  // Function to fetch data from the API
   const fetchDataFromApi = async () => {
     try {
-      const response = await fetch(`http://192.168.18.132:8080/get_data/${sliderValue}`);
+      const response = await fetch("http://192.168.100.10:8080/get_card_data");
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -42,22 +29,13 @@ export function ApiProvider({ children }) {
 
       const jsonData = await response.json();
 
-      // Update maximum and minimum values within a minute
-      if (jsonData.inStore !== null) {
-        setMaxCountWithinMinute((prevMax) => Math.max(prevMax, jsonData.inStore));
-        setMinCountWithinMinute((prevMin) => (prevMin === 0 ? jsonData.inStore : Math.min(prevMin, jsonData.inStore)));
-      }
-
       setApiData({
-        frame: jsonData.frame,
-        inStore: jsonData.inStore,
-        groupCount: jsonData.group_count,
-        time: jsonData.time,
-        male: jsonData.male,
-        female: jsonData.female,
-        unknown: jsonData.unknown,
-        enter: jsonData.enter,
-        exit: jsonData.exit
+        entered:jsonData.entered,
+        left:jsonData.left,
+        instore:jsonData.instore,
+        returning:jsonData.returning,
+        new:jsonData.new,
+        groups:jsonData.groups
       });
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -72,13 +50,10 @@ export function ApiProvider({ children }) {
 
     // Clean up the timer when the component unmounts
     return () => clearInterval(interval);
-  }, [sliderValue]);
+  },[]); 
 
   const apiContextValue = {
     apiData,
-    maxCountWithinMinute,
-    minCountWithinMinute,
-    updateSliderValue,
   };
 
   return (

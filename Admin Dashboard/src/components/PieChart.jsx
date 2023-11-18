@@ -16,7 +16,7 @@ const PieChart = () => {
   useEffect(() => {
     const fetchGenderPieData = async () => {
       try {
-        const response = await fetch('http://192.168.18.132:8080/get_gender_pie_data');
+        const response = await fetch('http://192.168.100.10:8080/get_gender_pie_data');
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -28,19 +28,19 @@ const PieChart = () => {
           {
             id: 'Man',
             label: `M : ${jsonData.male_percentage}`,
-            value: jsonData.male_percentage === 0 ? 10000 : jsonData.male_percentage,
+            value: jsonData.male_percentage,
             color: 'hsl(219, 55%, 64%)',
           },
           {
             id: 'Woman',
             label: `W : ${jsonData.female_percentage}`,
-            value: jsonData.female_percentage === 0 ? 10000 : jsonData.female_percentage,
+            value: jsonData.female_percentage,
             color: 'hsl(162, 70%, 50%)',
           },
           {
             id: 'Unidentified',
             label: `U : ${jsonData.unknown_percentage}`,
-            value: jsonData.unknown_percentage === 0 ? 10000 : jsonData.unknown_percentage,
+            value: jsonData.unknown_percentage,
             color: "hsl(274, 70%, 50%)",
           },
         ];

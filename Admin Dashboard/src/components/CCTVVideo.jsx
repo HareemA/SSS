@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { useApi } from "../scenes/global/ApiContext"; // Import the useApi hook
@@ -9,20 +9,54 @@ const CCTVVideo = ({ isDashboard = false, height }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const { apiData, sliderValue, updateSliderValue } = useApi();
-  const { frame } = apiData;
+  const [apiData, setApiData] = useState({
+    frame: null,
+    time: null,
+  });
+
+  const [sliderValue, setSliderValue] = useState(35);
+
+  const fetchDataFromApi = async () => {
+    try {
+      const response = await fetch(`http://192.168.100.10:8080/get_frame/${sliderValue}`);
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const jsonData = await response.json();
+
+      setApiData({
+        frame: jsonData.frame,
+        time: jsonData.time,
+      });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   const handleSliderChange = (event, newValue) => {
-    //updateSliderValue(newValue);
+    setSliderValue(newValue);
   };
 
   const handleSliderChangeCommitted = (event, newValue) => {
-    updateSliderValue(newValue);
+    fetchDataFromApi();
   };
 
+  useEffect(() => {
+    fetchDataFromApi(); // Fetch data initially
+
+    // Set up a timer to fetch data every 5 seconds (5000 milliseconds)
+    const interval = setInterval(fetchDataFromApi, 500);
+
+    // Clean up the timer when the component unmounts
+    return () => clearInterval(interval);
+  }, [sliderValue]);
+
   if (!apiData.frame) {
-    return <div>Loading...</div>; // You can replace this with a loading indicator or message
+    return <div>Loading...</div>;
   }
+  
 
 
   return (
@@ -41,7 +75,7 @@ const CCTVVideo = ({ isDashboard = false, height }) => {
           onChange={handleSliderChange}
           onChangeCommitted={handleSliderChangeCommitted}
           min={0}
-          max={100}
+          max={250}
           step={1}
           valueLabelDisplay="auto"
           valueLabelFormat={(value) => `${value}%`}
