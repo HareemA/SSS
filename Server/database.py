@@ -47,6 +47,10 @@ def create_tables():
   
 
 def customer_exist(encoding,group_val,gender):
+    if encoding is None:
+        print("Picture unclear")
+        return
+    
     all_encodings = get_all_encodings()
     # for id, encoding in all_encodings:
     #     print(f"Processing id: {id}, encoding: {encoding}")
@@ -58,7 +62,7 @@ def customer_exist(encoding,group_val,gender):
     # Compare the received encoding with all encodings in the database
     for id, db_encoding in all_encodings:
         # Compare the encodings using face_recognition library
-        results = face_recognition.compare_faces([encoding], db_encoding)
+        results = face_recognition.compare_faces([encoding], db_encoding,tolerance=0.8)
         # Check if a match is found
         if results[0]:
             add_visit(id,group_val)
@@ -115,6 +119,9 @@ def add_visit(id,group_val):
  
  
 def customer_leaving(encoding):
+    if encoding is None:
+        print("Person image not clear or no face detected.")
+        return
     all_encodings = get_all_encodings()
     
     if not all_encodings:
@@ -127,7 +134,7 @@ def customer_leaving(encoding):
     # Compare the received encoding with all encodings in the database
     for id, db_encoding in all_encodings:
         # Compare the encodings using face_recognition library
-        results = face_recognition.compare_faces([encoding], db_encoding)
+        results = face_recognition.compare_faces([encoding], db_encoding,tolerance=0.8)
         print("Here 1")
         # Check if a match is found
         if results[0]:

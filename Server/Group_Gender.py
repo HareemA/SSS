@@ -42,15 +42,18 @@ group_val = False
 group_threshold = 55
 
 group_lock = threading.Lock()
+frame_lock = threading.Lock()
 
-video_link = 'H:\\Downloads\\26102023_2.mp4'
+frame_to_send=None
+
+video_link = "H:\\Downloads\\26102023_4.mp4"
 
 cap = cv2.VideoCapture(video_link)
 
 def processing():
     
-    global cap, count, group_count, detected, area1, area2, people_enter, people_exit, counter1, group_val
-    global counter2, enter, exit, male, female, unknown, people, frame_to_send, group_threshold, video_link
+    global cap, count, group_count, detected, area1, area2, people_enter, people_exit, counter1, group_val, frame_lock
+    global counter2, enter, exit, male, female, unknown, people, frame_to_send, group_threshold, video_link, frame_to_send
     
 
     while True:    
@@ -95,15 +98,31 @@ def processing():
             d=int(row[5])
             id = int(row[4])
             
+            cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,0),1)
+            #cv2.circle(frame,(x_centre,y_centre),4,(255,0,0),-1)
+            cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
+            
             #For group detection
             original_coordinates.append({'id': id, 'coord': [x3, y3, x4, y4]})
             
         with group_lock:
             coordinate_groups = group_coordinates(original_coordinates, group_threshold)
             
+        for group_key, group_data in coordinate_groups.items():
+            if len(group_data) >= 2:
+                min_x = min([coord['coord'][0] for coord in group_data])
+                min_y = min([coord['coord'][1] for coord in group_data])
+                max_x = max([coord['coord'][2] for coord in group_data])
+                max_y = max([coord['coord'][3] for coord in group_data])
+        
+                cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
+        
+        with frame_lock:
+            frame_to_send = frame
+            
         group_stat=process_groups(coordinate_groups)
         print("Group_stat: ",group_stat)
-
+        
         #Now iterate through all the points again to predict gender, perform facial rec and add in database etc.
         for index,row in px.iterrows():
             x3=int(row[0])
@@ -137,12 +156,12 @@ def processing():
             if id in people_exit:
                 results2 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
                 if results2>=0:
-                    # if counter2.count(id)==0:
-                    encodings = encode_face_image(person)
-                    # counter2.append(id)
-                    exit=exit+1
-                    #SENDING DATA TO DATABASE TO BE STORED    
-                    customer_leaving(encodings)
+                    if counter2.count(id)==0:
+                        encodings = encode_face_image(person)
+                        counter2.append(id)
+                        exit=exit+1
+                        #SENDING DATA TO DATABASE TO BE STORED    
+                        customer_leaving(encodings)
      
             #People Enter
             results3 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
@@ -153,54 +172,50 @@ def processing():
             if id in people_enter:
                 results4 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y_centre)),False)
                 if results4>=0:
-                    #if counter1.count(id)==0:
-                    encodings = encode_face_image(person)
-                    
-                    # counter1.append(id)
-                    enter=enter+1
-                    if gender_label == 'man':
-                        gender="Male"
-                        male = male + 1
-                    elif gender_label == 'woman':
-                        gender="Female"
-                        female = female + 1
-                    else:
-                        unknown = unknown + 1
-                        gender="Unknown"
-                    #SENDING DATA TO DATABASE TO BE STORED    
-                    customer_exist(encodings,group_val,gender)
-     
+                    # if counter1.count(id)==0:
+                        encodings = encode_face_image(person)
+                        
+                        # counter1.append(id)
+                        enter=enter+1
+                        if gender_label == 'man':
+                            gender="Male"
+                            male = male + 1
+                        elif gender_label == 'woman':
+                            gender="Female"
+                            female = female + 1
+                        else:
+                            unknown = unknown + 1
+                            gender="Unknown"
+                        #SENDING DATA TO DATABASE TO BE STORED    
+                        customer_exist(encodings,group_val,gender)
+            cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
             # if(enter>exit):      
             #     detected = enter - exit
                         
-            cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,0),1)
-            cv2.circle(frame,(x_centre,y_centre),4,(255,0,0),-1)
-            cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
-            cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
         
     #     cv2.imshow("RGB", frame)
     #     if cv2.waitKey(1)&0xFF==27:
     #         break
     # cap.release()
     # cv2.destroyAllWindows()
-
-
-def clear_lists():
-    global counter1, counter2
-    counter1 = []
-    counter2 = []
-    print("Lists cleared")                    
+                
 
 
 #For encoding person
 def encode_face_image(image):
-    encoding = face_recognition.face_encodings(image)
-    if not encoding:
-        print("Person image not clear")
-        return None
+    try:
+        rgb_small_frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        encoding = face_recognition.face_encodings(rgb_small_frame)
+        if not encoding:
+            print("Person image not clear")
+            return None
 
-    # Return the encoding of the first face
-    return encoding[0]
+        # Return the encoding of the first face
+        return encoding[0]
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
 
 
 def calculate_distance(coord1, coord2):

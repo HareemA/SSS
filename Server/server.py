@@ -20,7 +20,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-video_link = 'H:\\Downloads\\26102023_2.mp4'
+video_link = "H:\\Downloads\\26102023_4.mp4"
 cap = cv2.VideoCapture(video_link)
 
 model=YOLO('yolov8n.pt')
@@ -29,6 +29,10 @@ frame_lock = threading.Lock()
 
 frame_to_send=None
 
+group_lock1=threading.Lock()
+
+group_threshold1=35
+
 count=0
 
 area1=[(1,367),(800,357),(792,406),(1,403)]
@@ -36,7 +40,7 @@ area2=[(2,322),(807,317),(801,355),(4,360)]
 
 def frame_to_send():
     
-    global cap, area1, area2, group_lock, group_threshold,count, frame_to_send
+    global cap, area1, area2, group_lock, group_threshold, count, frame_to_send
 
     while True:    
         ret,frame = cap.read()
@@ -80,13 +84,13 @@ def frame_to_send():
             cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,0),1)
             
         with group_lock:
+            print("Group threshold: ",group_threshold)
             coordinate_groups = group_coordinates(original_coordinates, group_threshold)
 
         #Iterate through the grouped coordinates and draw bounding boxes around groups
         for group_key, group_coord in coordinate_groups.items():
             if len(group_coord) >= 2:
                 #print("Group detected, key:", group_key)
-                group_count = group_count + 1
                 min_x = min([x1 for (x1, y1, x2, y2) in group_coord])
                 min_y = min([y1 for (x1, y1, x2, y2) in group_coord])
                 max_x = max([x2 for (x1, y1, x2, y2) in group_coord])
@@ -98,8 +102,8 @@ def frame_to_send():
         
 
 @app.route('/get_frame/<int:group_thresh>', methods=['GET'])
-def get_data(group_thresh):
-    global frame_to_send, group_lock, group_threshold
+def get_frame(group_thresh):
+    global frame_to_send, group_lock, group_threshold, frame_lock
     
     with group_lock:
         group_threshold = group_thresh
@@ -124,8 +128,6 @@ def get_data(group_thresh):
 
         return jsonify(response_data)
     
-
-
     
 @app.route('/get_gender_pie_data', methods=['GET'])
 def get_gender_pie_data():
@@ -162,13 +164,14 @@ def monthly_line_chart():
 
   
 if __name__ == '__main__':
-    processing_thread = threading.Thread(target=processing)
     frame_thread = threading.Thread(target=frame_to_send)
+    processing_thread = threading.Thread(target=processing)
+    
 
     frame_thread.start()
     processing_thread.start()
     
 
-    app.run(host='192.168.100.10', port=8080)
+    app.run(host='192.168.243.125', port=8080)
     
 
