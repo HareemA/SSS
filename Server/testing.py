@@ -15,7 +15,7 @@ def encode_face_image(image_path):
 def test_functions():
 
     # Add a new customer and visit
-    image_path = "C:\\Users\\Hareem\\Desktop\\6F4vLcfwtUXv81lIP0hZjZuEMuQ8XPwTr1aV0b9vgRA=_plaintext_638356738757299473.jpg"  # Replace with the actual path to the image
+    image_path="C:\\Users\\Hareem\\Desktop\\nM5rWKDQpTRpd8umswYMz0eFZ0EDfHKXXPPv6a0xw8s=_plaintext_638356738756599786.jpg"
     encoding = encode_face_image(image_path)
     gender = "Male"  # Replace with the actual gender
     group_val = True  # Replace with the actual group value
@@ -26,7 +26,7 @@ def test_functions():
 
     # Simulate customer leaving
     # Assuming that after some time, the customer is leaving, and you want to update the visit with the time_out
-    customer_leaving(encoding)
+    # customer_leaving(encoding)
 
 # Run the testing code
 test_functions()

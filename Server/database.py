@@ -51,25 +51,19 @@ def customer_exist(encoding,group_val,gender):
     # for id, encoding in all_encodings:
     #     print(f"Processing id: {id}, encoding: {encoding}")
     
-    # if not all_encodings:
-    #     add_customer(gender,encoding,group_val)
-    #     return
+    if not all_encodings:
+        add_customer(gender,encoding,group_val)
+        return
         
     # Compare the received encoding with all encodings in the database
     for id, db_encoding in all_encodings:
-        print("Here 3")
         # Compare the encodings using face_recognition library
         results = face_recognition.compare_faces([encoding], db_encoding)
-        print("Here 1")
         # Check if a match is found
         if results[0]:
             add_visit(id,group_val)
-            print("Visit added")
-            return
         else:
             add_customer(gender,encoding,group_val)
-            print("Customer added")
-            return
             
     
 # In the add_customer function
@@ -87,22 +81,35 @@ def add_customer(gender, encoding, group_val):
                 VALUES (%s, %s, %s, %s, %s, %s) returning id
             """, (name, gender, None, encoding_bytes, created_at, modified_at))
             customer_id = cur.fetchone()[0]
-            print(customer_id)
+            print("Customer added ",customer_id)
         add_visit(customer_id, group_val)
     except(Exception, psycopg2.DatabaseError) as error:
         print("Couldnt add customer ", error)
 
         
-        
- 
        
 def add_visit(id,group_val):
     date = datetime.now().strftime("%d %m %y")
     time_in = datetime.now().strftime("%H:%M:%S")
     try:
         with conn, conn.cursor() as cur:
+            #To check if persn who entered left as well
+            cur.execute("""
+                SELECT id
+                FROM visits
+                WHERE customer_id = %s AND time_out IS NULL
+            """, (id,))
+            
+            existing_visit_id = cur.fetchone()
+            
+            if existing_visit_id:
+                print("Customer is already inside. Cant add a new visit entry.")
+                return
+            
             cur.execute("""INSERT INTO VISITS (customer_id,date,time_in,group_val) VALUES (%s,%s,%s,%s)""",
                         (id,date,time_in,group_val))
+            print("Visit added")
+            
     except(Exception, psycopg2.DatabaseError) as error:
         print("Couldnt add visit ",error)
  
@@ -138,7 +145,7 @@ def edit_visit(customer_id):
             cur.execute("""
                 UPDATE visits
                 SET time_out = %s
-                WHERE customer_id = %s AND date = %s
+                WHERE customer_id = %s AND date = %s AND time_out IS NULL
             """, (time_out, customer_id, date))
     except(Exception, psycopg2.DatabaseError) as error:
         print("Couldn't edit visit ", error)
@@ -164,8 +171,4 @@ def get_all_encodings():
 
 
 
-   
-
-        
-    
-# create_tables()
+create_tables()
