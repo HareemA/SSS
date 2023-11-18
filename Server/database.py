@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime
 from datetime import datetime, timedelta
 import calendar
+from collections import defaultdict
 import face_recognition
 import numpy as np
 
@@ -172,19 +173,21 @@ def get_daily_gender_distribution():
     try:
         with conn, conn.cursor() as cur:
             # Query to get daily gender distribution
-            print("in pie data 2")
             current_date = datetime.now().strftime('%d %m %y')
             print(current_date)
             cur.execute("""
                 SELECT
                     COUNT(CASE WHEN c.gender = 'Male' THEN 1 END) as male_count,
                     COUNT(CASE WHEN c.gender = 'Female' THEN 1 END) as female_count,
-                    COUNT(CASE WHEN c.gender NOT IN ('Male', 'Female') THEN 1 END) as unknown_count,
+                    COUNT(CASE WHEN c.gender = 'Unknown' THEN 1 END) as unknown_count,
                     COUNT(*) as total_count
-                FROM customer c
-                WHERE c.created_at = %s
+                    FROM customer c
+                    WHERE c.id IN (
+                        SELECT v.customer_id
+                        FROM visits v
+                        WHERE v.date = %s
+                    );
             """, (current_date,))
-            print("in pie data 4")
 
             row = cur.fetchone()
 
@@ -199,7 +202,6 @@ def get_daily_gender_distribution():
                 female_percentage = (female_count / total_count) * 100
                 unknown_percentage = (unknown_count / total_count) * 100
 
-                print("in pie data 5")
 
                 return {
                     'male_percentage': round(male_percentage, 2),
@@ -322,9 +324,8 @@ def get_weekly_line_data():
         return {}
     
 
-from datetime import datetime, timedelta
-import calendar
 
+#to get data for monthly line chart
 def get_monthly_line_data():
     try:
         with conn, conn.cursor() as cur:
@@ -380,7 +381,122 @@ def get_monthly_line_data():
         return {}
 
 
-   
+#to get data for monthly line chart
+def get_repeat_ratio_pie_data():
+    try:
+        with conn, conn.cursor() as cur:
+            # Calculate the date range for the last 7 days
+            end_date = datetime.now().date()
+            formatted_end_date = end_date.strftime('%d %m %y')
+            start_date = end_date - timedelta(days=6)
+            formatted_start_date = start_date.strftime('%d %m %y')
+
+            # Query to get the count of unique customers and repeat customers in the past week
+            cur.execute("""
+                SELECT COUNT(DISTINCT customer_id) AS total_customers,
+                       COUNT(DISTINCT CASE WHEN date >= %s AND date <= %s THEN customer_id END) AS repeat_customers
+                FROM visits
+            """, (formatted_start_date, formatted_end_date))
+
+            total_customers, repeat_customers = cur.fetchone()
+
+            # Prepare the data for the frontend
+            repeat_ratio_data = {
+                'total_customers': total_customers,
+                'repeat_customers': repeat_customers
+            }
+
+            return repeat_ratio_data
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching repeat ratio data:", error)
+        return {}
+    
+#function for getting group Pie chart data
+def get_group_pie_data():
+    try:
+        # Get the current date in the format %d %m %y
+        current_date = datetime.now().strftime('%d %m %y')
+
+        # Calculate the start date of the week (7 days ago from the current date)
+        start_date = (datetime.now() - timedelta(days=7)).strftime('%d %m %y')
+
+        with conn, conn.cursor() as cur:
+            # Query to get the total number of customers for the current day
+            cur.execute("""
+                SELECT COUNT(DISTINCT c.id) FROM customer c
+                INNER JOIN visits v ON c.id = v.customer_id
+                WHERE EXTRACT(DAY FROM TO_DATE(v.date, 'DD MM YY')) = EXTRACT(DAY FROM TO_DATE(%s, 'DD MM YY'))
+            """, (current_date,))
+
+            total_customers = cur.fetchone()[0] or 0
+
+            # Query to get the number of customers in groups for the current day
+            cur.execute("""
+                SELECT COUNT(DISTINCT c.id) FROM customer c
+                INNER JOIN visits v ON c.id = v.customer_id
+                WHERE EXTRACT(DAY FROM TO_DATE(v.date, 'DD MM YY')) = EXTRACT(DAY FROM TO_DATE(%s, 'DD MM YY')) AND v.group_val = TRUE
+            """, (current_date,))
+
+            customers_in_groups = cur.fetchone()[0] or 0
+
+            result = {
+                'total_customers': total_customers,
+                'customers_in_groups': customers_in_groups
+            }
+
+            return result
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching group pie data:", error)
+        return {} 
+
+#
+def get_daily_gender_bar_data():
+    try:
+        # Initialize a dictionary to store data for each hour
+        hourly_data = defaultdict(lambda: {'Men': 0, 'Women': 0, 'Unidentified': 0})
+
+        with conn, conn.cursor() as cur:
+            # Get the current date
+            current_date = datetime.now().strftime('%d %m %y')
+
+            # Query to get customer and visit data for the current day
+            cur.execute("""
+                SELECT c.gender, v.time_in
+                FROM customer c
+                LEFT JOIN visits v ON c.id = v.customer_id AND v.date::date = '16 11 23'
+            """, (current_date,))
+
+            rows = cur.fetchall()
+
+            # Process the data to count Male, Female, and Unknown for each hour
+            for row in rows:
+                gender = row[0]
+                time_in = row[1]
+
+                # Check if time_in is not None
+                if time_in:
+                    # Extract the hour from the timestamp
+                    hour = datetime.strptime(time_in, '%H:%M:%S').hour
+
+                    # Update the counts based on gender
+                    if gender == 'Male':
+                        hourly_data[hour]['Men'] += 1
+                    elif gender == 'Female':
+                        hourly_data[hour]['Women'] += 1
+                    else:
+                        hourly_data[hour]['Unidentified'] += 1
+
+        # Prepare the result as a list of dictionaries
+        result = [{'time': f'{hour:02}:00', **data} for hour, data in hourly_data.items()]
+
+        return result
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching daily gender bar data:", error)
+        return []
+
 
 # monthly_data = get_monthly_line_data()
 # print(monthly_data) 
