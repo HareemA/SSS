@@ -78,7 +78,7 @@ const DailyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
   }
 
   const customColors2 = ['#326887', '#1885c4', '#8eb7de', '#0f6abf'];
-  const customColors = ['#d9db95', '#9bdb95', '#95d7db', '#9c95db'];
+  const customColors = ['#d98225', '#fae60c', '#63c904', '#bf53e0'];
 
   return (
     <ResponsiveLine
