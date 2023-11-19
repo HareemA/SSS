@@ -58,6 +58,7 @@ def customer_exist(encoding,group_val,gender):
     #     print(f"Processing id: {id}, encoding: {encoding}")
     
     if not all_encodings:
+        print("In not all encodings thing")
         add_customer(gender,encoding,group_val)
         return
         
@@ -243,10 +244,17 @@ def get_daily_line_data():
 
             # Query to get entered counts on an hourly basis for the current date
             cur.execute("""
-                SELECT EXTRACT(HOUR FROM TO_TIMESTAMP(time_in, 'HH24:MI:SS'))::integer AS hour, COUNT(*) as count
-                FROM visits
-                WHERE date = %s
-                GROUP BY hour
+                SELECT
+                        EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_in, 'HH24:MI:SS')) AS hour_of_entry,
+                        COUNT(*) AS number_of_customers
+                        FROM
+                            visits v
+                        WHERE
+                            date = '16 11 23'
+                        GROUP BY
+                            hour_of_entry
+                        ORDER BY
+                            hour_of_entry;
             """, (current_date,))
 
             rows = cur.fetchall()
@@ -258,10 +266,18 @@ def get_daily_line_data():
 
             # Query to get exited counts on an hourly basis for the current date
             cur.execute("""
-                SELECT EXTRACT(HOUR FROM TO_TIMESTAMP(time_out, 'HH24:MI:SS'))::integer AS hour, COUNT(*) as count
-                FROM visits
-                WHERE date = %s
-                GROUP BY hour
+                SELECT
+                    EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_out, 'HH24:MI:SS')) AS hour_of_exit,
+                    COUNT(*) AS number_of_customers
+                    FROM
+                        visits v
+                    WHERE
+                        date = '16 11 23' AND v.time_out IS NOT NULL
+                    GROUP BY
+                        hour_of_exit
+                    ORDER BY
+                        hour_of_exit;
+
             """, (current_date,))
 
             rows = cur.fetchall()
@@ -404,11 +420,11 @@ def chart_data():
                     (SELECT COUNT(*) FROM visits WHERE date = '{current_date}' AND time_in IS NOT NULL AND time_out IS NULL) AS instore,
                     (SELECT COUNT(DISTINCT v.customer_id) FROM visits v
                      LEFT JOIN customer c ON v.customer_id = c.id
-                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at= '{current_date}') AS returning_customers,
+                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at != '{current_date}') AS returning_customers,
                     (SELECT COUNT(DISTINCT v.customer_id) FROM visits v
                      LEFT JOIN customer c ON v.customer_id = c.id
-                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at != '{current_date}') AS new_customers,
-                    (SELECT COUNT(DISTINCT v.customer_id) FROM visits v
+                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at = '{current_date}') AS new_customers,
+                    (SELECT COUNT(v.customer_id) FROM visits v
                      WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND v.group_val = TRUE) AS groups;
             """)
 
@@ -516,6 +532,8 @@ def get_daily_gender_bar_data():
 
                 # Check if time_in is not None
                 if time_in:
+                    if time_in == '24:00:00':
+                        time_in = '00:00:00'
                     # Extract the hour from the timestamp
                     hour = datetime.strptime(time_in, '%H:%M:%S').hour
 
@@ -556,6 +574,10 @@ def get_engagement_bar_data():
             time_spent_per_customer = []
             for row in rows:
                 _, time_in, time_out = row
+                if time_in == '24:00:00':
+                        time_in = '00:00:00'
+                if time_out == '24:00:00':
+                        time_out = '00:00:00'
                 if time_in and time_out:
                     time_in_dt = datetime.strptime(time_in, '%H:%M:%S')
                     time_out_dt = datetime.strptime(time_out, '%H:%M:%S')
@@ -578,19 +600,71 @@ def get_engagement_bar_data():
         return []
     
 
+#get data for the customers tabel
+def get_customers_table_data():
+    try:
+        with conn, conn.cursor() as cur:
+            # Query to get customer and visit data for the current date
+            current_date = datetime.now().strftime('%d %m %y')
+            cur.execute("""SELECT
+                                c.id,
+                                c.name,
+                                COALESCE(COUNT(v.id), 0) as visits,
+                                c.gender,
+                                c.age,
+                                COALESCE(v.group_val, false) as group_val,
+                                COALESCE(v.time_in, '-- : --') as time_in,
+                                COALESCE(v.time_out, '-- : --') as time_out
+                            FROM
+                                customer c
+                            LEFT JOIN
+                                visits v ON c.id = v.customer_id AND v.date ='16 11 23'
+                            GROUP BY
+                                c.id, c.name, c.gender, c.age, v.group_val, v.time_in, v.time_out
+                            ORDER BY
+                                COALESCE(v.time_in, '00:00:01') DESC;
+                        """, (current_date,))
+
+            rows = cur.fetchall()
+
+            count = 0
+            # Prepare the data for the frontend
+            result = []
+            for row in rows:
+                count=count+1
+                result.append({
+                    'C_No': (count),
+                    'name': row[1],
+                    'visits': str(row[2]),
+                    'gender': row[3],
+                    'age': str(row[4]),
+                    'group': row[5],
+                    'timeIn': row[6],
+                    'timeOut': row[7],
+                    'id': str(row[0]),
+                })
+
+            return result
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching customer table data:", error)
+        return []
+
 
 # monthly_data = get_monthly_line_data()
 # print(monthly_data) 
  
 # bar_data = get_engagement_bar_data()
 # print("bar: ",bar_data)       
+# table_data = get_customers_table_data()
+# print("table: ",table_data)       
     
 # create_tables()
 
-# result=chart_data()
-# print(result)
+result=chart_data()
+print(result)
 
-
+# print(get_engagement_bar_data())
 # print(get_daily_gender_bar_data())
 
 # print(get_daily_gender_distribution())

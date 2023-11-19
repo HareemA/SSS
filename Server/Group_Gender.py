@@ -153,7 +153,7 @@ def processing():
             if id in people_exit:
                 results2 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
                 if results2>=0:
-                    if counter2.count(id)==0:
+                    # if counter2.count(id)==0:
                         encodings = encode_face_image(person)
                         counter2.append(id)
                         exit=exit+1
@@ -190,11 +190,11 @@ def processing():
             #     detected = enter - exit
                         
         
-    #     cv2.imshow("RGB", frame)
-    #     if cv2.waitKey(1)&0xFF==27:
-    #         break
-    # cap.release()
-    # cv2.destroyAllWindows()
+        cv2.imshow("RGB", frame)
+        if cv2.waitKey(1)&0xFF==27:
+            break
+    cap.release()
+    cv2.destroyAllWindows()
                 
 
 
@@ -269,7 +269,7 @@ def process_groups(coordinate_groups):
                 
     return group_status
                 
-         
+processing()
          
            
 # processing()

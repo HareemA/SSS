@@ -22,6 +22,7 @@ CORS(app)
 
 # video_link = '"E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4"'
 video_link= "H:\\Downloads\\26102023_4.mp4"
+# video_link = 'E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4'
 cap = cv2.VideoCapture(video_link)
 
 model=YOLO('yolov8n.pt')
@@ -197,6 +198,15 @@ def daily_gender_bar():
 @app.route('/daily_engagement_bar', methods=['GET'])
 def daily_engagement_bar():
     data = get_engagement_bar_data()
+    print(data)
+
+    return jsonify(data)
+
+
+#API for Customers Table
+@app.route('/customers_table', methods=['GET'])
+def customers_table():
+    data = get_customers_table_data()
     print(data)
 
     return jsonify(data)

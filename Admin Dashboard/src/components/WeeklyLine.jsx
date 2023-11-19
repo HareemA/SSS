@@ -12,7 +12,7 @@ const WeeklyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://192.168.100.10:8080/weekly_line_chart");
+      const response = await fetch("http://192.168.18.132:8080/weekly_line_chart");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -87,9 +87,17 @@ const WeeklyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
     return <div>Loading...</div>;
   }
 
+  const customColors2 = ['#326887', '#1885c4', '#8eb7de', '#0f6abf'];
+  const customColors = ['#d9db95', '#9bdb95', '#95d7db', '#9c95db'];
+
   return (
     <ResponsiveLine
       data={lineChartData}
+      colors={
+                  theme.palette.mode === "dark"
+                    ? customColors
+                    : customColors2
+                }
       theme={{
         axis: {
           domain: {
@@ -123,7 +131,6 @@ const WeeklyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
           },
         },
       }}
-      colors={isDashboard ? { datum: "color" } : { scheme: "nivo" }} // added
       margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
       xScale={{ type: "point" }}
       yScale={{

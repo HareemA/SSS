@@ -11,7 +11,7 @@ const DailyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://192.168.100.10:8080/daily_line_chart");
+      const response = await fetch("http://192.168.18.132:8080/daily_line_chart");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -77,6 +77,9 @@ const DailyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
     return <div>Loading...</div>;
   }
 
+  const customColors2 = ['#326887', '#1885c4', '#8eb7de', '#0f6abf'];
+  const customColors = ['#d98225', '#fae60c', '#63c904', '#bf53e0'];
+
   return (
     <ResponsiveLine
       data={lineChartData}
@@ -113,7 +116,11 @@ const DailyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
           },
         },
       }}
-      colors={isDashboard ? { datum: "color" } : { scheme: "nivo" }} // added
+      colors={
+                  theme.palette.mode === "dark"
+                    ? customColors
+                    : customColors2
+                }
       margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
       xScale={{ type: "point" }}
       yScale={{
