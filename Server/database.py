@@ -241,10 +241,17 @@ def get_daily_line_data():
 
             # Query to get entered counts on an hourly basis for the current date
             cur.execute("""
-                SELECT EXTRACT(HOUR FROM TO_TIMESTAMP(time_in, 'HH24:MI:SS'))::integer AS hour, COUNT(*) as count
-                FROM visits
-                WHERE date = %s
-                GROUP BY hour
+                SELECT
+                        EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_in, 'HH24:MI:SS')) AS hour_of_entry,
+                        COUNT(*) AS number_of_customers
+                        FROM
+                            visits v
+                        WHERE
+                            date = '16 11 23'
+                        GROUP BY
+                            hour_of_entry
+                        ORDER BY
+                            hour_of_entry;
             """, (current_date,))
 
             rows = cur.fetchall()
@@ -256,10 +263,18 @@ def get_daily_line_data():
 
             # Query to get exited counts on an hourly basis for the current date
             cur.execute("""
-                SELECT EXTRACT(HOUR FROM TO_TIMESTAMP(time_out, 'HH24:MI:SS'))::integer AS hour, COUNT(*) as count
-                FROM visits
-                WHERE date = %s
-                GROUP BY hour
+                SELECT
+                    EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_out, 'HH24:MI:SS')) AS hour_of_exit,
+                    COUNT(*) AS number_of_customers
+                    FROM
+                        visits v
+                    WHERE
+                        date = '16 11 23' AND v.time_out IS NOT NULL
+                    GROUP BY
+                        hour_of_exit
+                    ORDER BY
+                        hour_of_exit;
+
             """, (current_date,))
 
             rows = cur.fetchall()
