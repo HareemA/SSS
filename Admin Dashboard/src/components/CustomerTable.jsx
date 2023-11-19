@@ -24,7 +24,7 @@ const CustomerTable = ({isDashboard = false, users, height}) => {
       useEffect(() => {
         const fetchTableData = async () => {
           try {
-            const response = await fetch('http://192.168.18.132:8080/customers_table');
+            const response = await fetch('http://192.168.100.10:8080/customers_table');
       
             if (!response.ok) {
               throw new Error('Network response was not ok');

@@ -16,7 +16,7 @@ const PieChart = () => {
   useEffect(() => {
     const fetchGenderPieData = async () => {
       try {
-        const response = await fetch('http://192.168.18.132:8080/get_gender_pie_data');
+        const response = await fetch('http://192.168.100.10:8080/get_gender_pie_data');
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -27,7 +27,7 @@ const PieChart = () => {
         const genderPieData = [
           {
             id: 'Man',
-            label: `M : ${jsonData.male_percentage}%`,
+            label: `M : ${jsonData.male_percentage}`,
             value: jsonData.male_percentage,
             color: 'hsl(219, 55%, 64%)',
           },
@@ -47,7 +47,7 @@ const PieChart = () => {
 
         // Update the chart data with the latest values from the API
         setChartData(genderPieData);
-        console.log("Gender Pie Data: ",genderPieData);
+        // console.log("Gender Pie Data: ",genderPieData);
       } catch (error) {
         console.error('Error fetching gender pie chart data:', error);
       }
@@ -55,13 +55,13 @@ const PieChart = () => {
 
     // Fetch gender pie chart data initially and then every 10 minutes
     fetchGenderPieData();
-    const intervalId = setInterval(fetchGenderPieData, 6000);  
+    const intervalId = setInterval(fetchGenderPieData, 600);  
 
 
     return () => clearInterval(intervalId);
   }, []);
 
-  const customColors = ['#8eb7de', '#1d47e0', '#0f6abf'];
+  const customColors = ['#7171d6', '#1d47e0', '#495891'];
 
   return (
     <ResponsivePie
@@ -142,7 +142,7 @@ const PieChart = () => {
           justify: false,
           translateX: 0,
           translateY: 72,
-          itemsSpacing: 10,
+          itemsSpacing: 0,
           itemWidth: 80,
           itemHeight: 18,
           itemTextColor: "#999",

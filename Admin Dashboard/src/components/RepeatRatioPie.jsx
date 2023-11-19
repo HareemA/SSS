@@ -15,7 +15,7 @@ const RepeatRatioPie = () => {
   useEffect(() => {
     const fetchRRPieData = async () => {
       try {
-        const response = await fetch('http://192.168.18.132:8080/repeat_ratio_pie');
+        const response = await fetch('http://192.168.100.10:8080/repeat_ratio_pie');
   
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -31,8 +31,8 @@ const RepeatRatioPie = () => {
             color: 'hsl(219, 55%, 64%)',
           },
           {
-            id: 'Old',
-            label: `Old: ${jsonData.total_customers - (jsonData.repeat_customers || 0)}`,
+            id: 'New',
+            label: `New: ${jsonData.total_customers - (jsonData.repeat_customers || 0)}`,
             value: jsonData.total_customers === 0 ? 10000 : jsonData.total_customers - (jsonData.repeat_customers || 0),
             color: 'hsl(162, 70%, 50%)',
           },

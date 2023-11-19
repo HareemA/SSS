@@ -16,7 +16,7 @@ const PieChartGroup = (isDashboard = false) => {
   useEffect(() => {
     const fetchGRPieData = async () => {
       try {
-        const response = await fetch('http://192.168.18.132:8080/group_ratio_pie');
+        const response = await fetch('http://192.168.100.10:8080/group_ratio_pie');
   
         if (!response.ok) {
           throw new Error('Network response was not ok');
