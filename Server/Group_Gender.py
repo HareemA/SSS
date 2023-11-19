@@ -116,9 +116,6 @@ def processing():
                 max_y = max([coord['coord'][3] for coord in group_data])
         
                 cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
-        
-        with frame_lock:
-            frame_to_send = frame
             
         group_stat=process_groups(coordinate_groups)
         print("Group_stat: ",group_stat)

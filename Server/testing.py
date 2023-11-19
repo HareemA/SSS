@@ -29,4 +29,4 @@ def test_functions():
     # customer_leaving(encoding)
 
 # Run the testing code
-test_functions()
+# test_functions()

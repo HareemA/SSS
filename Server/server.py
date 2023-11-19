@@ -20,7 +20,8 @@ app = Flask(__name__)
 CORS(app)
 
 
-video_link = '"E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4"'
+# video_link = '"E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4"'
+video_link= "H:\\Downloads\\26102023_4.mp4"
 cap = cv2.VideoCapture(video_link)
 
 model=YOLO('yolov8n.pt')
