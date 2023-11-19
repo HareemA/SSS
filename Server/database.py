@@ -581,12 +581,62 @@ def get_engagement_bar_data():
         return []
     
 
+#get data for the customers tabel
+def get_customers_table_data():
+    try:
+        with conn, conn.cursor() as cur:
+            # Query to get customer and visit data for the current date
+            current_date = datetime.now().strftime('%d %m %y')
+            cur.execute("""SELECT
+                                c.id,
+                                c.name,
+                                COALESCE(COUNT(v.id), 0) as visits,
+                                c.gender,
+                                c.age,
+                                COALESCE(v.group_val, false) as group_val,
+                                COALESCE(v.time_in, '-- : --') as time_in,
+                                COALESCE(v.time_out, '-- : --') as time_out
+                            FROM
+                                customer c
+                            LEFT JOIN
+                                visits v ON c.id = v.customer_id AND v.date ='16 11 23'
+                            GROUP BY
+                                c.id, c.name, c.gender, c.age, v.group_val, v.time_in, v.time_out
+                            ORDER BY
+                                COALESCE(v.time_in, '00:00:01') DESC;
+                        """, (current_date,))
+
+            rows = cur.fetchall()
+
+            count = 0
+            # Prepare the data for the frontend
+            result = []
+            for row in rows:
+                count=count+1
+                result.append({
+                    'C_No': (count),
+                    'name': row[1],
+                    'visits': str(row[2]),
+                    'gender': row[3],
+                    'age': str(row[4]),
+                    'group': row[5],
+                    'timeIn': row[6],
+                    'timeOut': row[7],
+                    'id': str(row[0]),
+                })
+
+            return result
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error fetching customer table data:", error)
+        return []
+
 
 # monthly_data = get_monthly_line_data()
 # print(monthly_data) 
  
-bar_data = get_engagement_bar_data()
-print("bar: ",bar_data)       
+table_data = get_customers_table_data()
+print("table: ",table_data)       
     
 # create_tables()
 

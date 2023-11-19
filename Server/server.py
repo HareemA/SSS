@@ -20,7 +20,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-video_link = '"E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4"'
+video_link = 'E:\\Freelance Projects\\Shop Surveillance System\\video\\vid.mp4'
 cap = cv2.VideoCapture(video_link)
 
 model=YOLO('yolov8n.pt')
@@ -200,6 +200,15 @@ def daily_engagement_bar():
 
     return jsonify(data)
 
+
+#API for Customers Table
+@app.route('/customers_table', methods=['GET'])
+def customers_table():
+    data = get_customers_table_data()
+    print(data)
+
+    return jsonify(data)
+
   
 
 if __name__ == '__main__':
@@ -211,6 +220,6 @@ if __name__ == '__main__':
     processing_thread.start()
     
 
-    app.run(host='192.168.100.10', port=8080)
+    app.run(host='192.168.18.132', port=8080)
     
 
