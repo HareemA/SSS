@@ -27,7 +27,7 @@ const EngagementBarGraph = ({ isDashboard = false }) => {
   useEffect(() => {
     const fetchGenderBarData = async () => {
       try {
-        const response = await fetch('http://192.168.18.132:8080/daily_engagement_bar');
+        const response = await fetch('http://192.168.100.10:8080/daily_engagement_bar');
 
         if (!response.ok) {
           throw new Error('Network response was not ok');

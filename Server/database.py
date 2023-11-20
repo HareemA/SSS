@@ -58,6 +58,7 @@ def customer_exist(encoding,group_val,gender):
     #     print(f"Processing id: {id}, encoding: {encoding}")
     
     if not all_encodings:
+        print("In not all encodings thing")
         add_customer(gender,encoding,group_val)
         return
         
@@ -201,7 +202,9 @@ def get_daily_gender_distribution():
 
             if row:
                 male_count = row[0] or 0
+                print(male_count)
                 female_count = row[1] or 0
+                print(female_count)
                 unknown_count = row[2] or 0
                 total_count = row[3] or 1  # Avoid division by zero
 
@@ -470,11 +473,11 @@ def chart_data():
                     (SELECT COUNT(*) FROM visits WHERE date = '{current_date}' AND time_in IS NOT NULL AND time_out IS NULL) AS instore,
                     (SELECT COUNT(DISTINCT v.customer_id) FROM visits v
                      LEFT JOIN customer c ON v.customer_id = c.id
-                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at= '{current_date}') AS returning_customers,
+                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at != '{current_date}') AS returning_customers,
                     (SELECT COUNT(DISTINCT v.customer_id) FROM visits v
                      LEFT JOIN customer c ON v.customer_id = c.id
-                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at != '{current_date}') AS new_customers,
-                    (SELECT COUNT(DISTINCT v.customer_id) FROM visits v
+                     WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND c.created_at = '{current_date}') AS new_customers,
+                    (SELECT COUNT(v.customer_id) FROM visits v
                      WHERE v.date = '{current_date}' AND v.time_in IS NOT NULL AND v.group_val = TRUE) AS groups;
             """)
 
@@ -490,22 +493,22 @@ def chart_data():
     except (Exception, psycopg2.DatabaseError) as e:
         print(f"Error: {e}")
         return {"error": str(e)}
+    
 #to get data for monthly line chart
 def get_repeat_ratio_pie_data():
     try:
         with conn, conn.cursor() as cur:
             # Calculate the date range for the last 7 days
-            end_date = datetime.now().date()
-            formatted_end_date = end_date.strftime('%d %m %y')
-            start_date = end_date - timedelta(days=6)
-            formatted_start_date = start_date.strftime('%d %m %y')
+            current_date = datetime.now().strftime("%d %m %y")
 
             # Query to get the count of unique customers and repeat customers in the past week
             cur.execute("""
-                SELECT COUNT(DISTINCT customer_id) AS total_customers,
-                       COUNT(DISTINCT CASE WHEN date >= %s AND date <= %s THEN customer_id END) AS repeat_customers
-                FROM visits
-            """, (formatted_start_date, formatted_end_date))
+                SELECT 
+                COUNT(DISTINCT v.customer_id) AS total_customers,
+                COUNT(DISTINCT CASE WHEN c.created_at != %s THEN v.customer_id END) AS repeat_customers
+                FROM visits v
+                LEFT JOIN customer c ON v.customer_id = c.id
+            """, (current_date,))
 
             total_customers, repeat_customers = cur.fetchone()
 
@@ -527,24 +530,20 @@ def get_group_pie_data():
         # Get the current date in the format %d %m %y
         current_date = datetime.now().strftime('%d %m %y')
 
-        # Calculate the start date of the week (7 days ago from the current date)
-        start_date = (datetime.now() - timedelta(days=7)).strftime('%d %m %y')
-
         with conn, conn.cursor() as cur:
             # Query to get the total number of customers for the current day
             cur.execute("""
-                SELECT COUNT(DISTINCT c.id) FROM customer c
-                INNER JOIN visits v ON c.id = v.customer_id
-                WHERE EXTRACT(DAY FROM TO_DATE(v.date, 'DD MM YY')) = EXTRACT(DAY FROM TO_DATE(%s, 'DD MM YY'))
+                SELECT count(customer_id) from visits WHERE date=%s
             """, (current_date,))
 
             total_customers = cur.fetchone()[0] or 0
 
             # Query to get the number of customers in groups for the current day
             cur.execute("""
-                SELECT COUNT(DISTINCT c.id) FROM customer c
-                INNER JOIN visits v ON c.id = v.customer_id
-                WHERE EXTRACT(DAY FROM TO_DATE(v.date, 'DD MM YY')) = EXTRACT(DAY FROM TO_DATE(%s, 'DD MM YY')) AND v.group_val = TRUE
+                SELECT
+                COUNT(CASE WHEN group_val THEN 1 END) as group_count
+                FROM visits
+                WHERE date = %s
             """, (current_date,))
 
             customers_in_groups = cur.fetchone()[0] or 0
@@ -574,7 +573,7 @@ def get_daily_gender_bar_data():
             cur.execute("""
                 SELECT c.gender, v.time_in
                 FROM customer c
-                LEFT JOIN visits v ON c.id = v.customer_id AND v.date::date = %s
+                LEFT JOIN visits v ON c.id = v.customer_id AND v.date = %s
             """, (current_date,))
 
             rows = cur.fetchall()
@@ -586,6 +585,8 @@ def get_daily_gender_bar_data():
 
                 # Check if time_in is not None
                 if time_in:
+                    if time_in == '24:00:00':
+                        time_in = '00:00:00'
                     # Extract the hour from the timestamp
                     hour = datetime.strptime(time_in, '%H:%M:%S').hour
 
@@ -607,7 +608,6 @@ def get_daily_gender_bar_data():
         return []
     
 
-#
 def get_engagement_bar_data():
     try:
         # Get the current date in the required format
@@ -619,6 +619,7 @@ def get_engagement_bar_data():
                 SELECT c.id, v.time_in, v.time_out
                 FROM customer c
                 LEFT JOIN visits v ON c.id = v.customer_id AND v.date = %s
+                LEFT JOIN visits v ON c.id = v.customer_id AND v.date = %s
             """, (current_date,))
 
             rows = cur.fetchall()
@@ -627,6 +628,10 @@ def get_engagement_bar_data():
             time_spent_per_customer = []
             for row in rows:
                 _, time_in, time_out = row
+                if time_in == '24:00:00':
+                        time_in = '00:00:00'
+                if time_out == '24:00:00':
+                        time_out = '00:00:00'
                 if time_in and time_out:
                     time_in_dt = datetime.strptime(time_in, '%H:%M:%S')
                     time_out_dt = datetime.strptime(time_out, '%H:%M:%S')
@@ -703,14 +708,16 @@ def get_customers_table_data():
 weekly_data = get_weekly_line_data()
 print(weekly_data) 
  
-# table_data = get_customers_table_data()
-# print("table: ",table_data)       
+table_data = get_customers_table_data()
+print("table: ",table_data)       
     
 # get_daily_line_data()
 # create_tables()
 
-# result=chart_data()
-# print(result)
+result=chart_data()
+print(result)
 
+# print(get_engagement_bar_data())
+# print(get_daily_gender_bar_data())
 
-# get_daily_gender_distribution()
+# print(get_daily_gender_distribution())

@@ -116,9 +116,6 @@ def processing():
                 max_y = max([coord['coord'][3] for coord in group_data])
         
                 cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
-        
-        with frame_lock:
-            frame_to_send = frame
             
         group_stat=process_groups(coordinate_groups)
         print("Group_stat: ",group_stat)
@@ -156,7 +153,7 @@ def processing():
             if id in people_exit:
                 results2 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
                 if results2>=0:
-                    if counter2.count(id)==0:
+                    # if counter2.count(id)==0:
                         encodings = encode_face_image(person)
                         counter2.append(id)
                         exit=exit+1
@@ -193,11 +190,11 @@ def processing():
             #     detected = enter - exit
                         
         
-    #     cv2.imshow("RGB", frame)
-    #     if cv2.waitKey(1)&0xFF==27:
-    #         break
-    # cap.release()
-    # cv2.destroyAllWindows()
+        cv2.imshow("RGB", frame)
+        if cv2.waitKey(1)&0xFF==27:
+            break
+    cap.release()
+    cv2.destroyAllWindows()
                 
 
 
@@ -272,7 +269,7 @@ def process_groups(coordinate_groups):
                 
     return group_status
                 
-         
+processing()
          
            
 # processing()
