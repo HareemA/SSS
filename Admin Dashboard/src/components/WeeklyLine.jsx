@@ -19,6 +19,8 @@ const WeeklyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
       }
       const jsonData = await response.json();
 
+      
+
       // Convert the received data into the required format
       const convertedData = [
         {
