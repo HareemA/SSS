@@ -3,6 +3,7 @@ import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
 import { mockBarData as data } from "../data/mockData";
 import React, { useState, useEffect } from "react";
+import { API_IP } from "../config";
 
 const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
@@ -32,7 +33,7 @@ const BarChart = ({ isDashboard = false }) => {
   useEffect(() => {
     const fetchGenderBarData = async () => {
       try {
-        const response = await fetch('http://192.168.100.10:8080/daily_gender_bar');
+        const response = await fetch(`${API_IP}/daily_gender_bar`);
 
         if (!response.ok) {
           throw new Error('Network response was not ok');

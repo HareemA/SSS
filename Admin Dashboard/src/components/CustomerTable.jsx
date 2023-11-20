@@ -3,6 +3,7 @@ import { useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../theme";
 import { BorderClear } from "@mui/icons-material";
+import { API_IP } from "../config";
 
 const CustomerTable = ({isDashboard = false, users, height}) => {
     const columns = [
@@ -14,7 +15,7 @@ const CustomerTable = ({isDashboard = false, users, height}) => {
         {field: 'group', headerName:'Group',flex:1},
         {field: 'timeIn', headerName:'Time In',flex:1},
         {field: 'timeOut', headerName:'Time Out',flex:1},
-        {field:'id',headerName:'ID',flex:1,sortable: true, sortComparator: (a, b) => a - b}
+        {field:'id',headerName:'ID',flex:1}
     ];
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -24,7 +25,7 @@ const CustomerTable = ({isDashboard = false, users, height}) => {
       useEffect(() => {
         const fetchTableData = async () => {
           try {
-            const response = await fetch('http://192.168.100.10:8080/customers_table');
+            const response = await fetch(`${API_IP}/customers_table`);
       
             if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -59,7 +60,7 @@ const CustomerTable = ({isDashboard = false, users, height}) => {
             <DataGrid 
                 rows={chartData}
                 columns={columns}
-                keyProp="id"
+                keyProp="C_No"
                 checkboxSelection
                 pagination={false}
                 rowHeight={38}

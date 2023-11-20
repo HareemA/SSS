@@ -3,6 +3,7 @@ import { tokens } from "../theme";
 import { useEffect, useState } from 'react';
 import { useTheme } from "@mui/material";
 import { useApi } from "../scenes/global/ApiContext";
+import { API_IP } from "../config";
 
 const PieChartGroup = (isDashboard = false) => {
   const theme = useTheme();
@@ -16,7 +17,7 @@ const PieChartGroup = (isDashboard = false) => {
   useEffect(() => {
     const fetchGRPieData = async () => {
       try {
-        const response = await fetch('http://192.168.100.10:8080/group_ratio_pie');
+        const response = await fetch(`${API_IP}/group_ratio_pie`);
   
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -28,13 +29,13 @@ const PieChartGroup = (isDashboard = false) => {
           {
             id: 'Individual',
             label: `Individual: ${jsonData.total_customers -( jsonData.customers_in_groups || 0)}`,
-            value: jsonData.total_customers  === 0 ? 10000 : (jsonData.total_customers - jsonData.customers_in_groups),
+            value: jsonData.total_customers,
             color: 'hsl(219, 55%, 64%)',
           },
           {
             id: 'Group',
             label: `Group: ${jsonData.customers_in_groups || 0}`,
-            value: jsonData.customers_in_groups === 0 ? 10000 : jsonData.customers_in_groups ,
+            value: jsonData.customers_in_groups ,
             color: 'hsl(162, 70%, 50%)',
           },
         ];

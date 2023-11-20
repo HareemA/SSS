@@ -2,6 +2,7 @@ import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { mockLineDataCount as data } from "../data/mockData";
+import { API_IP } from "../config";
 
 const CountLineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
   const theme = useTheme();

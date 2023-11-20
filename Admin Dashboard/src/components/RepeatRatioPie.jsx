@@ -2,6 +2,7 @@ import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
 import React, { useState, useEffect } from "react";
+import { API_IP } from "../config";
 
 const RepeatRatioPie = () => {
   const theme = useTheme();
@@ -15,7 +16,7 @@ const RepeatRatioPie = () => {
   useEffect(() => {
     const fetchRRPieData = async () => {
       try {
-        const response = await fetch('http://192.168.100.10:8080/repeat_ratio_pie');
+        const response = await fetch(`${API_IP}/repeat_ratio_pie`);
   
         if (!response.ok) {
           throw new Error('Network response was not ok');

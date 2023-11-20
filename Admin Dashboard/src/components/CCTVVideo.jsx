@@ -3,6 +3,7 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { useApi } from "../scenes/global/ApiContext"; // Import the useApi hook
 import Slider from "@mui/material/Slider";
+import { API_IP } from "../config";
 
 
 const CCTVVideo = ({ isDashboard = false, height }) => {
@@ -18,7 +19,7 @@ const CCTVVideo = ({ isDashboard = false, height }) => {
 
   const fetchDataFromApi = async () => {
     try {
-      const response = await fetch(`http://192.168.100.10:8080/get_frame/${sliderValue}`);
+      const response = await fetch(`${API_IP}/get_frame/${sliderValue}`);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');

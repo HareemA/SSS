@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { mockLineDataWeekly as data } from "../data/mockData";
+import { API_IP } from "../config";
 
 const WeeklyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
   const theme = useTheme();
@@ -12,7 +13,7 @@ const WeeklyLine = ({ isCustomLineColors = false, isDashboard = false }) => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://192.168.100.10:8080/weekly_line_chart");
+      const response = await fetch(`${API_IP}/weekly_line_chart`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

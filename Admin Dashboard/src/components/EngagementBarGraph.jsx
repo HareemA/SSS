@@ -3,6 +3,7 @@ import { useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
 import { useState, useEffect } from "react";
+import { API_IP } from "../config";
 
 
 const EngagementBarGraph = ({ isDashboard = false }) => {
@@ -27,7 +28,7 @@ const EngagementBarGraph = ({ isDashboard = false }) => {
   useEffect(() => {
     const fetchGenderBarData = async () => {
       try {
-        const response = await fetch('http://192.168.100.10:8080/daily_engagement_bar');
+        const response = await fetch(`${API_IP}/daily_engagement_bar`);
 
         if (!response.ok) {
           throw new Error('Network response was not ok');

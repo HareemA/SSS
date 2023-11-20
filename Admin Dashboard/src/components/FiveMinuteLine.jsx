@@ -3,6 +3,7 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import React, { useState, useEffect } from "react";
 import { useApi } from "../scenes/global/ApiContext";
+import { API_IP } from "../config";
 
 const FiveMinuteLine = ({ isCustomLineColors = false, isDashboard = false }) => {
   const theme = useTheme();
