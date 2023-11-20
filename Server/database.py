@@ -247,7 +247,7 @@ def get_daily_line_data():
                         FROM
                             visits v
                         WHERE
-                            date = '16 11 23'
+                            date = %s
                         GROUP BY
                             hour_of_entry
                         ORDER BY
@@ -256,10 +256,12 @@ def get_daily_line_data():
 
             rows = cur.fetchall()
 
+
             # Update the result dictionary with the entered counts
             for row in rows:
                 hour_interval = f'{row[0]:02}:00-{(row[0] + 1) % 24:02}:00'
                 result[hour_interval]['Enter'] = row[1]
+
 
             # Query to get exited counts on an hourly basis for the current date
             cur.execute("""
@@ -269,7 +271,7 @@ def get_daily_line_data():
                     FROM
                         visits v
                     WHERE
-                        date = '16 11 23' AND v.time_out IS NOT NULL
+                        date = %s AND v.time_out IS NOT NULL
                     GROUP BY
                         hour_of_exit
                     ORDER BY
@@ -307,8 +309,14 @@ def get_weekly_line_data():
             end_date = datetime.now().date()
             start_date = end_date - timedelta(days=6)
 
+            # Array of days
+            days_of_week = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+            # Find the current day of the week
+            day_index = datetime.now().weekday()
+
             # Initialize the data dictionary
-            weekly_data = {'Entered': [], 'Left': [], 'Min': [], 'Max': []}
+            weekly_data = {'Entered': [], 'Left': [], 'Min': [], 'Max': [], 'index': day_index}
 
             # Loop through each day in the week
             for single_date in (start_date + timedelta(n) for n in range(7)):
@@ -316,25 +324,47 @@ def get_weekly_line_data():
 
                 # Get the count of people who entered and left the shop on the current day
                 cur.execute("""
-                    SELECT COUNT(DISTINCT v.customer_id), COUNT(DISTINCT CASE WHEN v.time_out IS NOT NULL THEN v.customer_id END)
+                    SELECT COUNT(v.customer_id), COUNT(CASE WHEN v.time_out IS NOT NULL THEN v.customer_id END)
                     FROM visits v
                     WHERE v.date = %s
                 """, (date_str,))
 
                 entered, left = cur.fetchone()
 
-                # Get the min and max count of people present in the shop at one time on the current day
+                # Get the min count of people present in the shop at one time on the current day
                 cur.execute("""
-                    SELECT MIN(people_count), MAX(people_count)
-                    FROM (
-                        SELECT COUNT(DISTINCT customer_id) AS people_count
-                        FROM visits
-                        WHERE date = %s
-                        GROUP BY time_in
-                    ) AS counts
+                    SELECT
+                    COUNT(*) AS number_of_customers
+                    FROM
+                        visits v
+                    WHERE
+                        date = %s
+                    GROUP BY
+                        EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_in, 'HH24:MI:SS'))
+                    ORDER BY
+                        number_of_customers
+                    LIMIT 1;
+
                 """, (date_str,))
 
-                min_count, max_count = cur.fetchone()
+                min_count = cur.fetchone()
+
+                # Get the min count of people present in the shop at one time on the current day
+                cur.execute("""
+                    SELECT
+                    COUNT(*) AS number_of_customers
+                    FROM
+                        visits v
+                    WHERE
+                        date = %s
+                    GROUP BY
+                        EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_in, 'HH24:MI:SS'))
+                    ORDER BY 
+                        number_of_customers DESC
+                    LIMIT 1;
+                """, (date_str,))
+
+                max_count = cur.fetchone()
 
                 # Append the data to the weekly_data dictionary
                 weekly_data['Entered'].append(entered)
@@ -346,7 +376,7 @@ def get_weekly_line_data():
 
     except (Exception, psycopg2.DatabaseError) as error:
         print("Error fetching weekly line data:", error)
-        return {}
+        return{}
     
 
 
@@ -370,25 +400,48 @@ def get_monthly_line_data():
 
                 # Get the count of people who entered and left the shop on the current day
                 cur.execute("""
-                    SELECT COUNT(DISTINCT v.customer_id), COUNT(DISTINCT CASE WHEN v.time_out IS NOT NULL THEN v.customer_id END)
+                    SELECT COUNT(v.customer_id), COUNT(CASE WHEN v.time_out IS NOT NULL THEN v.customer_id END)
                     FROM visits v
                     WHERE v.date = %s
                 """, (date_str,))
 
                 entered, left = cur.fetchone()
 
-                # Get the min and max count of people present in the shop at one time on the current day
+                 # Get the min count of people present in the shop at one time on the current day
                 cur.execute("""
-                    SELECT MIN(people_count), MAX(people_count)
-                    FROM (
-                        SELECT COUNT(DISTINCT customer_id) AS people_count
-                        FROM visits
-                        WHERE date = %s
-                        GROUP BY time_in
-                    ) AS counts
+                    SELECT
+                    COUNT(*) AS number_of_customers
+                    FROM
+                        visits v
+                    WHERE
+                        date = %s
+                    GROUP BY
+                        EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_in, 'HH24:MI:SS'))
+                    ORDER BY
+                        number_of_customers
+                    LIMIT 1;
+
                 """, (date_str,))
 
-                min_count, max_count = cur.fetchone()
+                min_count = cur.fetchone()
+
+                # Get the min count of people present in the shop at one time on the current day
+                cur.execute("""
+                    SELECT
+                    COUNT(*) AS number_of_customers
+                    FROM
+                        visits v
+                    WHERE
+                        date = %s
+                    GROUP BY
+                        EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_in, 'HH24:MI:SS'))
+                    ORDER BY 
+                        number_of_customers DESC
+                    LIMIT 1;
+                """, (date_str,))
+
+                max_count = cur.fetchone()
+
 
                 # Append the data to the monthly_data dictionary
                 monthly_data['Entered'].append(entered)
@@ -521,7 +574,7 @@ def get_daily_gender_bar_data():
             cur.execute("""
                 SELECT c.gender, v.time_in
                 FROM customer c
-                LEFT JOIN visits v ON c.id = v.customer_id AND v.date::date = '16 11 23'
+                LEFT JOIN visits v ON c.id = v.customer_id AND v.date::date = %s
             """, (current_date,))
 
             rows = cur.fetchall()
@@ -565,7 +618,7 @@ def get_engagement_bar_data():
             cur.execute("""
                 SELECT c.id, v.time_in, v.time_out
                 FROM customer c
-                LEFT JOIN visits v ON c.id = v.customer_id AND v.date = '16 11 23'
+                LEFT JOIN visits v ON c.id = v.customer_id AND v.date = %s
             """, (current_date,))
 
             rows = cur.fetchall()
@@ -614,7 +667,7 @@ def get_customers_table_data():
                             FROM
                                 customer c
                             LEFT JOIN
-                                visits v ON c.id = v.customer_id AND v.date ='16 11 23'
+                                visits v ON c.id = v.customer_id AND v.date = %s
                             GROUP BY
                                 c.id, c.name, c.gender, c.age, v.group_val, v.time_in, v.time_out
                             ORDER BY
@@ -647,12 +700,13 @@ def get_customers_table_data():
         return []
 
 
-# monthly_data = get_monthly_line_data()
-# print(monthly_data) 
+weekly_data = get_weekly_line_data()
+print(weekly_data) 
  
-table_data = get_customers_table_data()
-print("table: ",table_data)       
+# table_data = get_customers_table_data()
+# print("table: ",table_data)       
     
+# get_daily_line_data()
 # create_tables()
 
 # result=chart_data()
