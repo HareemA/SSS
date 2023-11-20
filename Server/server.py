@@ -222,6 +222,6 @@ if __name__ == '__main__':
     processing_thread.start()
     
 
-    app.run(host='192.168.100.10', port=8080)
+    app.run(host='192.168.18.132', port=8080)
     
 

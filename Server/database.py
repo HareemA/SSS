@@ -289,10 +289,11 @@ def get_daily_line_data():
                 hour_interval = f'{row[0]:02}:00-{(row[0] + 1) % 24:02}:00'
                 result[hour_interval]['Exit'] = row[1]
 
-            # Calculate Min and Max values for each hour
+            # Set Min count to 0 and Max count to the total entered count for each hour
             for hour_interval in result:
-                result[hour_interval]['Min'] = min(result[hour_interval]['Enter'], result[hour_interval]['Exit'])
-                result[hour_interval]['Max'] = max(result[hour_interval]['Enter'], result[hour_interval]['Exit'])
+                result[hour_interval]['Min'] = 0
+                result[hour_interval]['Max'] = result[hour_interval]['Enter']
+
 
             return result
 
