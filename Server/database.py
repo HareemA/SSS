@@ -54,9 +54,7 @@ def customer_exist(encoding,group_val,gender):
         return
     
     all_encodings = get_all_encodings()
-    # for id, encoding in all_encodings:
-    #     print(f"Processing id: {id}, encoding: {encoding}")
-    
+  
     if not all_encodings:
         print("In not all encodings thing")
         add_customer(gender,encoding,group_val)
@@ -65,17 +63,21 @@ def customer_exist(encoding,group_val,gender):
     # Compare the received encoding with all encodings in the database
     for id, db_encoding in all_encodings:
         # Compare the encodings using face_recognition library
-        results = face_recognition.compare_faces([encoding], db_encoding,tolerance=0.8)
+        results = face_recognition.compare_faces([encoding], db_encoding,tolerance=0.7)
         # Check if a match is found
         if results[0]:
-            add_visit(id,group_val)
-        else:
-            add_customer(gender,encoding,group_val)
+            result = check_visit(id)
+            if result:
+                add_visit(id,group_val)
+            else:
+                check_exit_enter_time_diff(id)
+            return
+    
+    add_customer(gender,encoding,group_val)
             
     
 # In the add_customer function
 def add_customer(gender, encoding, group_val):
-    print("In add customer")
     name = "unknown"
     created_at = datetime.now().strftime("%d %m %y")
     modified_at = datetime.now().strftime("%d %m %y")
@@ -93,14 +95,11 @@ def add_customer(gender, encoding, group_val):
     except(Exception, psycopg2.DatabaseError) as error:
         print("Couldnt add customer ", error)
 
-        
-       
-def add_visit(id,group_val):
-    date = datetime.now().strftime("%d %m %y")
-    time_in = datetime.now().strftime("%H:%M:%S")
+
+#To check if person who entered isnt still in the shop
+def check_visit(id):
     try:
         with conn, conn.cursor() as cur:
-            #To check if persn who entered left as well
             cur.execute("""
                 SELECT id
                 FROM visits
@@ -111,41 +110,58 @@ def add_visit(id,group_val):
             
             if existing_visit_id:
                 print("Customer is already inside. Cant add a new visit entry.")
-                return
+                return False
+            else:
+                return True
             
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("Couldnt finf visit ",error)
+    
+       
+def check_exit_enter_time_diff(id):
+    current_time = datetime.now().strftime("%H:%M:%S")
+    time_difference_minutes =0
+    print("In check time diff")
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute("""SELECT customer_id, time_in
+                        FROM visits
+                        WHERE customer_id = %s AND time_out IS NULL;""",(id,))
+            
+            result = cur.fetchone()
+
+            if result is not None:
+                customer_id, time_in_str = result
+
+                time_in = datetime.strptime(time_in_str, "%H:%M:%S")
+
+                # Convert current_time from string to datetime object
+                current_time_datetime = datetime.strptime(current_time, "%H:%M:%S")
+
+                # Calculate the time difference in minutes
+                time_difference = current_time_datetime - time_in
+                time_difference_minutes = time_difference.total_seconds() / 60
+                print(f"Time difference: {time_difference}")
+
+        if time_difference_minutes > 4:
+            edit_visit(id)
+            
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("Couldnt check time difference ",error)
+    
+def add_visit(id,group_val):
+    date = datetime.now().strftime("%d %m %y")
+    time_in = datetime.now().strftime("%H:%M:%S")
+    try:
+        with conn, conn.cursor() as cur:
             cur.execute("""INSERT INTO VISITS (customer_id,date,time_in,group_val) VALUES (%s,%s,%s,%s)""",
                         (id,date,time_in,group_val))
+            
             print("Visit added")
             
     except(Exception, psycopg2.DatabaseError) as error:
         print("Couldnt add visit ",error)
- 
- 
-def customer_leaving(encoding):
-    if encoding is None:
-        print("Person image not clear or no face detected.")
-        return
-    all_encodings = get_all_encodings()
-    
-    if not all_encodings:
-        print("No encodings found in the database.")
-        return
-    
-    # for id, encoding in all_encodings:
-    #     print(f"Processing id: {id}, encoding: {encoding}")
-
-    # Compare the received encoding with all encodings in the database
-    for id, db_encoding in all_encodings:
-        # Compare the encodings using face_recognition library
-        results = face_recognition.compare_faces([encoding], db_encoding,tolerance=0.8)
-        print("Here 1")
-        # Check if a match is found
-        if results[0]:
-            edit_visit(id)
-        else:
-            print("Customer not found")
-            
-
+     
 
 def edit_visit(customer_id):
     date = datetime.now().strftime("%d %m %y")
@@ -157,6 +173,7 @@ def edit_visit(customer_id):
                 SET time_out = %s
                 WHERE customer_id = %s AND date = %s AND time_out IS NULL
             """, (time_out, customer_id, date))
+            print("Time out updated")
     except(Exception, psycopg2.DatabaseError) as error:
         print("Couldn't edit visit ", error)
 
@@ -250,7 +267,7 @@ def get_daily_line_data():
                         FROM
                             visits v
                         WHERE
-                            date = '16 11 23'
+                            date = %s
                         GROUP BY
                             hour_of_entry
                         ORDER BY
@@ -272,7 +289,7 @@ def get_daily_line_data():
                     FROM
                         visits v
                     WHERE
-                        date = '16 11 23' AND v.time_out IS NOT NULL
+                        date = %s AND v.time_out IS NOT NULL
                     GROUP BY
                         hour_of_exit
                     ORDER BY
@@ -302,7 +319,7 @@ def get_daily_line_data():
 # print(hourly_data)
 
 
-#weekly line chart data
+# weekly line chart data
 def get_weekly_line_data():
     try:
         with conn, conn.cursor() as cur:
@@ -451,11 +468,12 @@ def get_repeat_ratio_pie_data():
             # Query to get the count of unique customers and repeat customers in the past week
             cur.execute("""
                 SELECT 
-                COUNT(DISTINCT v.customer_id) AS total_customers,
-                COUNT(DISTINCT CASE WHEN c.created_at != %s THEN v.customer_id END) AS repeat_customers
+                    COUNT(DISTINCT v.customer_id) AS total_customers,
+                    COUNT(DISTINCT CASE WHEN c.created_at != %s THEN v.customer_id END) AS new_customers
                 FROM visits v
                 LEFT JOIN customer c ON v.customer_id = c.id
-            """, (current_date,))
+                WHERE v.date = %s;
+            """, (current_date, current_date))
 
             total_customers, repeat_customers = cur.fetchone()
 
@@ -606,24 +624,25 @@ def get_customers_table_data():
         with conn, conn.cursor() as cur:
             # Query to get customer and visit data for the current date
             current_date = datetime.now().strftime('%d %m %y')
-            cur.execute("""SELECT
-                                c.id,
-                                c.name,
-                                COALESCE(COUNT(v.id), 0) as visits,
-                                c.gender,
-                                c.age,
-                                COALESCE(v.group_val, false) as group_val,
-                                COALESCE(v.time_in, '-- : --') as time_in,
-                                COALESCE(v.time_out, '-- : --') as time_out
-                            FROM
-                                customer c
-                            LEFT JOIN
-                                visits v ON c.id = v.customer_id AND v.date ='16 11 23'
-                            GROUP BY
-                                c.id, c.name, c.gender, c.age, v.group_val, v.time_in, v.time_out
-                            ORDER BY
-                                COALESCE(v.time_in, '00:00:01') DESC;
-                        """, (current_date,))
+            cur.execute("""
+                SELECT
+                    c.id AS customer_id,
+                    c.name AS customer_name,
+                    MAX(CAST(v.group_val AS INTEGER))::BOOLEAN AS group,
+                    COUNT(v.id) AS total_visits,
+                    MAX(v.time_in) AS current_visit_time_in,
+                    MAX(v.time_out) AS current_visit_time_out,
+                    c.gender,
+                    c.age
+                FROM
+                    customer c
+                LEFT JOIN
+                    visits v ON c.id = v.customer_id
+                WHERE
+                    v.date = %s
+                GROUP BY
+                    c.id, c.name, c.gender, c.age;
+            """, (current_date,))
 
             rows = cur.fetchall()
 
@@ -635,12 +654,12 @@ def get_customers_table_data():
                 result.append({
                     'C_No': (count),
                     'name': row[1],
-                    'visits': str(row[2]),
-                    'gender': row[3],
-                    'age': str(row[4]),
-                    'group': row[5],
-                    'timeIn': row[6],
-                    'timeOut': row[7],
+                    'visits': str(row[3]),
+                    'gender': row[6],
+                    'age': str(row[7]),
+                    'group': row[2],
+                    'timeIn': row[4],
+                    'timeOut': row[5],
                     'id': str(row[0]),
                 })
 
@@ -651,20 +670,4 @@ def get_customers_table_data():
         return []
 
 
-# monthly_data = get_monthly_line_data()
-# print(monthly_data) 
- 
-# bar_data = get_engagement_bar_data()
-# print("bar: ",bar_data)       
-# table_data = get_customers_table_data()
-# print("table: ",table_data)       
-    
-# create_tables()
-
-result=chart_data()
-print(result)
-
-# print(get_engagement_bar_data())
-# print(get_daily_gender_bar_data())
-
-# print(get_daily_gender_distribution())
+print(get_customers_table_data())

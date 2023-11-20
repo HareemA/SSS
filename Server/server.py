@@ -29,21 +29,17 @@ model=YOLO('yolov8n.pt')
 
 frame_lock = threading.Lock()
 
-frame_to_send=None
-
-group_lock1=threading.Lock()
-
-group_threshold1=35
+frame_update=None
 
 count=0
 
-area1=[(1,367),(800,357),(792,406),(1,403)]
-area2=[(2,322),(807,317),(801,355),(4,360)]
+# area1=[(1,367),(800,357),(792,406),(1,403)]
+area1=[(2,322),(807,317),(801,355),(4,360)]
 
 def frame_to_send():
-    
-    global cap, area1, area2, group_lock, group_threshold, count, frame_to_send
 
+    global count, frame_update, group_lock, group_threshold, cap, video_link
+    
     while True:    
         ret,frame = cap.read()
         
@@ -63,7 +59,6 @@ def frame_to_send():
         
         #Dfining areas for detection
         cv2.polylines(frame,[np.array(area1,np.int32)],True,(0,0,255),1)
-        cv2.polylines(frame,[np.array(area2,np.int32)],True,(0,255,0),1)   
 
         results=model.track(frame, conf = 0.3,classes=[0],persist=True)
         a=results[0].boxes.data
@@ -86,7 +81,6 @@ def frame_to_send():
             cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,0),1)
             
         with group_lock:
-            print("Group threshold: ",group_threshold)
             coordinate_groups = group_coordinates(original_coordinates, group_threshold)
 
         #Iterate through the grouped coordinates and draw bounding boxes around groups
@@ -100,12 +94,12 @@ def frame_to_send():
                 cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
 
         with frame_lock:
-            frame_to_send = frame
+            frame_update = frame
         
 
 @app.route('/get_frame/<int:group_thresh>', methods=['GET'])
 def get_frame(group_thresh):
-    global frame_to_send, group_lock, group_threshold, frame_lock
+    global frame_update, group_lock, group_threshold, frame_lock
     
     with group_lock:
         group_threshold = group_thresh
@@ -115,7 +109,7 @@ def get_frame(group_thresh):
             print("No frame found")
             return Response('Error: No frame available', status=500)
 
-        _, encoded_frame = cv2.imencode('.jpg', frame_to_send)
+        _, encoded_frame = cv2.imencode('.jpg', frame_update)
 
         if encoded_frame is None:
             print("Error here")
@@ -174,7 +168,7 @@ def get_card_data():
 @app.route('/repeat_ratio_pie', methods=['GET'])
 def repeat_ratio_pie():
     data = get_repeat_ratio_pie_data()
-    print(data)
+    # print(data)
 
     return jsonify(data)
 
@@ -182,7 +176,7 @@ def repeat_ratio_pie():
 @app.route('/group_ratio_pie', methods=['GET'])
 def group_ratio_pie():
     data = get_group_pie_data()
-    print(data)
+    # print(data)
 
     return jsonify(data)
 
@@ -190,7 +184,7 @@ def group_ratio_pie():
 @app.route('/daily_gender_bar', methods=['GET'])
 def daily_gender_bar():
     data = get_daily_gender_bar_data()
-    print(data)
+    # print(data)
 
     return jsonify(data)
 
@@ -198,7 +192,7 @@ def daily_gender_bar():
 @app.route('/daily_engagement_bar', methods=['GET'])
 def daily_engagement_bar():
     data = get_engagement_bar_data()
-    print(data)
+    # print(data)
 
     return jsonify(data)
 
@@ -207,7 +201,7 @@ def daily_engagement_bar():
 @app.route('/customers_table', methods=['GET'])
 def customers_table():
     data = get_customers_table_data()
-    print(data)
+    # print(data)
 
     return jsonify(data)
 

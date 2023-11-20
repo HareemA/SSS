@@ -8,7 +8,6 @@ import os
 import face_recognition
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
-from Group_Gender import *
 
 model=YOLO('yolov8n.pt')
 

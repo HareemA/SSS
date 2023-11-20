@@ -15,9 +15,9 @@ def encode_face_image(image_path):
 def test_functions():
 
     # Add a new customer and visit
-    image_path="C:\\Users\\Hareem\\Desktop\\nM5rWKDQpTRpd8umswYMz0eFZ0EDfHKXXPPv6a0xw8s=_plaintext_638356738756599786.jpg"
+    image_path="C:\\Users\\Hareem\\Desktop\\r4PjUq8eQ_ru6LSe_-ogdkj9L76m0CR_lq5T7N2mLDc=_plaintext_638356738757140466.jpg"
     encoding = encode_face_image(image_path)
-    gender = "Male"  # Replace with the actual gender
+    gender = "Female"  # Replace with the actual gender
     group_val = True  # Replace with the actual group value
 
     # Add customer and visit
@@ -29,4 +29,4 @@ def test_functions():
     # customer_leaving(encoding)
 
 # Run the testing code
-# test_functions()
+test_functions()

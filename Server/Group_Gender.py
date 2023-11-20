@@ -26,8 +26,8 @@ classes = ['man', 'woman']
 
 count = detected = enter = exit = male = female = unknown = people = group_count = 0
 
-area1=[(1,367),(800,357),(792,406),(1,403)]
-area2=[(2,322),(807,317),(801,355),(4,360)]
+# area1=[(1,367),(800,357),(792,406),(1,403)]
+area1=[(2,322),(807,317),(801,355),(4,360)]
 
 people_enter={}
 counter1=[]
@@ -42,9 +42,6 @@ group_val = False
 group_threshold = 55
 
 group_lock = threading.Lock()
-frame_lock = threading.Lock()
-
-frame_to_send=None
 
 video_link = "H:\\Downloads\\26102023_4.mp4"
 
@@ -52,9 +49,7 @@ cap = cv2.VideoCapture(video_link)
 
 def processing():
     
-    global cap, count, group_count, detected, area1, area2, people_enter, people_exit, counter1, group_val, frame_lock
-    global counter2, enter, exit, male, female, unknown, people, frame_to_send, group_threshold, video_link, frame_to_send
-    
+    global cap, count, area1, group_val, group_threshold, video_link, group_lock
 
     while True:    
         ret,frame = cap.read()
@@ -78,8 +73,7 @@ def processing():
         group_stat={}
         
         #Dfining areas for detection
-        cv2.polylines(frame,[np.array(area1,np.int32)],True,(0,0,255),1)
-        cv2.polylines(frame,[np.array(area2,np.int32)],True,(0,255,0),1)   
+        cv2.polylines(frame,[np.array(area1,np.int32)],True,(0,0,255),1) 
 
         results=model.track(frame, conf = 0.3,classes=[0],persist=True)
         a=results[0].boxes.data
@@ -99,7 +93,6 @@ def processing():
             id = int(row[4])
             
             cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,0),1)
-            #cv2.circle(frame,(x_centre,y_centre),4,(255,0,0),-1)
             cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
             
             #For group detection
@@ -145,56 +138,34 @@ def processing():
             gender_index = np.argmax(gender_confidence)
             gender_label = classes[gender_index]
 
-            #people leave
+            #When a person enters in a specified area take his encodings and check if already exists if yes add a visit
+            #for him, If visit already added with time-out as NULL check if difference between current time and his entry 
+            #time is greater than 3 mins, if yes update his leaving time, if not it means person is just being 
+            #detected repeatedly in the frames (after his entry visist added once) till he leaves the specified area
+        
             results1 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y_centre)),False)
             if results1>=0:
-                people_exit[id]=(x4,y4)
-                
-            if id in people_exit:
-                results2 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
-                if results2>=0:
-                    # if counter2.count(id)==0:
-                        encodings = encode_face_image(person)
-                        counter2.append(id)
-                        exit=exit+1
-                        #SENDING DATA TO DATABASE TO BE STORED    
-                        customer_leaving(encodings)
-     
-            #People Enter
-            results3 = cv2.pointPolygonTest(np.array(area2,np.int32),((x_centre,y_centre)),False)
-            if results3>=0:
-                #print("result3:",results3)
-                people_enter[id]=(x4,y4)
-                
-            if id in people_enter:
-                results4 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y_centre)),False)
-                if results4>=0:
-                    # if counter1.count(id)==0:
-                        encodings = encode_face_image(person)
-                        
-                        # counter1.append(id)
-                        enter=enter+1
-                        if gender_label == 'man':
-                            gender="Male"
-                            male = male + 1
-                        elif gender_label == 'woman':
-                            gender="Female"
-                            female = female + 1
-                        else:
-                            unknown = unknown + 1
-                            gender="Unknown"
-                        #SENDING DATA TO DATABASE TO BE STORED    
-                        customer_exist(encodings,group_val,gender)
-            cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
-            # if(enter>exit):      
-            #     detected = enter - exit
-                        
+                encodings = encode_face_image(person)
         
-        cv2.imshow("RGB", frame)
-        if cv2.waitKey(1)&0xFF==27:
-            break
-    cap.release()
-    cv2.destroyAllWindows()
+                if gender_label == 'man':
+                    gender="Male"
+
+                elif gender_label == 'woman':
+                    gender="Female"
+                   
+                else:
+                    unknown = unknown + 1
+                    gender="Unknown"
+                    
+                #SENDING DATA TO DATABASE TO BE CHECKED AND STORED 
+                customer_exist(encodings,group_val,gender)
+            cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)  
+        
+    #     cv2.imshow("RGB", frame)
+    #     if cv2.waitKey(0)&0xFF==27:
+    #         break
+    # cap.release()
+    # cv2.destroyAllWindows()
                 
 
 
@@ -268,8 +239,6 @@ def process_groups(coordinate_groups):
                 group_status[member_id] = False  # Not in a group
                 
     return group_status
-                
-processing()
-         
+                         
            
 # processing()
