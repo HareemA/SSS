@@ -27,7 +27,7 @@ classes = ['man', 'woman']
 count = detected = enter = exit = male = female = unknown = people = group_count = 0
 
 # area1=[(1,367),(800,357),(792,406),(1,403)]
-area1=[(2,322),(807,317),(801,355),(4,360)]
+area1=[(2,350),(815,356),(795,413),(3,413)]
 
 people_enter={}
 counter1=[]
@@ -43,7 +43,8 @@ group_threshold = 55
 
 group_lock = threading.Lock()
 
-video_link = "H:\\Downloads\\26102023_4.mp4"
+video_link = "rtsp://admin:hik@12345@172.23.16.55"
+# video_link = "H:\\Downloads\\26102023_4.mp4"
 
 cap = cv2.VideoCapture(video_link)
 
@@ -52,10 +53,11 @@ def processing():
     global cap, count, area1, group_val, group_threshold, video_link, group_lock
 
     while True:    
-        ret,frame = cap.read()
         
         if not cap:
             cap = cv2.VideoCapture(video_link)
+
+        ret,frame = cap.read()
             
         if not ret:
             cap.release()
@@ -162,7 +164,7 @@ def processing():
             cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)  
         
     #     cv2.imshow("RGB", frame)
-    #     if cv2.waitKey(0)&0xFF==27:
+    #     if cv2.waitKey(1)&0xFF==27:
     #         break
     # cap.release()
     # cv2.destroyAllWindows()
@@ -240,5 +242,4 @@ def process_groups(coordinate_groups):
                 
     return group_status
                          
-           
-# processing()
+# processing()

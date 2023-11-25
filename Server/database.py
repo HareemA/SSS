@@ -15,7 +15,7 @@ conn = psycopg2.connect(
     port="5432",
     dbname="SSS",
     user="postgres",
-    password="12345"
+    password="12345" #serG
 )
 
 def create_tables():
@@ -255,6 +255,7 @@ def get_daily_line_data():
         with conn, conn.cursor() as cur:
             # Get the current date in the specified format
             current_date = datetime.now().strftime('%d %m %y')
+            print(current_date)
 
             # Initialize the result dictionary with hourly intervals
             result = {f'{hour:02}:00-{(hour + 1) % 24:02}:00': {'Enter': 0, 'Exit': 0, 'Min': 0, 'Max': 0} for hour in range(8, 22)}
@@ -262,55 +263,69 @@ def get_daily_line_data():
             # Query to get entered counts on an hourly basis for the current date
             cur.execute("""
                 SELECT
-                        EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_in, 'HH24:MI:SS')) AS hour_of_entry,
-                        COUNT(*) AS number_of_customers
-                        FROM
-                            visits v
-                        WHERE
-                            date = %s
-                        GROUP BY
-                            hour_of_entry
-                        ORDER BY
-                            hour_of_entry;
+                hours.hour_of_entry,
+                COALESCE(COUNT(v.id), 0) AS number_of_customers
+                    FROM
+                        (SELECT generate_series(0, 23) AS hour_of_entry) hours
+                    LEFT JOIN
+                        visits v
+                    ON
+                        hours.hour_of_entry = EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_in, 'HH24:MI:SS')) AND v.date = %s
+                    GROUP BY
+                        hours.hour_of_entry
+                    ORDER BY
+                        hours.hour_of_entry ;
             """, (current_date,))
 
             rows = cur.fetchall()
 
+                  
 
-            # Update the result dictionary with the entered counts
+
             for row in rows:
-                hour_interval = f'{row[0]:02}:00-{(row[0] + 1) % 24:02}:00'
-                result[hour_interval]['Enter'] = row[1]
+                try:
+                    hour_interval = f'{row[0]:02}:00-{(row[0] + 1) % 24:02}:00'
+                    
+                    # If the value is None or 0, set it to 0 in the result dictionary
+                    result[hour_interval]['Enter'] = row[1] if row[1] is not None and row[1] != 0 else 0
+                except KeyError as e:
+                    print(f"Error updating 'Enter' value for {hour_interval}: {e}")
+                except Exception as ex:
+                    print(f"Error processing data for {hour_interval}: {ex}")
 
+            
 
             # Query to get exited counts on an hourly basis for the current date
             cur.execute("""
                 SELECT
-                    EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_out, 'HH24:MI:SS')) AS hour_of_exit,
-                    COUNT(*) AS number_of_customers
+                hours.hour_of_entry,
+                COALESCE(COUNT(v.id), 0) AS number_of_customers
                     FROM
+                        (SELECT generate_series(0, 23) AS hour_of_entry) hours
+                    LEFT JOIN
                         visits v
-                    WHERE
-                        date = %s AND v.time_out IS NOT NULL
+                    ON
+                        hours.hour_of_entry = EXTRACT(HOUR FROM TO_TIMESTAMP(v.time_out, 'HH24:MI:SS')) AND v.date = %s
                     GROUP BY
-                        hour_of_exit
+                        hours.hour_of_entry
                     ORDER BY
-                        hour_of_exit;
+                        hours.hour_of_entry ;
 
             """, (current_date,))
 
             rows = cur.fetchall()
+            
 
             # Update the result dictionary with the exited counts
+            
             for row in rows:
-                hour_interval = f'{row[0]:02}:00-{(row[0] + 1) % 24:02}:00'
-                result[hour_interval]['Exit'] = row[1]
-
-            # Set Min count to 0 and Max count to the total entered count for each hour
-            for hour_interval in result:
-                result[hour_interval]['Min'] = 0
-                result[hour_interval]['Max'] = result[hour_interval]['Enter']
-
+                try:
+                    hour_interval = f'{row[0]:02}:00-{(row[0] + 1) % 24:02}:00'
+                    
+                    # If the value is None or 0, set it to 0 in the result dictionary
+                    result[hour_interval]['Enter'] = row[1] if row[1] is not None and row[1] != 0 else 0
+                except KeyError as e:
+                    print(f"Error updating 'Enter' value for {hour_interval}: {e}" )
 
             return result
 
@@ -638,7 +653,6 @@ def get_engagement_bar_data():
                 SELECT c.id, v.time_in, v.time_out
                 FROM customer c
                 LEFT JOIN visits v ON c.id = v.customer_id AND v.date = %s
-                LEFT JOIN visits v ON c.id = v.customer_id AND v.date = %s
             """, (current_date,))
 
             rows = cur.fetchall()
@@ -663,9 +677,9 @@ def get_engagement_bar_data():
             max_time_spent = max(time_spent_per_customer) if time_spent_per_customer else 0
 
             return [
-                {"metric": "Max", "value": round(max_time_spent, 2)},
-                {"metric": "Min", "value": round(min_time_spent, 2)},
-                {"metric": "Avg", "value": round(average_time_spent, 2)}
+                {"metric": "Max", "value": abs(round(max_time_spent, 2))},
+                {"metric": "Min", "value": abs(round(min_time_spent, 2))},
+                {"metric": "Avg", "value": abs(round(average_time_spent, 2))}
             ]
 
     except (Exception, psycopg2.DatabaseError) as error:
@@ -679,7 +693,6 @@ def get_customers_table_data():
         with conn, conn.cursor() as cur:
             # Query to get customer and visit data for the current date
             current_date = datetime.now().strftime('%d %m %y')
-<<<<<<< HEAD
             cur.execute("""
                 SELECT
                     c.id AS customer_id,
@@ -699,26 +712,6 @@ def get_customers_table_data():
                 GROUP BY
                     c.id, c.name, c.gender, c.age;
             """, (current_date,))
-=======
-            cur.execute("""SELECT
-                                c.id,
-                                c.name,
-                                COALESCE(COUNT(v.id), 0) as visits,
-                                c.gender,
-                                c.age,
-                                COALESCE(v.group_val, false) as group_val,
-                                COALESCE(v.time_in, '-- : --') as time_in,
-                                COALESCE(v.time_out, '-- : --') as time_out
-                            FROM
-                                customer c
-                            LEFT JOIN
-                                visits v ON c.id = v.customer_id AND v.date = %s
-                            GROUP BY
-                                c.id, c.name, c.gender, c.age, v.group_val, v.time_in, v.time_out
-                            ORDER BY
-                                COALESCE(v.time_in, '00:00:01') DESC;
-                        """, (current_date,))
->>>>>>> 29e7bb1f03a7fbc7cbdd651b4bd82aeca74805be
 
             rows = cur.fetchall()
 
@@ -745,24 +738,7 @@ def get_customers_table_data():
         print("Error fetching customer table data:", error)
         return []
 
+create_tables()
 
-<<<<<<< HEAD
-print(get_customers_table_data())
-=======
-weekly_data = get_weekly_line_data()
-print(weekly_data) 
- 
-table_data = get_customers_table_data()
-print("table: ",table_data)       
-    
-# get_daily_line_data()
-# create_tables()
 
-result=chart_data()
-print(result)
-
-# print(get_engagement_bar_data())
-# print(get_daily_gender_bar_data())
-
-# print(get_daily_gender_distribution())
->>>>>>> 29e7bb1f03a7fbc7cbdd651b4bd82aeca74805be
+print("eng data: ",get_engagement_bar_data())
