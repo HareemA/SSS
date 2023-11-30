@@ -189,7 +189,6 @@ def get_daily_gender_distribution():
         }
 
 #get Daily Line CHart data
-
 def get_daily_line_data():
     try:
         # Get the current date in the specified format
@@ -547,7 +546,7 @@ def get_daily_gender_bar_data():
         start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
 
         # Generate a list of all hours up to the current hour
-        hours_to_query = [start_of_day + timedelta(hours=i) for i in range(current_datetime.hour, current_datetime.hour - 6, -1)]
+        hours_to_query = [start_of_day + timedelta(hours=i) for i in range(current_datetime.hour, current_datetime.hour - 6, -1) if i >= 0]
 
         # Query to get customer and visit data for the current hour and 5 previous hours
         visits = aliased(Visit)
@@ -688,4 +687,4 @@ def get_customers_table_data():
 # print("eng data: ",get_engagement_bar_data())
 # print(get_monthly_line_data())
 
-# print(get_daily_line_data())
+print(get_daily_line_data())
