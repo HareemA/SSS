@@ -1,57 +1,30 @@
+import math
 import cv2
 import pandas as pd
 import numpy as np
 from ultralytics import YOLO
-from tracker import*
-from deepface import DeepFace
-import os
-import face_recognition
 import threading
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import img_to_array
-from database import *
-
 
 model=YOLO('yolov8n.pt')
 
-gender_model = load_model('gender_detection.model')
-classes = ['man', 'woman']
-# def RGB(event, x, y, flags, param):
-#     if event == cv2.EVENT_MOUSEMOVE :  
-#         colorsBGR = [x, y]
-#         print(colorsBGR)
-        
-# cv2.namedWindow('RGB')
-# cv2.setMouseCallback('RGB', RGB)
 
-count = detected = enter = exit = male = female = unknown = people = group_count = 0
+count = group_count = 0
 
 # area1=[(1,367),(800,357),(792,406),(1,403)]
 area1=[(2,350),(815,356),(795,413),(3,413)]
-
-people_enter={}
-counter1=[]
-
-people_exit={}
-counter2=[]
-
-frame_to_send = None
-
-group_val = False
 
 group_threshold = 55
 
 group_lock = threading.Lock()
 
 # video_link = "rtsp://admin:hik@12345@172.23.16.55"
-# video_link = "H:\\Downloads\\26102023_4.mp4"
-video_link= "H:\\Downloads\\26102023_4.mp4"
+video_link = "H:\\Downloads\\26102023_4.mp4"
 
 cap = cv2.VideoCapture(video_link)
 
 def processing():
     
-    global cap, count, area1, group_val, group_threshold, video_link, group_lock
+    global cap, count, area1, group_threshold, video_link, group_lock
 
     while True:    
         
@@ -65,10 +38,12 @@ def processing():
             cap = None
             continue
         
+        #Perform processing on every third frame
         count += 1
         if count % 3 != 0:
             continue
         
+        #Resize frame to drwa the area for detection
         frame=cv2.resize(frame,(1020,500))
         
         original_coordinates = []  
@@ -78,13 +53,10 @@ def processing():
         #Dfining areas for detection
         cv2.polylines(frame,[np.array(area1,np.int32)],True,(0,0,255),1) 
 
+        #Track people in  group
         results=model.track(frame, conf = 0.3,classes=[0],persist=True)
         a=results[0].boxes.data
         px=pd.DataFrame(a).astype("float")
-        
-        gender_label = 'none'
-
-        list=[]         
         
         #Iterate through all the  points to group them
         for index,row in px.iterrows():
@@ -98,95 +70,30 @@ def processing():
             cv2.rectangle(frame,(x3,y3),(x4,y4),(255,0,0),1)
             cv2.putText(frame,str(int(id)),(x3,y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)
             
-            #For group detection
+            #For group detection append every detected person's id and coordinates
             original_coordinates.append({'id': id, 'coord': [x3, y3, x4, y4]})
-            
+          
+        #Pass the dictionary to a function along with group threshold
         with group_lock:
             coordinate_groups = group_coordinates(original_coordinates, group_threshold)
             
-        for group_key, group_data in coordinate_groups.items():
-            if len(group_data) >= 2:
-                min_x = min([coord['coord'][0] for coord in group_data])
-                min_y = min([coord['coord'][1] for coord in group_data])
-                max_x = max([coord['coord'][2] for coord in group_data])
-                max_y = max([coord['coord'][3] for coord in group_data])
+        #For drawing bounding boxes around groups
+        # for group_key, group_data in coordinate_groups.items():
+        #     if len(group_data) >= 2:
+        #         min_x = min([coord['coord'][0] for coord in group_data])
+        #         min_y = min([coord['coord'][1] for coord in group_data])
+        #         max_x = max([coord['coord'][2] for coord in group_data])
+        #         max_y = max([coord['coord'][3] for coord in group_data])
         
-                cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
+        #         cv2.rectangle(frame, (min_x, min_y), (max_x, max_y), (0, 0, 255), 2)
             
+        #Send the information about groups to a function which returns a dictionary containing id of person and boolean value for
+        #indicating if hes in a group or not
         group_stat=process_groups(coordinate_groups)
         print("Group_stat: ",group_stat)
         
         #Now iterate through all the points again to predict gender, perform facial rec and add in database etc.
-        for index,row in px.iterrows():
-            x3=int(row[0])
-            y3=int(row[1])
-            x4=int(row[2])
-            y4=int(row[3])
-            d=int(row[5])
-            id = int(row[4])
-            
-            x_centre= (x3+x4)//2
-            y_centre=(y3+y4)//2
-
-            person=frame[y3:y4,x3:x4]
-            
-            group_val = group_stat[id]
-            
-            face_crop = cv2.resize(person, (96, 96))
-            face_crop = face_crop.astype("float") / 255.0
-            face_crop = img_to_array(face_crop)
-            face_crop = np.expand_dims(face_crop, axis=0)
-
-            gender_confidence = gender_model.predict(face_crop)[0]
-            gender_index = np.argmax(gender_confidence)
-            gender_label = classes[gender_index]
-
-            #When a person enters in a specified area take his encodings and check if already exists if yes add a visit
-            #for him, If visit already added with time-out as NULL check if difference between current time and his entry 
-            #time is greater than 3 mins, if yes update his leaving time, if not it means person is just being 
-            #detected repeatedly in the frames (after his entry visist added once) till he leaves the specified area
         
-            results1 = cv2.pointPolygonTest(np.array(area1,np.int32),((x_centre,y_centre)),False)
-            if results1>=0:
-                encodings = encode_face_image(person)
-        
-                if gender_label == 'man':
-                    gender="Male"
-
-                elif gender_label == 'woman':
-                    gender="Female"
-                   
-                else:
-                    unknown = unknown + 1
-                    gender="Unknown"
-                    
-                #SENDING DATA TO DATABASE TO BE CHECKED AND STORED 
-                customer_exist(encodings,group_val,gender)
-            cv2.putText(frame,gender_label,((x3+19),y3),cv2.FONT_HERSHEY_COMPLEX,0.5,(255,0,0),1)  
-        
-    #     cv2.imshow("RGB", frame)
-    #     if cv2.waitKey(1)&0xFF==27:
-    #         break
-    # cap.release()
-    # cv2.destroyAllWindows()
-                
-
-
-#For encoding person
-def encode_face_image(image):
-    try:
-        rgb_small_frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        encoding = face_recognition.face_encodings(rgb_small_frame)
-        if not encoding:
-            print("Person image not clear")
-            return None
-
-        # Return the encoding of the first face
-        return encoding[0]
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
 
 
 def calculate_distance(coord1, coord2):
@@ -197,6 +104,7 @@ def calculate_distance(coord1, coord2):
     cx2 = (x3 + x4) // 2
     cy2 = (y3 + y4) // 2
     return math.sqrt((cx1 - cx2) ** 2 + (cy1 - cy2) ** 2)
+
 
 def group_coordinates(coordinates, group_threshold):
     # Dictionary to store the groups
@@ -228,6 +136,7 @@ def group_coordinates(coordinates, group_threshold):
             coordinate_groups[i] = [{'id': person_id, 'coord': coord}]  # Assign a unique key for the new group
 
     return coordinate_groups
+
 
 def process_groups(coordinate_groups):
     group_status = {}

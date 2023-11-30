@@ -7,5 +7,6 @@ Flask-Cors
 pytube
 deepface
 tensorflow
-psycopg2-binary
+psycopg2
 face_recognition
+sqlalchemy
