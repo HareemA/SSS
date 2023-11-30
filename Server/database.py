@@ -191,15 +191,20 @@ def get_daily_gender_distribution():
 #get Daily Line CHart data
 def get_daily_line_data():
     try:
-        # Get the current date in the specified format
         current_date = date.today()
 
-        # Initialize the result dictionary with hourly intervals
-        result = {f'{hour:02}:00-{(hour + 1) % 24:02}:00' if hour != 23 else '23:00-00:00': {'Enter': 0, 'Exit': 0, 'Min': 0, 'Max': 0} for hour in range(0, 24)}
+        current_datetime = datetime.now()
+        # Calculate the current hour
+        current_hour = current_datetime.hour
 
+        start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        # Generate a list of hours from the current hour to 0
+        hours_to_query = range(current_hour, -1, -1)
+
+        # Prepare the result dictionary for the specified hours
+        result = {f'{hour:02}:00-{(hour + 1) % 24:02}:00' if hour != 23 else '23:00-00:00': {'Enter': 0, 'Exit': 0, 'Min': 0, 'Max': 0} for hour in hours_to_query}
         # Alias for visits table to join with itself for entry and exit counts
-        VisitEntry = aliased(Visit)
-        VisitExit = aliased(Visit)
 
         # Query to get entered counts on an hourly basis for the current date
         entry_counts = (
