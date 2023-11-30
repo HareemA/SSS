@@ -28,19 +28,19 @@ const PieChart = () => {
         const genderPieData = [
           {
             id: 'Man',
-            label: `M : ${jsonData.male_percentage}\\%`,
+            label: `M : ${jsonData.male_percentage}\%`,
             value: jsonData.male_percentage,
             color: 'hsl(219, 55%, 64%)',
           },
           {
             id: 'Woman',
-            label: `W : ${jsonData.female_percentage}\\%`,
+            label: `W : ${jsonData.female_percentage}\%`,
             value: jsonData.female_percentage,
             color: 'hsl(162, 70%, 50%)',
           },
           {
             id: 'Unidentified',
-            label: `U : ${jsonData.unknown_percentage}\\%`,
+            label: `U : ${jsonData.unknown_percentage}\%`,
             value: jsonData.unknown_percentage,
             color: "hsl(274, 70%, 50%)",
           },

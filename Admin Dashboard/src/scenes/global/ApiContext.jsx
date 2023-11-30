@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_IP } from "../../config"
 
 const ApiContext = createContext();
 
@@ -21,7 +22,7 @@ export function ApiProvider({ children }) {
 
   const fetchDataFromApi = async () => {
     try {
-      const response = await fetch("http://192.168.100.10:8080/get_card_data");
+      const response = await fetch(`${API_IP}/get_card_data`);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
