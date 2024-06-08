@@ -1,4 +1,4 @@
-#This repo has a full stack project containing computer Vision and AI. It has a React Dashboard as frontEnd, and in backend has used models like YOLO \n It also has databasse script to create database and queries too add data and fetch it for the frontend tables.
+# This repo has a full stack project containing computer Vision and AI. It has a React Dashboard as frontEnd, and in backend has used models like YOLO \n It also has databasse script to create database and queries too add data and fetch it for the frontend tables.
 
 # SERVER:
 To run the server open server folder in VS code or any IDE and run 
