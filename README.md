@@ -2,9 +2,8 @@
 # It also has databasse script to create database and queries too add data and fetch it for the frontend tables.
 
 # SERVER:
-To run the server open server folder in VS code or any IDE and run 
-pip install -r requirements.txt
-to install all requirements, then change IP at the end of server.py and change video location at the start of server.py in 2 places, and run the python script
+- To run the server open server folder in VS code or any IDE and run pip install -r requirements.txt to install all requirements
+- Then change IP at the end of server.py and change video location at the start of server.py in 2 places, and run the python script
 
 
 # FRONTEND:
