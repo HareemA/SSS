@@ -7,10 +7,8 @@
 
 
 # FRONTEND:
-To view front end, open the Admin React folder in VS code.
-install Node.js and then in terminal run 
-npm install 
-Then in src > scenes > globals > ApiContext.js change the IP 
-this will download all the dependencies, then to start the react app run
--npm start
+- To view front end, open the Admin React folder in VS code.
+- Install Node.js and then in terminal run  npm install 
+- Then in src > scenes > globals > ApiContext.js change the IP  this will download all the dependencies
+- then to start the react app run npm start
 
